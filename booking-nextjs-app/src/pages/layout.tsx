@@ -4,7 +4,7 @@ import defaultAvatar from '../images/default-avatar.svg'
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className='bg-[url(../images/layout-bg.jpg)] h-screen bg-no-repeat bg-cover'>
+    <div>
       <header className='px-6 py-4 bg-white flex justify-between mb-8'>
         <Logo />
         <nav className='flex gap-2'>

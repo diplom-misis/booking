@@ -100,7 +100,7 @@ export default function BookingPage() {
             </div>
             <div className='flex justify-between items-end'>
               <p className='text-gray-500 text-xs'>Общая сумма:</p>
-              <p className='text-green-500 text-2xl'>6 000 ₽</p>
+              <p className='text-green-500 text-2xl font-bold'>6 000 ₽</p>
             </div>
             <button
               type='submit'
