@@ -1,19 +1,21 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
 import prisma from '@/utils/prisma';
-import { Status } from '@prisma/client';
+import { Reservation, Status } from '@prisma/client';
 
 type Data = {
-  name: string;
+  message?: string;
+  reservation?: Reservation;
+  reservations?: Reservation[];
 };
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse,
+  res: NextApiResponse<Data>,
 ) {
   // Пример просмотра и создания. TODO удалить, после обкатки ORM.
   if (req.query.method === 'get') {
-    res.status(200).json({ reservation: await prisma.reservation.findMany() })
+    res.status(200).json({ reservations: await prisma.reservation.findMany() })
     return
   }
 

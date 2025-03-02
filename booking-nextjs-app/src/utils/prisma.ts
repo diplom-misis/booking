@@ -19,13 +19,6 @@ const libsql = createClient({
 
 const adapter = new PrismaLibSQL(libsql);
 
-const prisma = new PrismaClient({ 
-  adapter,
-  log: ['error', 'info', 'warn']
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection:', reason);
-});
+const prisma = new PrismaClient({ adapter });
 
 export default prisma;
