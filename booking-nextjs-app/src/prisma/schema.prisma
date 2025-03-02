@@ -1,0 +1,78 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id    Int     @id @default(autoincrement())
+  email String  @unique
+  name  String?
+}
+
+model Flight {
+  id            String   @id @default(uuid())
+  fromAirport   Airport  @relation(name: "Departure", fields: [fromAirportId], references: [id])
+  fromAirportId String
+  fromDatetime  DateTime
+  toAirport     Airport  @relation(name: "Arrival", fields: [toAirportId], references: [id])
+  toAirportId   String
+  toDatetime    DateTime
+  company       String
+  price         Float
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  flightRoutes FlightsRoutes[]
+}
+
+model Airport {
+  id       String   @id @default(uuid())
+  name     String
+  code     String   @unique
+  city     String
+  country  String
+
+  flightsFrom Flight[] @relation(name: "Departure")
+  flightsTo   Flight[] @relation(name: "Arrival")
+}
+
+model Route {
+  id            String          @id @default(uuid())
+  flightRoutes  FlightsRoutes[]
+  carts         Cart[]
+}
+
+model FlightsRoutes {
+  id         String @id @default(uuid())
+  sequenceId Int
+  flight     Flight @relation(fields: [flightId], references: [id])
+  flightId   String
+  route      Route  @relation(fields: [routeId], references: [id])
+  routeId    String
+
+  @@unique([sequenceId, routeId])
+}
+
+model Cart {
+  id       String  @id @default(uuid())
+  route    Route   @relation(fields: [routeId], references: [id])
+  routeId  String
+}
+
+model Reservation {
+  id        String   @id @default(uuid())
+  data      Json
+  status    Status   @default(IN_PROCESSING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Status {
+  IN_PROCESSING
+  COMPLETE
+}
