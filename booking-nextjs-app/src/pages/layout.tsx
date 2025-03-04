@@ -1,6 +1,7 @@
 import { Logo } from '@/components/logo';
 import Image from 'next/image'
 import defaultAvatar from '../images/default-avatar.svg'
+import Link from 'next/link';
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -22,7 +23,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 stroke-width='1.5'
               />
             </svg>
-            <p className='text-sm'>Поиск авиабилетов</p>
+            <Link href='/booking-airplane' className='text-sm'>Поиск авиабилетов</Link>
           </div>
           <div className='flex gap-2 px-5 py-2 items-center'>
             <svg
@@ -44,7 +45,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 fill='#1F2937'
               />
             </svg>
-            <p className='text-sm'>Бронирования</p>
+            <Link href='/booking-page' className='text-sm'>Бронирования</Link>
           </div>
           <Image src={defaultAvatar} width={40} height={40} alt="Аватар пользователя"/>
         </nav>
