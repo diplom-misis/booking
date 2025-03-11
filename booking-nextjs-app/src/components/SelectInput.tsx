@@ -3,7 +3,7 @@ import { Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOption
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
 
-type selectData = { id: number; name: string };
+export type selectData = { id: number; name: string };
 
 interface SelectInputProps {
   className?: string;
@@ -15,8 +15,6 @@ interface SelectInputProps {
   defaultValue?: string
   typeCombobox: boolean
   placeholder?: string
-  paddingY: string
-  paddingX: string
   required?: boolean,
   value: selectData | null;
   onChange: (value: selectData | null) => void;
@@ -28,19 +26,13 @@ export default function SelectInput(props: SelectInputProps) {
     title,
     data,
     disabled = false,
-    height,
-    widthSize,
-    defaultValue = '',
     typeCombobox,
     placeholder,
-    paddingY,
-    paddingX,
     required,
     value,
     onChange
   } = props
   const [query, setQuery] = useState('')
-  // const [selectedData, setSelectedData] = useState<selectData | null>(null)
 
   const filteredData =
   query === ''
@@ -48,39 +40,20 @@ export default function SelectInput(props: SelectInputProps) {
     : data.filter((item) => {
         return item.name.toLowerCase().includes(query.toLowerCase())
       })
-  
-  // useEffect(() => {
-  //   if (defaultValue) {
-  //     const defaultItem = data.find(item => item.name === defaultValue)
-  //     if (defaultItem) {
-  //       setSelectedData(defaultItem)
-  //     }
-  //   }
-  // }, [defaultValue, data])
-
-  // useEffect(() => {
-  //   onChange(selectedData);
-  // }, [selectedData, onChange]);
-
-  const handleChange = (item: selectData | null) => {
-    onChange(item);
-  };
 
   return (
     <div>
     <Field>
     <Label className="text-gray-400 text-s">{title}</Label>
-    <Combobox value={value} onChange={handleChange} onClose={() => setQuery('')}>
+    <Combobox value={value} onChange={onChange} onClose={() => setQuery('')}>
         <div className="relative">
           <ComboboxInput
             className={cn(
-              `rounded-[4px] border border-gray-300 bg-white py-${paddingY} px-${paddingX} text-sm`, className
+              `rounded-[4px] border border-gray-300 bg-white text-sm`, className
             )}
             disabled={disabled}
             placeholder={placeholder}
             displayValue={(item: selectData | null) => item?.name || ""}
-            // displayValue={(item) => item?.name}
-            // onChange={(event) => setQuery(event.target.value)}
             style={{
               backgroundColor: disabled ? '#F9FAFB' : '',
             }}
