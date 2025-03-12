@@ -11,12 +11,13 @@ type Data = {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>,
+  res: NextApiResponse<Data>
 ) {
   // Пример просмотра и создания. TODO удалить, после обкатки ORM.
   if (req.query.method === 'get') {
-    res.status(200).json({ reservations: await prisma.reservation.findMany() })
-    return
+    console.log("test")
+    res.status(200).json({ reservations: await prisma.reservation.findMany() });
+    return;
   }
 
   const newReservation = await prisma.reservation.create({
@@ -31,5 +32,7 @@ export default async function handler(
   });
 
   console.log('Reservation Created:', newReservation);
-  res.status(200).json({ message: 'Reservation created', reservation: newReservation });
+  res
+    .status(200)
+    .json({ message: 'Reservation created', reservation: newReservation });
 }

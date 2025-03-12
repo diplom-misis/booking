@@ -1,7 +1,36 @@
 import { Separator } from '@/components/separator';
 import { Layout } from '../layout';
+import { months } from '@/utils/constants';
+
+const data = {
+  fromCity: 'Лукоморье',
+  fromAirport: 'LKMR',
+  toCity: 'Тридевятье',
+  toAirport: 'TN',
+  company: 'Золотая стрела',
+  fromDatetime: new Date('2025-03-02T14:46:22.449Z'),
+  toDatetime: new Date('2025-03-02T15:46:22.449Z'),
+};
 
 export default function BookingSuccessPage() {
+  const { fromCity, fromAirport, toCity, toAirport, company, fromDatetime, toDatetime } = data;
+
+  const currentDate = new Date()
+
+  const currentDay = currentDate.getDate();
+  const currentMonth = months[currentDate.getMonth() + 1];
+  const currentYear = currentDate.getFullYear();
+
+  const currentDateFormatted = `${currentDay} ${currentMonth} ${currentYear}`
+
+  const dayFrom = fromDatetime.getDate();
+  const monthFrom = months[fromDatetime.getMonth() + 1];
+  const yearFrom = fromDatetime.getFullYear();
+  const hoursFrom = fromDatetime.getHours();
+  const minutesFrom = fromDatetime.getMinutes();
+
+  const dateFrom = `${hoursFrom}:${minutesFrom} ${dayFrom} ${monthFrom} ${yearFrom}`;
+
   return (
     <Layout>
       <div className='flex flex-col justify-self-center gap-6'>
@@ -11,7 +40,7 @@ export default function BookingSuccessPage() {
         <div className='flex flex-col gap-4 bg-white p-6 shadow-[0_4px_8px_rgba(0,0,0,0.15)] rounded-lg'>
           <div className='flex justify-between'>
             <p className='text-2xl text-gray-800 font-bold'>#YA12345678</p>
-            <p className='text-2xl text-gray-800'>29 ноября 2024</p>
+            <p className='text-2xl text-gray-800'>{currentDateFormatted}</p>
             <p className='text-green-500 text-2xl'>6 000 ₽</p>
           </div>
           <Separator />
@@ -19,18 +48,18 @@ export default function BookingSuccessPage() {
             <p className='text-gray-800 font-bold w-40'>Детали рейса</p>
             <div className='flex flex-col gap-1 w-[200px]'>
               <p className='text-gray-400 text-xs'>Отправление</p>
-              <p className='text-gray-800 text-sm'>Лукоморье → Тридевятье</p>
+              <p className='text-gray-800 text-sm'>{`${fromCity} → ${toCity}`}</p>
             </div>
             <div className='flex flex-col gap-1 w-[200px]'>
               <p className='text-gray-400 text-xs'>Дата и время</p>
-              <p className='text-gray-800 text-sm'>08:00 2 декабря 2024</p>
+              <p className='text-gray-800 text-sm'>{dateFrom}</p>
             </div>
             <div className='flex flex-col gap-1 max-w-[200px]'>
               <p className='text-gray-400 text-xs'>Авиакомпания</p>
-              <p className='text-gray-800 text-sm'>«Золотая стрела»</p>
+              <p className='text-gray-800 text-sm'>«{company}»</p>
             </div>
           </div>
-          <Separator />
+          {/* <Separator />
           <div className='flex'>
             <p className='text-gray-800 font-bold w-40'>Отель</p>
             <div className='flex flex-col gap-1 w-[200px]'>
@@ -45,7 +74,7 @@ export default function BookingSuccessPage() {
               <p className='text-gray-400 text-xs'>Выезд</p>
               <p className='text-gray-800 text-sm'>4 декабря 2024</p>
             </div>
-          </div>
+          </div> */}
           <Separator />
           <div className='flex flex-col gap-0.5'>
             <div className='flex'>
@@ -79,13 +108,13 @@ export default function BookingSuccessPage() {
         <div className='flex gap-2'>
           <button
             type='submit'
-            className='bg-blue-500 text-gray-100 px-4 py-2 rounded-lg'
+            className='bg-blue-500 text-gray-100 px-4 py-2 rounded-lg hover:bg-blue-600 active:bg-blue-700'
           >
             Оформить заказ
           </button>
           <button
             type='button'
-            className='border border-gray-300 px-4 py-2 rounded-lg text-gray-800 font-bold '
+            className='border border-gray-300 px-4 py-2 rounded-lg text-gray-800 font-bold hover:border-transparent'
           >
             Распечатать
           </button>
