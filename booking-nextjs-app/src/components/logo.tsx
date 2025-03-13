@@ -13,7 +13,7 @@ export const Logo = ({ className }: Props) => (
     xmlns='http://www.w3.org/2000/svg'
     className={cn(className)}
   >
-    <g clip-path='url(#clip0_12190_118)'>
+    <g clipPath='url(#clip0_12190_118)'>
       <path
         d='M0 0.422323H7.36418L14.455 13.7255H14.7587L21.8496 0.422323H29.2138L17.8714 20.3922V31.3122H11.3424V20.3922L0 0.422323Z'
         fill='#3B82F6'

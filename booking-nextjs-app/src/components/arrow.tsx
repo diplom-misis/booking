@@ -2,9 +2,10 @@ import { cn } from '@/utils/cn';
 
 type Props = {
   className?: string;
+  onClick?: () => void;
 };
 
-export const Arrow = ({ className }: Props) => (
+export const Arrow = ({ className, onClick }: Props) => (
   <svg
     width='32'
     height='18'
@@ -12,6 +13,7 @@ export const Arrow = ({ className }: Props) => (
     fill='none'
     xmlns='http://www.w3.org/2000/svg'
     className={cn(className)}
+    onClick={onClick}
   >
     <path
       d='M7.83333 16L2 9M2 9L7.83333 2M2 9L30 9'
