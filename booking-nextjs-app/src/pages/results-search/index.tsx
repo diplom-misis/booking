@@ -1,16 +1,212 @@
-import { Button, Checkbox, Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions, Field, Input, Label } from "@headlessui/react";
 import { Layout } from "../layout";
-import { useState } from "react";
-import { cn } from "@/utils/cn";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import { useEffect, useState } from "react";
 import Filters from "@/components/filters";
 import { Arrow } from "@/components/arrow";
+import { useSearchParams } from "next/navigation";
+import CheapFilter from "@/components/CheapFilter";
+import RouteCard from "@/components/RouteCard";
+
+const layovers = [
+  { id: 1, name: "Без пересадок", state: 'noTransfers' },
+  { id: 2, name: "1 пересадка", state: "oneTransfer" },
+  { id: 3, name: "2 пересадки", state: "twoTransfers" },
+  { id: 4, name: "3 пересадки", state: "threeTransfers" },
+];
+
+const airlines = [
+  { id: 1, name: "Аэрофлот", state: "aeroflot" },
+  { id: 2, name: "S7 Airlines", state: "s7" },
+  { id: 3, name: "Utair", state: "utair" },
+  { id: 4, name: "Победа", state: "pobeda" },
+];
+
+const monthNames = [
+  '', 'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+  'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
+];
+
+const getPassengersLabel = (count: number) => {
+  if (count === 1) {
+    return 'пассажир';
+  } else if (count >= 2 && count <= 4) {
+    return 'пассажира';
+  } else {
+    return 'пассажиров';
+  }
+};
+
+const formatDate = (dateStr: string) => {
+  if (!dateStr || dateStr.length !== 8) return '';
+
+  const day = dateStr.slice(0, 2);
+  const month = Number(dateStr.slice(2, 4));
+  const year = dateStr.slice(4, 8);
+
+  return `${day} ${monthNames[month]} ${year}`;
+};
+
+const transfers = [
+  { id: 1, station: 'Белогорье', duration: '2 часа' },
+  { id: 2, station: 'Белогорье', duration: '2 часа' },
+];
+
+const routes = [
+  {
+    id: 1,
+    airlines: ["«Золотая стрела»"],
+    dateOut: "3 декабря",
+    timeOut: "08:00",
+    dateIn: "3 декабря",
+    timeIn: "14:30",
+    totalTime: "4 ч. 30 мин.",
+    transfers: transfers,
+    cityFrom: 'Лукоморье',
+    cityTo: 'Тридевятье',
+    totalPrice: '2500'
+  }
+]
 
 export default function ResultsSearch() {
-  const transfers = [
-    { station: 'Белогорье', duration: '2 часа' },
-    { station: 'Белогорье', duration: '2 часа' },
-  ];
+  const searchParams = useSearchParams();
+
+  const [cityFrom, setCityFrom] = useState("");
+  const [airportFrom, setAirportFrom] = useState("");
+  const [cityTo, setCityTo] = useState("");
+  const [airportTo, setAirportTo] = useState("");
+  const [passengers, setPassengers] = useState(1);
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [classTicket, setClassTicket] = useState("");
+  const [filtersCheap, setFiltersCheap] = useState<string[]>([]);
+
+  const [transfersCheckboxes, setTransfersCheckboxes] = useState({
+    noTransfers: false,
+    oneTransfer: false,
+    twoTransfers: false,
+    threeTransfers: false,
+  });
+
+  const [airlineCheckboxes, setAirlineCheckboxes] = useState({
+    aeroflot: false,
+    s7: false,
+    utair: false,
+    pobeda: false,
+  });
+
+  const [priceRange, setPriceRange] = useState({ from: "", to: "" });
+
+  const [selectedSort, setSelectedSort] = useState({ id: 1, name: 'дешевые → дорогие' });
+
+  useEffect(() => {
+    setCityFrom(searchParams.get("cityFrom") || "");
+    setAirportFrom(searchParams.get("airportFrom") || "");
+    setCityTo(searchParams.get("cityTo") || "");
+    setAirportTo(searchParams.get("airportTo") || "");
+    setDateFrom(formatDate(searchParams.get("dateFrom") || ""));
+    setDateTo(formatDate(searchParams.get("dateTo") || ""));
+    setPassengers(Number(searchParams.get("passengers")) || 1);
+    setClassTicket(searchParams.get("class") || "")
+    
+  }, [searchParams]);
+
+  useEffect(() => {
+    const getCheapFilters = () => {
+      const cheapFilters: string[] = [];
+      Object.entries(transfersCheckboxes).forEach(([key, value]) => {
+        if (value) {
+          const layover = layovers.find((l) => l.state === key);
+          if (layover) {
+            cheapFilters.push(layover.name);
+          }
+        }
+      });
+      Object.entries(airlineCheckboxes).forEach(([key, value]) => {
+        if (value) {
+          const airline = airlines.find((a) => a.state === key);
+          if (airline) {
+            cheapFilters.push(airline.name);
+          }
+        }
+      });
+      if (priceRange.from) {
+        cheapFilters.push(`От ${priceRange.from} ₽`);
+      }
+      if (priceRange.to) {
+        cheapFilters.push(`До ${priceRange.to} ₽`);
+      }
+
+      cheapFilters.push(`${selectedSort.name}`);
+
+      return cheapFilters;
+    };
+  
+    const filters = getCheapFilters();
+    setFiltersCheap(filters);
+  }, [transfersCheckboxes, airlineCheckboxes, priceRange, selectedSort.name]);
+
+  const handleCheckboxChange = (key: string) => (checked: boolean) => {
+    if (key in transfersCheckboxes) {
+      setTransfersCheckboxes((prev) => ({ ...prev, [key]: checked }));
+    } else if (key in airlineCheckboxes) {
+      setAirlineCheckboxes((prev) => ({ ...prev, [key]: checked }));
+    }
+  };
+
+  const handlePriceChange = (key: "from" | "to", value: string) => {
+    setPriceRange((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
+  const handleSortChange = (value: any) => {
+    setSelectedSort(value);
+  };
+
+  const handleClearFilters = () => {
+    setTransfersCheckboxes({
+      noTransfers: false,
+      oneTransfer: false,
+      twoTransfers: false,
+      threeTransfers: false,
+    });
+    setAirlineCheckboxes({
+      aeroflot: false,
+      s7: false,
+      utair: false,
+      pobeda: false,
+    });
+    setPriceRange({ from: "", to: "" });
+    setSelectedSort({ id: 1, name: 'дешевые → дорогие' });
+  };
+
+  const handleRemoveFilter = (filter: string) => {
+    const layover = layovers.find((l) => l.name === filter);
+    if (layover) {
+      setTransfersCheckboxes((prev) => ({ ...prev, [layover.state]: false }));
+      return;
+    }
+  
+    const airline = airlines.find((a) => a.name === filter);
+    if (airline) {
+      setAirlineCheckboxes((prev) => ({ ...prev, [airline.state]: false }));
+      return;
+    }
+  
+    if (filter.startsWith("От")) {
+      setPriceRange((prev) => ({ ...prev, from: "" }));
+      return;
+    }
+    if (filter.startsWith("До")) {
+      setPriceRange((prev) => ({ ...prev, to: "" }));
+      return;
+    }
+  
+    if (filter === selectedSort.name) {
+      setSelectedSort({ id: 1, name: 'дешевые → дорогие' });
+      return;
+    }
+  };
 
   return (
     <Layout>
@@ -20,102 +216,58 @@ export default function ResultsSearch() {
           <div className="flex flex-row gap-6 pt-3 items-center">
             <div className="flex flex-row gap-2 items-center">
               <div className="flex flex-row gap-1 items-center">
-                <p className="text-sm text-gray-500">Лукоморье</p>
-                <p className="text-base text-gray-400">LKMR</p>
+                <p className="text-sm text-gray-500">{cityFrom}</p>
+                <p className="text-base text-gray-400">{airportFrom}</p>
               </div>
               <Arrow className='rotate-180 w-5 h-2.5 [&>path]:stroke-gray-500' />
               <div className="flex flex-row gap-1 items-center">
-                <p className="text-sm text-gray-500">Тридевятье</p>
-                <p className="text-base text-gray-400">TN</p>
+                <p className="text-sm text-gray-500">{cityTo}</p>
+                <p className="text-base text-gray-400">{airportTo}</p>
               </div>
             </div>
             <div>
-              <p className="text-sm text-gray-500">1 пассажир</p>
+              <p className="text-sm text-gray-500">{passengers} {getPassengersLabel(passengers)}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">3 декабря 2024</p>
+              <p className="text-sm text-gray-500">{classTicket}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">В одну сторону</p>
+              <p className="text-sm text-gray-500">{dateFrom}</p>
             </div>
+            {dateTo
+              ?
+              <div>
+                <p className="text-sm text-gray-500">{dateTo}</p>
+              </div>
+              :
+              <div>
+                <p className="text-sm text-gray-500">В одну сторону</p>
+              </div>
+            }
           </div>
         </div>
         <div className="flex flex-row gap-5">
-          <Filters />
-          <div className="flex flex-col gap-2">
-            <div className="flex flex-row gap-2">
-              <div className="flex flex-row gap-3 items-center border py-1 px-3 rounded-[20px] border-blue-500">
-                <p className="text-blue-500 text-xs">Без пересадок</p>
-                <button>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-blue-500">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              <div className="flex flex-row gap-3 items-center border py-1 px-3 rounded-[20px] border-blue-500">
-                <p className="text-blue-500 text-xs">1 пересадка</p>
-                <button>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-blue-500">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
+          <Filters
+            layovers={layovers}
+            airlines={airlines}
+            transfersCheckboxes={transfersCheckboxes}
+            airlineCheckboxes={airlineCheckboxes}
+            priceRange={priceRange}
+            selectedSort={selectedSort}
+            onCheckboxChange={handleCheckboxChange}
+            onPriceChange={handlePriceChange}
+            onSortChange={handleSortChange}
+            onClearFilters={handleClearFilters}
+          />
+          <div className="flex flex-col gap-2 max-w-[582px]">
+            <div className="flex flex-row gap-2 overflow-x-auto">
+              {filtersCheap.map((filter, index) => (
+                <CheapFilter key={index} filterTitle={filter} onRemove={() => handleRemoveFilter(filter)} />
+              ))}
             </div>
-            <div className="bg-white rounded-xl shadow-[rgba(0,0,0,0.15)_0px_4px_8px] flex flex-col gap-3 px-6 py-5 w-[582px]">
-              <h2 className="font-bold text-base text-blue-500">«Золотая стрела»</h2>
-              <div className="flex flex-row gap-6">
-      {/* Время и дата сверху */}
-      <div className="w-[404px]">
-      <div className="flex justify-between">
-        <div className="text-center">
-          <p className="text-sm text-gray-500">3 декабря</p>
-          <p className="text-2xl">08:00</p>
-        </div>
-        <div className="flex items-end">
-          <p className="text-xs">В пути 4 ч. 30 мин.</p>
-        </div>
-        <div className="text-center">
-          <p className="text-sm text-gray-500">3 декабря</p>
-          <p className="text-2xl">14:30</p>
-        </div>
-      </div>
-
-      {/* Линия маршрута */}
-      <div className="flex flex-col items-center mt-1">
-        <div className="flex items-center w-full relative">
-          {/* Начальная точка */}
-          <div className="w-[10px] h-[10px] bg-blue-500 rounded-full"></div>
-          <div className="h-[2px] bg-blue-500 flex-grow"></div>
-          {transfers.map((transfer, index) => (
-            <div key={index} className="flex items-center relative">
-              <div className="w-[10px] h-[10px] bg-blue-500 rounded-full"></div>
-              <div className="h-[2px] bg-gray-300 w-5 mx-1 rounded-full"></div> {/* Серая линия пересадки */}
-              <div className="w-[10px] h-[10px] bg-blue-500 rounded-full"></div>
-              <div className="h-[2px] bg-blue-500 w-6 flex-grow"></div> {/* Синяя линия между пересадками */}
-              <div className="absolute top-4 text-center text-gray-400 text-xs">
-                <p>{transfer.station}</p>
-                <p>{transfer.duration}</p>
-              </div>
-            </div>
-          ))}
-          <div className="h-[2px] bg-blue-500 flex-grow"></div>
-          {/* Конечная точка */}
-          <div className="w-[10px] h-[10px] bg-blue-500 rounded-full"></div>
-        </div>
-      </div>
-      <div className="flex flex-row justify-between">
-        <p className="text-sm">Лукоморье</p>
-        <p className="text-sm">Тридевятье</p>
-      </div>
-      </div>
-      <div className="flex flex-col gap-2">
-        <p className="text-3xl text-green-500 font-bold">2 500 ₽</p>
-        <Button className="rounded-lg bg-sky-600 py-2 px-4 text-m font-semibold text-white data-[hover]:bg-sky-500 data-[active]:bg-sky-700">
-              Выбрать
-            </Button>
-      </div>
-      </div>
-            </div>
+            {routes.map((route) => (
+              <RouteCard key={route.id} route={route} />
+            ))}
           </div>
         </div>
       </div>

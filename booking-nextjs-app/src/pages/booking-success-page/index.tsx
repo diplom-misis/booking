@@ -1,35 +1,34 @@
 import { Separator } from '@/components/separator';
 import { Layout } from '../layout';
 import { months } from '@/utils/constants';
-
-const data = {
-  fromCity: 'Лукоморье',
-  fromAirport: 'LKMR',
-  toCity: 'Тридевятье',
-  toAirport: 'TN',
-  company: 'Золотая стрела',
-  fromDatetime: new Date('2025-03-02T14:46:22.449Z'),
-  toDatetime: new Date('2025-03-02T15:46:22.449Z'),
-};
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function BookingSuccessPage() {
-  const { fromCity, fromAirport, toCity, toAirport, company, fromDatetime, toDatetime } = data;
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const currentDate = new Date()
+  const [fromCity, setFromCity] = useState('');
+  const [toCity, setToCity] = useState('');
+  const [company, setCompany] = useState('');
+  const [dateFrom, setDateFrom] = useState('');
+  const [timeFrom, setTimeFrom] = useState('');
+
+  const currentDate = new Date();
 
   const currentDay = currentDate.getDate();
   const currentMonth = months[currentDate.getMonth() + 1];
   const currentYear = currentDate.getFullYear();
 
-  const currentDateFormatted = `${currentDay} ${currentMonth} ${currentYear}`
+  const currentDateFormatted = `${currentDay} ${currentMonth} ${currentYear}`;
 
-  const dayFrom = fromDatetime.getDate();
-  const monthFrom = months[fromDatetime.getMonth() + 1];
-  const yearFrom = fromDatetime.getFullYear();
-  const hoursFrom = fromDatetime.getHours();
-  const minutesFrom = fromDatetime.getMinutes();
-
-  const dateFrom = `${hoursFrom}:${minutesFrom} ${dayFrom} ${monthFrom} ${yearFrom}`;
+  useEffect(() => {
+    setFromCity(searchParams.get('fromCity') || '');
+    setToCity(searchParams.get('toCity') || '');
+    setCompany(searchParams.get('company') || '');
+    setDateFrom(searchParams.get('dateFrom') || '');
+    setTimeFrom(searchParams.get('timeFrom') || '');
+  }, [searchParams]);
 
   return (
     <Layout>
@@ -52,29 +51,13 @@ export default function BookingSuccessPage() {
             </div>
             <div className='flex flex-col gap-1 w-[200px]'>
               <p className='text-gray-400 text-xs'>Дата и время</p>
-              <p className='text-gray-800 text-sm'>{dateFrom}</p>
+              <p className='text-gray-800 text-sm'>{`${timeFrom} ${dateFrom}`}</p>
             </div>
             <div className='flex flex-col gap-1 max-w-[200px]'>
               <p className='text-gray-400 text-xs'>Авиакомпания</p>
               <p className='text-gray-800 text-sm'>«{company}»</p>
             </div>
           </div>
-          {/* <Separator />
-          <div className='flex'>
-            <p className='text-gray-800 font-bold w-40'>Отель</p>
-            <div className='flex flex-col gap-1 w-[200px]'>
-              <p className='text-gray-400 text-xs'>Название</p>
-              <p className='text-gray-800 text-sm'>«Златая палата»</p>
-            </div>
-            <div className='flex flex-col gap-1 w-[200px]'>
-              <p className='text-gray-400 text-xs'>Заезд</p>
-              <p className='text-gray-800 text-sm'>3 декабря 2024</p>
-            </div>
-            <div className='flex flex-col gap-1 max-w-[200px]'>
-              <p className='text-gray-400 text-xs'>Выезд</p>
-              <p className='text-gray-800 text-sm'>4 декабря 2024</p>
-            </div>
-          </div> */}
           <Separator />
           <div className='flex flex-col gap-0.5'>
             <div className='flex'>

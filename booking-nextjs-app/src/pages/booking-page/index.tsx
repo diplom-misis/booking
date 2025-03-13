@@ -2,7 +2,8 @@ import { Arrow } from '@/components/arrow';
 import { Separator } from '@/components/separator';
 import { Layout } from '../layout';
 import { months } from '@/utils/constants';
-import { useState } from 'react';
+import { SyntheticEvent, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const data = {
   fromCity: 'Лукоморье',
@@ -16,6 +17,8 @@ const data = {
 };
 
 export default function BookingPage() {
+  const router = useRouter()
+
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
   const [birthday, setBirthday] = useState<string>('');
@@ -39,21 +42,30 @@ export default function BookingPage() {
   const hoursFrom = fromDatetime.getHours();
   const minutesFrom = fromDatetime.getMinutes();
 
-  const dateFrom = `${dayFrom} ${monthFrom} ${yearFrom} ${hoursFrom}:${minutesFrom}`;
+  const dateFrom = `${dayFrom} ${monthFrom} ${yearFrom}`;
+  const timeFrom = `${hoursFrom}:${minutesFrom}`
 
   const dayTo = toDatetime.getDate();
+  const monthTo = months[toDatetime.getMonth() + 1];
+  const yearTo = toDatetime.getFullYear();
   const hoursTo = toDatetime.getHours();
   const minutesTo = toDatetime.getMinutes();
 
-  let dateTo;
+  const dateTo = `${dayTo} ${monthTo} ${yearTo}`;
+  const timeTo = `${hoursTo}:${minutesTo}`;
 
-  if (dayFrom == dayTo) {
-    dateTo = `${hoursTo}:${minutesTo}`;
-  } else {
-    const monthTo = months[toDatetime.getMonth() + 1];
-    const yearTo = toDatetime.getFullYear();
+  const handleSubmit = (e: SyntheticEvent) => {
+    e.preventDefault()
 
-    dateTo = `${dayTo} ${monthTo} ${yearTo} ${hoursTo}:${minutesTo}`;
+    const query = new URLSearchParams({
+      fromCity,
+      toCity,
+      company,
+      dateFrom,
+      timeFrom,
+    }).toString();
+
+    router.push(`/booking-success-page?${query}`)
   }
 
   return (
@@ -63,7 +75,7 @@ export default function BookingPage() {
           <Arrow />
           <h1 className='text-3xl font-bold'>Бронирование</h1>
         </div>
-        <form className='flex gap-5'>
+        <form className='flex gap-5' onSubmit={handleSubmit}>
           <div>
             <div className='flex flex-col gap-3 bg-white px-6 py-5 shadow-[0_4px_8px_rgba(0,0,0,0.15)] rounded-lg'>
               <h2 className='text-2xl font-bold'>Рейс</h2>
@@ -75,9 +87,9 @@ export default function BookingPage() {
                     <p>{`${toCity} ${toAirport}`}</p>
                   </div>
                   <div className='flex gap-2 items-center'>
-                    <p>{dateFrom}</p>
+                    <p>{`${dateFrom} ${timeFrom}`}</p>
                     <Arrow className='rotate-180 w-5 h-2.5' />
-                    <p>{dateTo}</p>
+                    <p>{dayTo > dayFrom ? `${dateTo} ${timeTo}` : timeTo}</p>
                   </div>
                 </div>
                 <div className='flex flex-col gap-1 mr-32'>

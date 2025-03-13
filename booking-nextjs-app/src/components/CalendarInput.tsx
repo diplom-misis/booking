@@ -16,10 +16,8 @@ interface CalendarInputProps {
 
 export default function CalendarInput(props: CalendarInputProps) {
   const { disabled, placeholder, hideCalendarIcon, required, value, onChange } = props
-  // const [selectedDate, setSelectedDate] = useState<Date | undefined>();
 
   const handleDateChange = (date: Date | undefined) => {
-    // setSelectedDate(date);
     onChange(date);
   };
 
