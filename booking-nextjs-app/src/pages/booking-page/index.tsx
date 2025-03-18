@@ -13,17 +13,29 @@ const data = {
   company: 'Золотая стрела',
   fromDatetime: new Date('2025-03-02T14:46:22.449Z'),
   toDatetime: new Date('2025-03-02T15:46:22.449Z'),
-  passengerCount: 3
+  passengerCount: 3,
 };
 
 export default function BookingPage() {
-  const router = useRouter()
+  const router = useRouter();
 
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
   const [birthday, setBirthday] = useState<string>('');
   const [passportSeries, setPassportSeries] = useState<string>('');
   const [passportNumber, setPassportNumber] = useState<string>('');
+
+  const firstNameError = !/^[a-zа-я-]*$/i.test(firstName);
+  const lastNameError = !/^[a-zа-я-]*$/i.test(lastName);
+  const passportSeriesError = !/^[0-9]*$/.test(passportSeries);
+  const passportNumberError = !/^[0-9]*$/.test(passportNumber);
+
+  const formValid = !(
+    firstNameError ||
+    lastNameError ||
+    passportSeriesError ||
+    passportNumberError
+  );
 
   const {
     fromCity,
@@ -33,7 +45,7 @@ export default function BookingPage() {
     company,
     fromDatetime,
     toDatetime,
-    passengerCount
+    passengerCount,
   } = data;
 
   const dayFrom = fromDatetime.getDate();
@@ -43,7 +55,7 @@ export default function BookingPage() {
   const minutesFrom = fromDatetime.getMinutes();
 
   const dateFrom = `${dayFrom} ${monthFrom} ${yearFrom}`;
-  const timeFrom = `${hoursFrom}:${minutesFrom}`
+  const timeFrom = `${hoursFrom}:${minutesFrom}`;
 
   const dayTo = toDatetime.getDate();
   const monthTo = months[toDatetime.getMonth() + 1];
@@ -54,8 +66,18 @@ export default function BookingPage() {
   const dateTo = `${dayTo} ${monthTo} ${yearTo}`;
   const timeTo = `${hoursTo}:${minutesTo}`;
 
+  let passengerEnding;
+
+  if (passengerCount == 1) {
+    passengerEnding = 'пассажир';
+  } else if (2 <= passengerCount && passengerCount <= 4) {
+    passengerEnding = 'пассажира';
+  } else if (5 <= passengerCount && passengerCount <= 9) {
+    passengerEnding = 'пассажиров';
+  }
+
   const handleSubmit = (e: SyntheticEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     const query = new URLSearchParams({
       fromCity,
@@ -65,8 +87,8 @@ export default function BookingPage() {
       timeFrom,
     }).toString();
 
-    router.push(`/booking-success-page?${query}`)
-  }
+    router.push(`/booking-success-page?${query}`);
+  };
 
   return (
     <Layout>
@@ -100,7 +122,7 @@ export default function BookingPage() {
               <div className='flex'>
                 <div className='flex flex-col gap-1 w-[225px]'>
                   <p className='text-gray-400 text-xs'>Пассажиров</p>
-                  <p>1 пассажир</p>
+                  <p>{`${passengerCount} ${passengerEnding}`}</p>
                 </div>
                 <div className='flex flex-col gap-1 w-[225px]'>
                   <p className='text-gray-400 text-xs'>Класс</p>
@@ -112,65 +134,112 @@ export default function BookingPage() {
                 </div>
               </div>
               <Separator />
-              <h3 className='font-bold'>Данные пассажира</h3>
-              <div className='flex justify-between gap-3'>
-                <div className='flex flex-col gap-1'>
-                  <p className='text-gray-400 text-xs'>Имя</p>
-                  <input
-                    type='text'
-                    className='border border-gray-300 rounded-sm px-3.5 py-2 w-[202px] hover:border-gray-400 focus:outline-none focus:border-blue-500 h-10'
-                    placeholder='Ярополк'
-                    required
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                  />
-                </div>
-                <div className='flex flex-col gap-1'>
-                  <p className='text-gray-400 text-xs'>Фамилия</p>
-                  <input
-                    type='text'
-                    className='border border-gray-300 rounded-sm px-3.5 py-2 w-[202px] hover:border-gray-400 focus:outline-none focus:border-blue-500 h-10'
-                    placeholder='Иванов'
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                  />
-                </div>
-                <div className='flex flex-col gap-1'>
-                  <p className='text-gray-400 text-xs'>Дата рождения</p>
-                  <input
-                    type='date'
-                    className='border border-gray-300 rounded-sm px-3.5 py-2 w-[202px] hover:border-gray-400 focus:outline-none focus:border-blue-500 h-10'
-                    placeholder='04.06.1993'
-                    value={birthday}
-                    onChange={(e) => setBirthday(e.target.value)}
-                    onFocus={(e) => e.target.type = 'date'}
-                    onBlur={(e) => e.target.type = 'text'}
-                  />
-                </div>
-              </div>
-              <div className='flex justify-between gap-3'>
-                <div className='flex flex-col gap-1'>
-                  <p className='text-gray-400 text-xs'>Паспортные данные</p>
-                  <div className='flex gap-[6px]'>
-                    <input
-                      type='text'
-                      className='border border-gray-300 rounded-sm px-[14px] py-2 w-24 hover:border-gray-400 focus:outline-none focus:border-blue-500 h-10'
-                      placeholder='7341'
-                      value={passportSeries}
-                      onChange={(e) => setPassportSeries(e.target.value)}
-                      maxLength={4}
-                    />
-                    <input
-                      type='text'
-                      className='border border-gray-300 rounded-sm px-[14px] py-2 w-24 hover:border-gray-400 focus:outline-none focus:border-blue-500 h-10'
-                      placeholder='71 34 30'
-                      value={passportNumber}
-                      onChange={(e) => setPassportNumber(e.target.value)}
-                      maxLength={6}
-                    />
-                  </div>
-                </div>
-              </div>
+              {(() => {
+                const passengers = [];
+                for (let count = 1; count <= passengerCount; count++) {
+                  passengers.push(
+                    <div key={count}>
+                      <div className='flex flex-col gap-3'>
+                        <h3 className='font-bold'>Данные пассажира {count}</h3>
+                        <div className='flex justify-between gap-3'>
+                          <div className='flex flex-col gap-1'>
+                            <p className='text-gray-400 text-xs'>Имя</p>
+                            <input
+                              type='text'
+                              className='border border-gray-300 rounded-sm px-3.5 py-2 w-[202px] hover:border-gray-400 focus:outline-none focus:border-blue-500 h-10 invalid:border-red-500'
+                              placeholder='Ярополк'
+                              value={firstName}
+                              onChange={(e) => setFirstName(e.target.value)}
+                              pattern='[A-za-zА-яа-я\-]*$'
+                            />
+                            {firstNameError && (
+                              <p className='text-xs text-red-500 max-w-[202px]'>
+                                Имя может содержать только буквы и дефис
+                              </p>
+                            )}
+                          </div>
+                          <div className='flex flex-col gap-1'>
+                            <p className='text-gray-400 text-xs'>Фамилия</p>
+                            <input
+                              type='text'
+                              className='border border-gray-300 rounded-sm px-3.5 py-2 w-[202px] hover:border-gray-400 focus:outline-none focus:border-blue-500 h-10 invalid:border-red-500'
+                              placeholder='Иванов'
+                              value={lastName}
+                              onChange={(e) => setLastName(e.target.value)}
+                              pattern='[A-za-zА-яа-я\-]*$'
+                            />
+                            {lastNameError && (
+                              <p className='text-xs text-red-500 max-w-[202px]'>
+                                Фамилия может содержать только буквы и дефис
+                              </p>
+                            )}
+                          </div>
+                          <div className='flex flex-col gap-1'>
+                            <p className='text-gray-400 text-xs'>
+                              Дата рождения
+                            </p>
+                            <input
+                              type='date'
+                              className='border border-gray-300 rounded-sm px-3.5 py-2 w-[202px] hover:border-gray-400 focus:outline-none focus:border-blue-500 h-10 invalid:border-red-500'
+                              placeholder='04.06.1993'
+                              value={birthday}
+                              onChange={(e) => setBirthday(e.target.value)}
+                              onFocus={(e) => (e.target.type = 'date')}
+                              onBlur={(e) => (e.target.type = 'text')}
+                            />
+                          </div>
+                        </div>
+                        <div className='flex justify-between gap-3'>
+                          <div className='flex flex-col gap-1'>
+                            <p className='text-gray-400 text-xs'>
+                              Паспортные данные
+                            </p>
+                            <div className='flex gap-[6px]'>
+                              <div className='flex flex-col gap-1'>
+                                <input
+                                  type='text'
+                                  className='border border-gray-300 rounded-sm px-[14px] py-2 w-24 hover:border-gray-400 focus:outline-none focus:border-blue-500 h-10 invalid:border-red-500'
+                                  placeholder='7341'
+                                  value={passportSeries}
+                                  onChange={(e) =>
+                                    setPassportSeries(e.target.value)
+                                  }
+                                  maxLength={4}
+                                  pattern='\d'
+                                />
+                                {passportSeriesError && (
+                                  <p className='text-xs text-red-500 max-w-24'>
+                                    Серия паспорта может содержать только цифры
+                                  </p>
+                                )}
+                              </div>
+                              <div className='flex flex-col gap-1'>
+                                <input
+                                  type='text'
+                                  className='border border-gray-300 rounded-sm px-[14px] py-2 w-24 hover:border-gray-400 focus:outline-none focus:border-blue-500 h-10 invalid:border-red-500'
+                                  placeholder='71 34 30'
+                                  value={passportNumber}
+                                  onChange={(e) =>
+                                    setPassportNumber(e.target.value)
+                                  }
+                                  maxLength={6}
+                                  pattern='\d'
+                                />
+                                {passportNumberError && (
+                                  <p className='text-xs text-red-500 max-w-24'>
+                                    Номер паспорта может содержать только цифры
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+                return passengers;
+              })()}
             </div>
           </div>
           <div className='flex flex-col gap-3 bg-white rounded-lg px-4 py-5 shadow-[0_4px_8px_rgba(0,0,0,0.15)] self-start'>
@@ -184,7 +253,8 @@ export default function BookingPage() {
             </div>
             <button
               type='submit'
-              className='bg-blue-500 text-gray-100 px-16 py-2 rounded-lg hover:bg-blue-600 active:bg-blue-700'
+              className='bg-blue-500 text-gray-100 px-16 py-2 rounded-lg hover:bg-blue-600 active:bg-blue-700 disabled:bg-gray-400 disabled:text-gray-300'
+              disabled={!formValid}
             >
               Забронировать
             </button>
