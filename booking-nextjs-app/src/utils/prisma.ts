@@ -5,6 +5,7 @@ import { createClient } from '@libsql/client/web';
 const TURSO_DATABASE_URL = process.env.TURSO_DATABASE_URL;
 const TURSO_AUTH_TOKEN = process.env.TURSO_AUTH_TOKEN;
 
+console.log(TURSO_DATABASE_URL, TURSO_AUTH_TOKEN)
 if (!TURSO_DATABASE_URL) {
   throw new Error("TURSO_DATABASE_URL is not defined in environment variables.");
 }
