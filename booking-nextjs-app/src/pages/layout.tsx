@@ -5,11 +5,11 @@ import Link from 'next/link';
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div>
-      <header className='px-6 py-4 bg-white flex justify-between mb-8'>
-        <Logo />
-        <nav className='flex gap-2'>
-          <div className='flex gap-1.5 px-5 py-2 items-center [&_path]:hover:stroke-blue-600 hover:text-blue-500 cursor-pointer'>
+    <div className='bg-gray-100 md:bg-[url(../images/layout-bg.jpg)] bg-fixed bg-cover bg-center'>
+      <header className='px-5 pt-2 pb-3 md:px-6 md:py-4 bg-white flex justify-between rounded-b-xl md:rounded-none border-b border-gray-200'>
+        <Logo className='hidden md:inline'/>
+        <nav className='flex gap-2 justify-between md:justify-end w-full'>
+          <div className='flex gap-1.5 md:px-5 md:py-2 items-center [&_path]:hover:stroke-blue-600 hover:text-blue-500 cursor-pointer'>
             <svg
               width='24'
               height='24'
@@ -23,9 +23,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 strokeWidth='1.5'
               />
             </svg>
-            <Link href='/booking-airplane' className='text-sm'>Поиск авиабилетов</Link>
+            <Link href='/booking-airplane' className='text-sm hidden md:inline'>Поиск авиабилетов</Link>
           </div>
-          <div className='flex gap-2 px-5 py-2 items-center [&_path]:hover:stroke-blue-600 hover:text-blue-500 cursor-pointer'>
+          <div className='flex gap-2 md:px-5 md:py-2 items-center [&_path]:hover:stroke-blue-600 hover:text-blue-500 cursor-pointer'>
             <svg
               width='24'
               height='24'
@@ -45,12 +45,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 fill='#1F2937'
               />
             </svg>
-            <Link href='/booking-page' className='text-sm'>Бронирования</Link>
+            <Link href='/booking-page' className='text-sm hidden md:inline'>Бронирования</Link>
           </div>
-          <Image src={defaultAvatar} width={40} height={40} className='outline-1 rounded-full hover:outline hover:outline-blue-600 active:outline-2 cursor-pointer' alt="Аватар пользователя"/>
+          <Image src={defaultAvatar} width={40} height={40} className='outline-1 rounded-full hover:outline hover:outline-blue-600 active:outline-2 cursor-pointer w-6 h-6 md:w-10 md:h-10' alt="Аватар пользователя"/>
         </nav>
       </header>
-      {children}
+      <div className='pl-5 pr-7 pt-5 md:py-8'>
+        {children}
+      </div>
     </div>
   );
 }
