@@ -1,1 +1,8 @@
-export const Separator = () => <div className='bg-gray-300 h-px hidden md:flex'></div>;
+type SeparatorProps = {
+  extraClass?: string
+}
+
+
+export const Separator = ({extraClass}: SeparatorProps) => (
+  <div className={`bg-gray-300 h-px ${extraClass}`}></div>
+);

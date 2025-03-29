@@ -4,7 +4,7 @@ import { Reservation, Status, User, Cart } from '@prisma/client';
 
 type Data = {
   message?: string;
-  reservation?: Reservation| null;
+  reservation?: Reservation | null;
   reservations?: Reservation[];
   users?: User[];
   cart?: Cart | null;
@@ -15,11 +15,17 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
 
-  // console.log('Reservation Created:', newReservation);
   // res
   //   .status(200)
   //   .json({ message: 'Reservation created', reservation: newReservation });
 
   // await prisma.user.create({ data: { name: 'George', email: 'test@ya.ru' } })
-  res.status(200).json({ users: await prisma.user.findMany(), cart: await prisma.cart.findFirst(), reservation: await prisma.reservation.findFirst() });
+  
+  res
+    .status(200)
+    .json({
+      users: await prisma.user.findMany(),
+      cart: await prisma.cart.findFirst(),
+      reservation: await prisma.reservation.findFirst(),
+    });
 }

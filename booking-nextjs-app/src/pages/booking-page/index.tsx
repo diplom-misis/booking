@@ -179,7 +179,7 @@ export default function BookingPage() {
                 </div>
               </div>
             </div>
-            <Separator />
+            <Separator extraClass='hidden md:flex'/>
             <div
               className={`flex flex-col gap-3 ${
                 currentTab === 'passengerData' ? 'flex' : 'hidden'
@@ -256,7 +256,7 @@ export default function BookingPage() {
                                     setPassportSeries(e.target.value)
                                   }
                                   maxLength={4}
-                                  pattern='\d'
+                                  pattern='\d*'
                                 />
                                 {passportSeriesError && (
                                   <p className='text-xs text-red-500 max-w-36 md:max-w-24'>
@@ -274,7 +274,7 @@ export default function BookingPage() {
                                     setPassportNumber(e.target.value)
                                   }
                                   maxLength={6}
-                                  pattern='\d'
+                                  pattern='\d*'
                                 />
                                 {passportNumberError && (
                                   <p className='text-xs text-red-500 max-w-36 md:max-w-24'>
