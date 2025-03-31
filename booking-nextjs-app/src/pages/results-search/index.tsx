@@ -5,6 +5,7 @@ import { Arrow } from "@/components/arrow";
 import { useSearchParams } from "next/navigation";
 import CheapFilter from "@/components/CheapFilter";
 import RouteCard from "@/components/RouteCard";
+import { routesBack, routesThere } from "@/common/constants";
 
 const layovers = [
   { id: 1, name: "Без пересадок", state: 'noTransfers' },
@@ -45,27 +46,6 @@ const formatDate = (dateStr: string) => {
   return `${day} ${monthNames[month]} ${year}`;
 };
 
-const transfers = [
-  { id: 1, station: 'Белогорье', duration: '2 часа' },
-  { id: 2, station: 'Белогорье', duration: '2 часа' },
-];
-
-const routes = [
-  {
-    id: 1,
-    airlines: ["«Золотая стрела»"],
-    dateOut: "3 декабря",
-    timeOut: "08:00",
-    dateIn: "3 декабря",
-    timeIn: "14:30",
-    totalTime: "4 ч. 30 мин.",
-    transfers: transfers,
-    cityFrom: 'Лукоморье',
-    cityTo: 'Тридевятье',
-    totalPrice: '2500'
-  }
-]
-
 export default function ResultsSearch() {
   const searchParams = useSearchParams();
 
@@ -94,8 +74,15 @@ export default function ResultsSearch() {
   });
 
   const [priceRange, setPriceRange] = useState({ from: "", to: "" });
-
   const [selectedSort, setSelectedSort] = useState({ id: 1, name: 'дешевые → дорогие' });
+
+  const sortedRoutesThere = routesThere.sort((a, b) => a.totalPrice - b.totalPrice);
+  const sortedRoutesBack = routesBack.sort((a, b) => a.totalPrice - b.totalPrice);
+
+  const pairedRoutes = sortedRoutesThere.map((routeThere, index) => ({
+    routeThere,
+    routeBack: sortedRoutesBack[index],
+  }));
 
   useEffect(() => {
     setCityFrom(searchParams.get("cityFrom") || "");
@@ -259,15 +246,22 @@ export default function ResultsSearch() {
             onSortChange={handleSortChange}
             onClearFilters={handleClearFilters}
           />
-          <div className="flex flex-col gap-2 max-w-[582px]">
+          <div className="flex flex-col gap-2 w-[600px]">
             <div className="flex flex-row gap-2 overflow-x-auto">
               {filtersCheap.map((filter, index) => (
                 <CheapFilter key={index} filterTitle={filter} onRemove={() => handleRemoveFilter(filter)} />
               ))}
             </div>
-            {routes.map((route) => (
-              <RouteCard key={route.id} route={route} />
-            ))}
+            {dateTo !== ''
+              ?
+              pairedRoutes.map(({ routeThere, routeBack }, index) => (
+                <RouteCard key={index} routeThere={routeThere} routeBack={routeBack} passengersCount={passengers} />
+              ))
+              :
+              sortedRoutesThere.map((route) => (
+                <RouteCard key={route.id} routeThere={route} passengersCount={passengers} />
+              ))
+            }
           </div>
         </div>
       </div>

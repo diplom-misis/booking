@@ -6,22 +6,16 @@ import CalendarInput from '@/components/CalendarInput';
 import SelectInput from '@/components/SelectInput';
 import { useForm } from "react-hook-form"
 import PassengersSelect from '@/components/PassengersSelect';
-
-const city = [
-  { id: 1, name: 'Moscow' },
-  { id: 2, name: 'Tokyo' },
-]
-
-const airports = [
-  { id: 1, name: 'VKO' },
-  { id: 2, name: 'DMO' }
-]
+import { useCities } from '@/hooks/useCities';
+import { useCityStore } from '@/store/useCityStore';
+import { useAirportStore } from '@/store/useAirportStore';
+import { useAirports } from '@/hooks/useAirports';
 
 const typeClass = [
-  { id: 1, name: 'Эконом' },
-  { id: 2, name: 'Комфорт' },
-  { id: 3, name: 'Бизнес' },
-  { id: 4, name: 'Первый' }
+  { id: '1', name: 'Эконом' },
+  { id: '2', name: 'Комфорт' },
+  { id: '3', name: 'Бизнес' },
+  { id: '4', name: 'Первый' }
 ]
 
 const formatDate = (date: Date | undefined) => {
@@ -35,7 +29,7 @@ const formatDate = (date: Date | undefined) => {
 export default function BookingAirplane() {
   const router = useRouter()
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm();
-
+  
   const [formData, setFormData] = useState({
     fromCity: null,
     fromAirport: null,
@@ -68,6 +62,19 @@ export default function BookingAirplane() {
     localStorage.setItem('formData', JSON.stringify(formData));
   }, [formData]);
 
+  
+  const { data: cities } = useCities();
+  const { cities: storedCities } = useCityStore();
+  const { data: fetchedAirports } = useAirports(formData.fromCity?.id);
+  const { airports } = useAirportStore();
+  const { data: fetchedToAirports } = useAirports(formData.toCity?.id);
+
+  useEffect(() => {
+    if (fetchedAirports?.length) {
+      setValue('fromAirport', fetchedAirports[0]);
+    }
+  }, [fetchedAirports, setValue]);
+
   const handleChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     setValue(field, value);
@@ -99,10 +106,10 @@ export default function BookingAirplane() {
 
     const queryString = new URLSearchParams({
       cityFrom: fromCity?.name || '',
-      airportFrom: fromAirport?.name || '',
+      airportFrom: fromAirport?.code || '',
       dateFrom: formatDate(departureDate),
       cityTo: toCity?.name || '',
-      airportTo: toAirport?.name || '',
+      airportTo: toAirport?.code || '',
       dateTo: isOneWay ? '' : formatDate(returnDate),
       class: classType?.name || '',
       passengers: totalPassengers.toString()
@@ -124,7 +131,7 @@ export default function BookingAirplane() {
                     {...register('fromCity', { required: 'Это поле обязательно',  })}
                     className="h-10 w-[160px] px-[14px] py-[8px]"
                     title='Откуда'
-                    data={city}
+                    data={storedCities.filter(city => city.id !== formData.toCity?.id)}
                     value={formData.fromCity}
                     typeCombobox={false}
                     placeholder={'Лукоморье'}
@@ -132,14 +139,14 @@ export default function BookingAirplane() {
                   />
                   {errors.fromCity && <p className='text-red-500 text-sm'>Это поле обязательное</p>}
                 </div>
-                <SelectInput className="h-10 w-[88px] px-[10px] py-[10px]" title='Аэропорт' data={airports} value={formData.toAirport} disabled typeCombobox={true} onChange={(value) => handleChange('toAirport', value)} />
+                <SelectInput className="h-10 w-[88px] px-[10px] py-[10px]" title='Аэропорт' data={fetchedAirports || []} value={formData.toAirport} disabled typeCombobox={true} onChange={(value) => handleChange('toAirport', value)} />
               </div>
               <div className='flex flex-row gap-2'>
                 <div className='flex flex-col gap-1'>
-                <SelectInput className="h-10 w-[160px] px-[14px] py-[8px]" title='Куда' data={city} value={formData.toCity} typeCombobox={false} placeholder={'Тридевятье'} {...register('toCity', { required: 'Это поле обязательно' })} onChange={(value) => handleChange('toCity', value)}  />
+                <SelectInput className="h-10 w-[160px] px-[14px] py-[8px]" title='Куда' data={storedCities.filter(city => city.id !== formData.fromCity?.id)} value={formData.toCity} typeCombobox={false} placeholder={'Тридевятье'} {...register('toCity', { required: 'Это поле обязательно' })} onChange={(value) => handleChange('toCity', value)}  />
                 {errors.toCity && <p className='text-red-500 text-sm'>Это поле обязательное</p>}
                 </div>
-                <SelectInput className="h-10 w-[88px] px-[10px] py-[10px]" title='Аэропорт' data={airports} value={formData.fromAirport} disabled={true} typeCombobox={true} onChange={(value) => handleChange('fromAirport', value)} />
+                <SelectInput className="h-10 w-[88px] px-[10px] py-[10px]" title='Аэропорт' data={fetchedToAirports || []} value={formData.fromAirport} disabled={true} typeCombobox={true} onChange={(value) => handleChange('fromAirport', value)} />
               </div>
             </div>
             <div className='flex flex-row gap-2'>
