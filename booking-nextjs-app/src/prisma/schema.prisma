@@ -34,11 +34,18 @@ model Airport {
   id       String   @id @default(uuid())
   name     String
   code     String   @unique
-  city     String
+  cityId   String
+  city     City     @relation(fields: [cityId], references: [id])
   country  String
 
   flightsFrom Flight[] @relation(name: "Departure")
   flightsTo   Flight[] @relation(name: "Arrival")
+}
+
+model City {
+  id      String    @id @default(uuid())
+  name    String
+  Airport Airport[]
 }
 
 model Route {
