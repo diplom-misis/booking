@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
 import prisma from '@/utils/prisma';
-import { Reservation, Status } from '@prisma/client';
+import { City, Reservation, Status } from '@prisma/client';
 
 type Data = {
   message?: string;
@@ -13,6 +13,16 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
+
+  if (req.query.method === 'test') {
+    const name = Array.isArray(req.query.name) ? req.query.name[0] : req.query.name || '';
+    const city: City = await prisma.city.create({
+      data: { name },
+    });
+    console.log('Reservation Created:', city)
+    res.status(200)
+    return
+  }
   // Пример просмотра и создания. TODO удалить, после обкатки ORM.
   if (req.query.method === 'get') {
     console.log("test")
