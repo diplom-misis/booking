@@ -12,19 +12,11 @@ import { useAirportStore } from '@/store/useAirportStore';
 import { useAirports } from '@/hooks/useAirports';
 
 const typeClass = [
-<<<<<<< HEAD
-  { id: 1, name: 'Эконом' },
-  { id: 2, name: 'Комфорт' },
-  { id: 3, name: 'Бизнес' },
-  { id: 4, name: 'Первый' },
-];
-=======
   { id: '1', name: 'Эконом' },
   { id: '2', name: 'Комфорт' },
   { id: '3', name: 'Бизнес' },
   { id: '4', name: 'Первый' }
 ]
->>>>>>> 767ed520b7cdbc78b94be2223036b54e5c0600a7
 
 const formatDate = (date: Date | undefined) => {
   if (!date) return '';

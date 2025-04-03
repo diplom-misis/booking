@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { cn } from '@/utils/cn';
 import {
   Combobox,
@@ -11,12 +10,6 @@ import {
 } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import { useEffect, useState } from 'react';
-=======
-import { cn } from "@/utils/cn";
-import { Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions, Field, Label } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
->>>>>>> 767ed520b7cdbc78b94be2223036b54e5c0600a7
 
 export type selectData = { id: string; name: string };
 export type selectDataAirport = {
@@ -98,7 +91,6 @@ export default function SelectInput(props: SelectInputProps) {
               'transition duration-100 ease-in'
             )}
           >
-<<<<<<< HEAD
             {filteredData.map((item) => (
               <ComboboxOption
                 key={item.id}
@@ -106,11 +98,6 @@ export default function SelectInput(props: SelectInputProps) {
                 className='h-9 flex items-center justify-center data-[focus]:bg-gray-100'
               >
                 {item.name}
-=======
-            {filteredData.map((item: selectData | selectDataAirport) => (
-              <ComboboxOption key={item.id} value={item} className="h-9 flex items-center justify-center data-[focus]:bg-gray-100">
-                {item && 'code' in item ? item.code : item.name}
->>>>>>> 767ed520b7cdbc78b94be2223036b54e5c0600a7
               </ComboboxOption>
             ))}
           </ComboboxOptions>
