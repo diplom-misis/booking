@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Layout } from '../layout';
-import { Field, Label, Button, Checkbox } from '@headlessui/react'
-import { useRouter } from 'next/navigation'
+import { Field, Label, Button, Checkbox } from '@headlessui/react';
+import { useRouter } from 'next/navigation';
 import CalendarInput from '@/components/CalendarInput';
 import SelectInput from '@/components/SelectInput';
 import { useForm } from "react-hook-form"
@@ -12,11 +12,19 @@ import { useAirportStore } from '@/store/useAirportStore';
 import { useAirports } from '@/hooks/useAirports';
 
 const typeClass = [
+<<<<<<< HEAD
+  { id: 1, name: 'Эконом' },
+  { id: 2, name: 'Комфорт' },
+  { id: 3, name: 'Бизнес' },
+  { id: 4, name: 'Первый' },
+];
+=======
   { id: '1', name: 'Эконом' },
   { id: '2', name: 'Комфорт' },
   { id: '3', name: 'Бизнес' },
   { id: '4', name: 'Первый' }
 ]
+>>>>>>> 767ed520b7cdbc78b94be2223036b54e5c0600a7
 
 const formatDate = (date: Date | undefined) => {
   if (!date) return '';
@@ -171,7 +179,9 @@ export default function BookingAirplane() {
                       <div className="absolute  size-[10px] bg-blue-500 rounded-sm"></div>
                     )}
                   </Checkbox>
-                  <Label className="text-sm text-gray-800">Обратный билет не нужен</Label>
+                  <Label className='text-sm text-gray-800'>
+                    Обратный билет не нужен
+                  </Label>
                 </Field>
               </div>
             </div>
@@ -182,5 +192,5 @@ export default function BookingAirplane() {
         </div>
       </div>
     </Layout>
-  )
+  );
 }
