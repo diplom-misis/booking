@@ -47,7 +47,7 @@ export default function Filters(props: FiltersProps) {
   } = props;
 
   return (
-    <div className="bg-white rounded-xl shadow-[rgba(0,0,0,0.15)_0px_4px_8px]">
+    <div className="bg-white rounded-xl shadow-[rgba(0,0,0,0.15)_0px_4px_8px] max-h-max">
       <form className="flex px-6 pt-8 flex-col gap-4">
         <h2 className="font-bold text-base">Сортировка</h2>
         <SelectInput

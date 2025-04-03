@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { cn } from '@/utils/cn';
 import {
   Combobox,
@@ -10,13 +11,24 @@ import {
 } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import { useEffect, useState } from 'react';
+=======
+import { cn } from "@/utils/cn";
+import { Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions, Field, Label } from "@headlessui/react";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import { useState } from "react";
+>>>>>>> 767ed520b7cdbc78b94be2223036b54e5c0600a7
 
-export type selectData = { id: number; name: string };
+export type selectData = { id: string; name: string };
+export type selectDataAirport = {
+  id: string
+  name: string
+  code: string
+}
 
 interface SelectInputProps {
   className?: string;
   title?: string
-  data: selectData[]
+  data: selectData[] | selectDataAirport[]
   disabled?: boolean
   height?: string
   widthSize?: string
@@ -24,8 +36,8 @@ interface SelectInputProps {
   typeCombobox: boolean
   placeholder?: string
   required?: boolean,
-  value: selectData | null;
-  onChange: (value: selectData | null) => void;
+  value: selectData | selectDataAirport | null;
+  onChange: (value: selectData | selectDataAirport  | null) => void;
 }
 
 export default function SelectInput(props: SelectInputProps) {
@@ -42,7 +54,7 @@ export default function SelectInput(props: SelectInputProps) {
   } = props
   const [query, setQuery] = useState('')
 
-  const filteredData =
+  const filteredData: selectData[] | selectDataAirport[] =
   query === ''
     ? data
     : data.filter((item) => {
@@ -61,7 +73,12 @@ export default function SelectInput(props: SelectInputProps) {
             )}
             disabled={disabled}
             placeholder={placeholder}
-            displayValue={(item: selectData | null) => item?.name || ""}
+            displayValue={(item: selectData | selectDataAirport | null) => {
+              if (item && 'code' in item) {
+                return item.code;
+              }
+              return item?.name || "";
+            }}
             style={{
               backgroundColor: disabled ? '#F9FAFB' : '',
             }}
@@ -81,6 +98,7 @@ export default function SelectInput(props: SelectInputProps) {
               'transition duration-100 ease-in'
             )}
           >
+<<<<<<< HEAD
             {filteredData.map((item) => (
               <ComboboxOption
                 key={item.id}
@@ -88,6 +106,11 @@ export default function SelectInput(props: SelectInputProps) {
                 className='h-9 flex items-center justify-center data-[focus]:bg-gray-100'
               >
                 {item.name}
+=======
+            {filteredData.map((item: selectData | selectDataAirport) => (
+              <ComboboxOption key={item.id} value={item} className="h-9 flex items-center justify-center data-[focus]:bg-gray-100">
+                {item && 'code' in item ? item.code : item.name}
+>>>>>>> 767ed520b7cdbc78b94be2223036b54e5c0600a7
               </ComboboxOption>
             ))}
           </ComboboxOptions>
