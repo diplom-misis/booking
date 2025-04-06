@@ -20,7 +20,7 @@ interface FiltersProps {
   transfersCheckboxes: { [key: string]: boolean }
   airlineCheckboxes: { [key: string]: boolean }
   priceRange: { from: string, to: string }
-  selectedSort: { id: number, name: string }
+  selectedSort: { id: string, name: string }
   onCheckboxChange: (key: string) => (checked: boolean) => void
   onPriceChange: (key: "from" | "to", value: string) => void
   onSortChange: (value: any) => void
@@ -28,8 +28,8 @@ interface FiltersProps {
 }
 
 const typeSort = [
-  { id: 1, name: 'дешевые → дорогие' },
-  { id: 2, name: 'дорогие → дешевые' },
+  { id: '1', name: 'дешевые → дорогие' },
+  { id: '2', name: 'дорогие → дешевые' },
 ]
 
 export default function Filters(props: FiltersProps) {
