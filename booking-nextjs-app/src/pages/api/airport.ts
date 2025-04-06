@@ -25,7 +25,16 @@ export default async function handler(
       }
 
       // Получение списка всех городов
-      const cities: City[] = await prisma.city.findMany();
+      const searchQuery = req.query.search as string | undefined;
+      const cities: City[] = await prisma.city.findMany({
+        where: searchQuery ? {
+          OR: [
+            { name: { contains: searchQuery } },
+            { name: { contains: searchQuery.toLowerCase() } },
+            { name: { contains: searchQuery.toUpperCase() } },
+          ]
+        } : {}
+      });
       return res.status(200).json({ cities });
     }
 
