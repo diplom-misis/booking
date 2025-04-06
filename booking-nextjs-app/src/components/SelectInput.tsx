@@ -90,7 +90,7 @@ export default function SelectInput(props: SelectInputProps) {
           </div>
 
           <ComboboxOptions
-            anchor="bottom"
+            anchor='bottom'
             className={cn(
               "w-[var(--input-width)] rounded-xl mt-1 border bg-white py-2 empty:invisible",
               "transition duration-100 ease-in",

@@ -1,7 +1,5 @@
-import Image from "next/image";
 import { Geist, Geist_Mono } from "next/font/google";
-import BookingPage from "./booking-page";
-import BookingAirplane from "./booking-airplane";
+import AuthPage from "./auth";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,7 +14,7 @@ const geistMono = Geist_Mono({
 export default function Home() {
   return (
     <div>
-      <BookingAirplane />
+      <AuthPage />
     </div>
   );
 }
