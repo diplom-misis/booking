@@ -9,7 +9,7 @@ import {
   Label,
 } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export type selectData = { id: string; name: string };
 export type selectDataAirport = {
@@ -31,6 +31,7 @@ interface SelectInputProps {
   required?: boolean;
   value: selectData | selectDataAirport | null;
   onChange: (value: selectData | selectDataAirport | null) => void;
+  onSearch?: (query: string) => void;
 }
 
 export default function SelectInput(props: SelectInputProps) {
@@ -44,8 +45,15 @@ export default function SelectInput(props: SelectInputProps) {
     required,
     value,
     onChange,
+    onSearch
   } = props;
   const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    if (onSearch && query) {
+      onSearch(query);
+    }
+  }, [query, onSearch]);
 
   const filteredData: selectData[] | selectDataAirport[] =
     query === ""
@@ -80,6 +88,12 @@ export default function SelectInput(props: SelectInputProps) {
               style={{
                 backgroundColor: disabled ? "#F9FAFB" : "",
               }}
+              onChange={(event) => {
+                setQuery(event.target.value);
+                if (onSearch) {
+                  onSearch(event.target.value);
+                }
+              }}
               required={required}
             />
             {typeCombobox && (
@@ -112,3 +126,4 @@ export default function SelectInput(props: SelectInputProps) {
     </div>
   );
 }
+

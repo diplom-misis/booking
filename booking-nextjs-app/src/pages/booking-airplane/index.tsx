@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Layout } from "../layout";
 import { Field, Label, Button, Checkbox } from "@headlessui/react";
 import { useRouter } from "next/navigation";
@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form";
 import PassengersSelect from "@/components/PassengersSelect";
 import { useCityStore } from "@/store/useCityStore";
 import { useAirportStore } from "@/store/useAirportStore";
+import { useDebounce } from "@/hooks/useDebounce";
 
 const typeClass = [
   { id: "1", name: "Эконом" },
@@ -68,7 +69,32 @@ export default function BookingAirplane() {
 
   const formValues = watch();
 
-  const { cities, isLoading: citiesLoading, loadCities } = useCityStore();
+  const {
+    fromCities,
+    toCities,
+    isLoading: citiesLoading,
+    searchFromCities,
+    searchToCities,
+  } = useCityStore();
+
+  const [fromSearchQuery, setFromSearchQuery] = useState("");
+  const debouncedFromSearch = useDebounce(fromSearchQuery, 300);
+
+  const [toSearchQuery, setToSearchQuery] = useState("");
+  const debouncedToSearch = useDebounce(toSearchQuery, 300);
+
+  useEffect(() => {
+    if (debouncedFromSearch) {
+      searchFromCities(debouncedFromSearch);
+    }
+  }, [debouncedFromSearch, searchFromCities]);
+
+  useEffect(() => {
+    if (debouncedToSearch) {
+      searchToCities(debouncedToSearch);
+    }
+  }, [debouncedToSearch, searchToCities]);
+
   const {
     airportsFrom,
     airportsTo,
@@ -76,10 +102,6 @@ export default function BookingAirplane() {
     loadAirportsFrom,
     loadAirportsTo,
   } = useAirportStore();
-
-  useEffect(() => {
-    loadCities();
-  }, [loadCities]);
 
   useEffect(() => {
     if (formValues.fromCity?.id) {
@@ -166,6 +188,14 @@ export default function BookingAirplane() {
     router.push(`/results-search?${queryString}`);
   };
 
+  const handleFromCitySearch = (query: string) => {
+    setFromSearchQuery(query);
+  };
+
+  const handleToCitySearch = (query: string) => {
+    setToSearchQuery(query);
+  };
+
   return (
     <Layout>
       <div className="flex flex-col justify-self-center">
@@ -184,13 +214,12 @@ export default function BookingAirplane() {
                     })}
                     className="h-10 w-[160px] px-[14px] py-[8px]"
                     title="Откуда"
-                    data={cities.filter(
-                      (city) => city.id !== formValues.toCity?.id,
-                    )}
+                    data={fromCities}
                     value={formValues.fromCity}
                     typeCombobox={false}
                     placeholder={"Лукоморье"}
                     onChange={(value) => setValue("fromCity", value)}
+                    onSearch={handleFromCitySearch}
                   />
                   {errors.fromCity && (
                     <p className="text-red-500 text-sm">
@@ -219,9 +248,7 @@ export default function BookingAirplane() {
                   <SelectInput
                     className="h-10 w-[160px] px-[14px] py-[8px]"
                     title="Куда"
-                    data={cities.filter(
-                      (city) => city.id !== formValues.fromCity?.id,
-                    )}
+                    data={toCities}
                     value={formValues.toCity}
                     typeCombobox={false}
                     placeholder={"Тридевятье"}
@@ -229,6 +256,7 @@ export default function BookingAirplane() {
                       required: "Это поле обязательно",
                     })}
                     onChange={(value) => setValue("toCity", value)}
+                    onSearch={handleToCitySearch}
                   />
                   {errors.toCity && (
                     <p className="text-red-500 text-sm">
