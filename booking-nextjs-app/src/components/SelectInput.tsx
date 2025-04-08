@@ -88,10 +88,17 @@ export default function SelectInput(props: SelectInputProps) {
               style={{
                 backgroundColor: disabled ? "#F9FAFB" : "",
               }}
-              onChange={(event) => {
-                setQuery(event.target.value);
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                const inputValue = event.target.value;
+                setQuery(inputValue);
                 if (onSearch) {
-                  onSearch(event.target.value);
+                  onSearch(inputValue);
+                }
+              }}
+              onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
+                const regex = /^[a-zA-Zа-яА-ЯёЁ\s]$/;
+                if (!regex.test(event.key) && event.key !== 'Backspace') {
+                  event.preventDefault();
                 }
               }}
               required={required}

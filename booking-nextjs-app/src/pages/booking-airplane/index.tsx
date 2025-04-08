@@ -12,6 +12,8 @@ import PassengersSelect from "@/components/PassengersSelect";
 import { useCityStore } from "@/store/useCityStore";
 import { useAirportStore } from "@/store/useAirportStore";
 import { useDebounce } from "@/hooks/useDebounce";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { bookingSchema } from "../../schemas/booking";
 
 const typeClass = [
   { id: "1", name: "Эконом" },
@@ -20,7 +22,7 @@ const typeClass = [
   { id: "4", name: "Первый" },
 ];
 
-const formatDate = (date: Date | undefined) => {
+const formatDate = (date: Date | null | undefined) => {
   if (!date) return "";
   const day = String(date.getDate()).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -35,8 +37,8 @@ type FormData = {
   toAirport: selectDataAirport | null;
   passengers: { Взрослые: number; Дети: number; Младенцы: number };
   classType: selectData | null;
-  departureDate: Date | undefined;
-  returnDate: Date | undefined;
+  departureDate: Date | null;
+  returnDate?: Date | null | undefined;
   isOneWay: boolean;
 };
 
@@ -50,10 +52,10 @@ export default function BookingAirplane() {
     setValue,
     watch,
     formState: { errors },
-    getValues,
     reset,
     clearErrors,
   } = useForm<FormData>({
+    resolver: zodResolver(bookingSchema),
     defaultValues: {
       fromCity: null,
       fromAirport: null,
@@ -61,8 +63,8 @@ export default function BookingAirplane() {
       toAirport: null,
       passengers: { Взрослые: 1, Дети: 0, Младенцы: 0 },
       classType: typeClass[0],
-      departureDate: undefined,
-      returnDate: undefined,
+      departureDate: null,
+      returnDate: null,
       isOneWay: false,
     },
   });
@@ -72,7 +74,6 @@ export default function BookingAirplane() {
   const {
     fromCities,
     toCities,
-    isLoading: citiesLoading,
     searchFromCities,
     searchToCities,
   } = useCityStore();
@@ -98,7 +99,6 @@ export default function BookingAirplane() {
   const {
     airportsFrom,
     airportsTo,
-    isLoading: airportsLoading,
     loadAirportsFrom,
     loadAirportsTo,
   } = useAirportStore();
@@ -152,7 +152,7 @@ export default function BookingAirplane() {
     const newEnabledState = !formValues.isOneWay;
     setValue("isOneWay", newEnabledState);
     if (newEnabledState) {
-      setValue("returnDate", undefined);
+      setValue("returnDate", null);
     }
   };
 
@@ -209,39 +209,38 @@ export default function BookingAirplane() {
               <div className="flex flex-row gap-2">
                 <div className="flex flex-col gap-1">
                   <SelectInput
-                    {...register("fromCity", {
-                      required: "Это поле обязательно",
-                    })}
+                    {...register("fromCity")}
                     className="h-10 w-[160px] px-[14px] py-[8px]"
                     title="Откуда"
                     data={fromCities}
                     value={formValues.fromCity}
                     typeCombobox={false}
-                    placeholder={"Лукоморье"}
+                    placeholder={"Лукоморье*"}
                     onChange={(value) => setValue("fromCity", value)}
                     onSearch={handleFromCitySearch}
                   />
                   {errors.fromCity && (
-                    <p className="text-red-500 text-sm">
-                      Это поле обязательное
-                    </p>
+                    <p className="text-red-500 text-xs">{errors.fromCity.message}</p>
                   )}
                 </div>
-                <SelectInput
-                  {...register("fromAirport", {
-                    required: "Это поле обязательно",
-                  })}
-                  className="h-10 w-[88px] px-[10px] py-[10px]"
-                  title="Аэропорт"
-                  data={airportsFrom}
-                  value={formValues.fromAirport}
-                  placeholder={"LKMR"}
-                  disabled
-                  typeCombobox={true}
-                  onChange={(value) =>
-                    setValue("fromAirport", value as selectDataAirport)
-                  }
-                />
+                <div className="flex flex-col gap-1">
+                  <SelectInput
+                    {...register("fromAirport")}
+                    className="h-10 w-[88px] px-[10px] py-[10px]"
+                    title="Аэропорт"
+                    data={airportsFrom}
+                    value={formValues.fromAirport}
+                    placeholder={"LKMR*"}
+                    disabled
+                    typeCombobox={true}
+                    onChange={(value) =>
+                      setValue("fromAirport", value as selectDataAirport)
+                    }
+                  />  
+                  {errors.fromAirport && (
+                    <p className="text-red-500 text-xs break-words whitespace-normal max-w-[88px]">{errors.fromAirport.message}</p>
+                  )}
+                </div>
               </div>
               <div className="flex flex-row gap-2">
                 <div className="flex flex-col gap-1">
@@ -251,34 +250,37 @@ export default function BookingAirplane() {
                     data={toCities}
                     value={formValues.toCity}
                     typeCombobox={false}
-                    placeholder={"Тридевятье"}
-                    {...register("toCity", {
-                      required: "Это поле обязательно",
-                    })}
+                    placeholder={"Тридевятье*"}
+                    {...register("toCity")}
                     onChange={(value) => setValue("toCity", value)}
                     onSearch={handleToCitySearch}
                   />
                   {errors.toCity && (
-                    <p className="text-red-500 text-sm">
-                      Это поле обязательное
+                    <p className="text-red-500 text-xs">
+                      {errors.toCity.message}
                     </p>
                   )}
                 </div>
-                <SelectInput
-                  {...register("toAirport", {
-                    required: "Это поле обязательно",
-                  })}
-                  className="h-10 w-[88px] px-[10px] py-[10px]"
-                  title="Аэропорт"
-                  data={airportsTo}
-                  value={formValues.toAirport}
-                  placeholder={"39"}
-                  disabled={true}
-                  typeCombobox={true}
-                  onChange={(value) =>
-                    setValue("toAirport", value as selectDataAirport)
-                  }
-                />
+                <div className="flex flex-col gap-1">
+                  <SelectInput
+                    {...register("toAirport")}
+                    className="h-10 w-[88px] px-[10px] py-[10px]"
+                    title="Аэропорт"
+                    data={airportsTo}
+                    value={formValues.toAirport}
+                    placeholder={"39*"}
+                    disabled={true}
+                    typeCombobox={true}
+                    onChange={(value) =>
+                      setValue("toAirport", value as selectDataAirport)
+                    }
+                  />
+                  {errors.toAirport && (
+                    <p className="text-red-500 text-xs break-words whitespace-normal max-w-[88px]">
+                      {errors.toAirport.message}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
             <div className="flex flex-row gap-2">
@@ -286,51 +288,50 @@ export default function BookingAirplane() {
                 value={formValues.passengers}
                 onChange={(value) => setValue("passengers", value)}
               />
-              <SelectInput
-                {...register("classType", {
-                  required: "Это поле обязательно",
-                })}
-                className="h-11 w-[262px] px-[14px] py-[10px]"
-                title="Класс"
-                data={typeClass}
-                value={formValues.classType}
-                disabled={false}
-                defaultValue={typeClass[0].name}
-                typeCombobox={true}
-                onChange={(value) => setValue("classType", value)}
-              />
+              <div className="flex flex-col gap-1">
+                <SelectInput
+                  {...register("classType")}
+                  className="h-11 w-[262px] px-[14px] py-[10px]"
+                  title="Класс"
+                  data={typeClass}
+                  value={formValues.classType}
+                  disabled={false}
+                  defaultValue={typeClass[0].name}
+                  typeCombobox={true}
+                  onChange={(value) => setValue("classType", value)}
+                />
+                {errors.classType && (
+                  <p className="text-red-500 text-xs">{errors.classType.message}</p>
+                )}
+              </div>
             </div>
             <div className="flex flex-row gap-2">
               <div className="flex flex-col gap-1">
                 <CalendarInput
-                  {...register("departureDate", {
-                    required: "Это поле обязательно",
-                  })}
+                  {...register("departureDate")}
                   value={formValues.departureDate}
-                  placeholder={"Выберите дату"}
+                  placeholder={"Выберите дату*"}
                   onChange={(date) => setValue("departureDate", date)}
                 />
                 {errors.departureDate && (
-                  <p className="text-red-500 text-sm">Это поле обязательное</p>
+                  <p className="text-red-500 text-xs">{errors.departureDate.message}</p>
                 )}
               </div>
               <div className="flex flex-col gap-1">
                 <CalendarInput
-                  {...register("returnDate", {
-                    required: !formValues.isOneWay && "Это поле обязательно",
-                  })}
-                  value={formValues.returnDate}
+                  {...register("returnDate")}
+                  value={formValues.returnDate || null}
                   disabled={formValues.isOneWay}
                   placeholder={
                     formValues.isOneWay
                       ? "Без обратного билета"
-                      : "Выберите дату"
+                      : "Выберите дату*"
                   }
                   hideCalendarIcon={formValues.isOneWay}
                   onChange={(date) => setValue("returnDate", date)}
                 />
                 {errors.returnDate && (
-                  <p className="text-red-500 text-sm">Это поле обязательное</p>
+                  <p className="text-red-500 text-xs break-words whitespace-normal max-w-[262px]">{errors.returnDate.message}</p>
                 )}
                 <Field className="flex items-center gap-2">
                   <Checkbox
