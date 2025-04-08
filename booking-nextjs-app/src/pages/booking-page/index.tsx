@@ -4,6 +4,9 @@ import { Layout } from '../layout';
 import { months } from '@/utils/constants';
 import { SyntheticEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useCartStore } from '@/store/useCartStore';
+import { METHODS } from 'http';
+import { fetchCart } from '@/services/cartService';
 
 const data = {
   fromCity: 'Лукоморье',
@@ -86,8 +89,17 @@ export default function BookingPage() {
     'flight'
   );
 
-  const handleSubmit = (e: SyntheticEvent) => {
+  const { setCart } = useCartStore()
+
+  const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault();
+
+    setCart('1');
+    console.log(await fetchCart())
+    fetch(`/api/booking-page`, {
+      method: 'POST',
+      body: JSON.stringify('1')
+    })
 
     const query = new URLSearchParams({
       fromCity,
