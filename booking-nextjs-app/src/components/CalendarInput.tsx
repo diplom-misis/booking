@@ -10,15 +10,15 @@ interface CalendarInputProps {
   placeholder: string
   hideCalendarIcon?: boolean
   required?: boolean
-  value: Date | undefined;
-  onChange: (date: Date | undefined) => void;
+  value: Date | null;
+  onChange: (date: Date | null) => void;
 }
 
 export default function CalendarInput(props: CalendarInputProps) {
   const { disabled, placeholder, hideCalendarIcon, required, value, onChange } = props
 
   const handleDateChange = (date: Date | undefined) => {
-    onChange(date);
+    onChange(date || null);
   };
 
   return (
@@ -40,7 +40,7 @@ export default function CalendarInput(props: CalendarInputProps) {
         <DayPicker
           locale={ru}
           mode="single"
-          selected={value}
+          selected={value || undefined}
           onSelect={handleDateChange}
           classNames={{
             nav_button: 'text-gray-800',

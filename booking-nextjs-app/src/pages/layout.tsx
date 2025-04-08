@@ -8,8 +8,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const [currentPage, setCurrentPage] = useState<'booking' | 'allBookings' | 'profile'>('booking')
 
   return (
-    <div className='bg-gray-100 md:bg-[url(../images/layout-bg.jpg)] bg-fixed bg-cover bg-center z-[-9999] relative'>
-      <header className='px-5 pt-2 pb-3 md:px-6 md:py-4 bg-white flex justify-between rounded-b-xl md:rounded-none border-b border-gray-200 relative z-[-999]'>
+    <div className='bg-gray-100 md:bg-[url(../images/layout-bg.jpg)] bg-fixed bg-cover bg-center z-[0] relative min-h-screen flex flex-col'>
+      <header className='px-5 pt-2 pb-3 md:px-6 md:py-4 bg-white flex justify-between rounded-b-xl md:rounded-none border-b border-gray-200 relative z-[1]'>
         <Logo className='hidden md:inline' />
         <nav className='flex gap-2 justify-between md:justify-end w-full'>
           <div className='flex flex-row-reverse justify-between w-[calc(50%+12px)] md:w-auto md:flex-row relative'>
@@ -33,7 +33,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
               >
                 Поиск авиабилетов
               </Link>
+<<<<<<< HEAD
               {currentPage === 'booking' && <div className='flex absolute size-7 rounded-full z-[-1] bg-blue-500 right-0.5 md:hidden'></div>}
+=======
+              {currentPage === 'booking' && <div className='flex absolute size-7 rounded-full z-[3] bg-blue-500 right-0.5'></div>}
+>>>>>>> 6072091a46cba34283ec4b7e50a8f59adfd13e25
             </div>
             <div className='flex gap-2 md:px-5 md:py-2 items-center [&_path]:hover:stroke-blue-600 hover:text-blue-500 cursor-pointer'>
               <svg
@@ -70,7 +74,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           />
         </nav>
       </header>
-      <div className='pl-5 pr-7 pt-5 md:py-8'>{children}</div>
+      <div className='pl-5 pr-7 pt-5 md:py-8 flex-1'>{children}</div>
     </div>
   );
 }
