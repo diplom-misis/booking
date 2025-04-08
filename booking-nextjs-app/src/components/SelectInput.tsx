@@ -1,7 +1,15 @@
-import { cn } from "@/utils/cn";
-import { Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions, Field, Label } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import { cn } from '@/utils/cn';
+import {
+  Combobox,
+  ComboboxButton,
+  ComboboxInput,
+  ComboboxOption,
+  ComboboxOptions,
+  Field,
+  Label,
+} from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/24/outline';
+import { useEffect, useState } from 'react';
 
 export type selectData = { id: string; name: string };
 export type selectDataAirport = {
@@ -83,9 +91,13 @@ export default function SelectInput(props: SelectInputProps) {
               'transition duration-100 ease-in'
             )}
           >
-            {filteredData.map((item: selectData | selectDataAirport) => (
-              <ComboboxOption key={item.id} value={item} className="h-9 flex items-center justify-center data-[focus]:bg-gray-100">
-                {item && 'code' in item ? item.code : item.name}
+            {filteredData.map((item) => (
+              <ComboboxOption
+                key={item.id}
+                value={item}
+                className='h-9 flex items-center justify-center data-[focus]:bg-gray-100'
+              >
+                {item.name}
               </ComboboxOption>
             ))}
           </ComboboxOptions>

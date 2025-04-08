@@ -8,8 +8,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const [currentPage, setCurrentPage] = useState<'booking' | 'allBookings' | 'profile'>('booking')
 
   return (
-    <div className='bg-gray-100 md:bg-[url(../images/layout-bg.jpg)] bg-fixed bg-cover bg-center'>
-      <header className='px-5 pt-2 pb-3 md:px-6 md:py-4 bg-white flex justify-between rounded-b-xl md:rounded-none border-b border-gray-200 relative'>
+    <div className='bg-gray-100 md:bg-[url(../images/layout-bg.jpg)] bg-fixed bg-cover bg-center z-[-9999] relative'>
+      <header className='px-5 pt-2 pb-3 md:px-6 md:py-4 bg-white flex justify-between rounded-b-xl md:rounded-none border-b border-gray-200 relative z-[-999]'>
         <Logo className='hidden md:inline' />
         <nav className='flex gap-2 justify-between md:justify-end w-full'>
           <div className='flex flex-row-reverse justify-between w-[calc(50%+12px)] md:w-auto md:flex-row relative'>

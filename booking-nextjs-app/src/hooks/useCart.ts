@@ -9,7 +9,7 @@ export const useCart = () => {
     queryKey: ['cart'],
     queryFn: async () => {
       const cart = await fetchCart();
-      setCart(cart.routeId);
+      setCart(cart!.routeId);
       return cart;
     },
     staleTime: 60000,
