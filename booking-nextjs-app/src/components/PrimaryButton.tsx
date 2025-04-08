@@ -1,17 +1,16 @@
 import React from 'react';
 
 interface PrimaryButtonProps {
-  type: 'button' | 'submit' | 'reset' | undefined;
   onClick?: () => void;
   children: React.ReactNode;
   className?: string;
 }
 
-const PrimaryButton: React.FC<PrimaryButtonProps> = ({ type = 'button', onClick = () => {}, children, className = '' }) => {
+const PrimaryButton: React.FC<PrimaryButtonProps> = ({ onClick = () => {}, children, className = '' }) => {
   return (
     <button
-      type={type}
-      // onClick={onClick}
+      type='button'
+      onClick={onClick}
       className={`bg-blue-500 text-gray-100 py-2 rounded-lg font-bold ${className}`}
     >
       {children}
