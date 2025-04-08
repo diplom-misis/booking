@@ -1,27 +1,41 @@
-interface InputFieldProps {
+import React from "react";
+
+interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
-  type?: string;
   placeholder: string;
-  width: string;
+  width?: string;
   linkComponent?: React.ReactNode;
+  className?: string;
+  error?: { message?: string }; // Для отображения ошибки
 }
 
 export default function InputField({
   label,
-  type = 'text',
+  type = "text",
   placeholder,
-  width,
+  width = "w-full",
   linkComponent,
+  className = "",
+  id,
+  error,
+  ...inputProps
 }: InputFieldProps) {
   return (
     <div className={`flex flex-col gap-1 ${width}`}>
-      <p className="text-gray-400 text-xs">{label}</p>
+      <label htmlFor={id} className="text-gray-400 text-xs">
+        {label}
+      </label>
       <input
+        id={id}
         type={type}
-        className="border border-gray-300 rounded px-3.5 py-2 w-full"
         placeholder={placeholder}
+        className={`border ${error ? "border-red-500" : "border-gray-300"} rounded px-3.5 py-2 w-full ${className}`}
+        {...inputProps}
       />
-      {linkComponent && <>{linkComponent}</>}
+      {error && error.message && (
+        <p className="text-red-500 text-xs">{error.message}</p>
+      )}
+      {linkComponent && <div className="text-right">{linkComponent}</div>}
     </div>
   );
 }
