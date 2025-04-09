@@ -94,9 +94,7 @@ export default function BookingPage() {
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault();
 
-    setCart('1');
-    console.log(await fetchCart())
-    fetch(`/api/booking-page`, {
+    await fetch(`/api/booking-page`, {
       method: 'POST',
       body: JSON.stringify('1')
     })
