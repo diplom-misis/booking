@@ -14,15 +14,18 @@ export default async function handler(
   try {
     switch (req.method) {
       case "GET":
+        console.log(await prisma.reservation.findMany())
         return res.status(200).json({ cart: await prisma.cart.findFirst() });
       case "POST": {
-        // await prisma.flight.create({ data: {}})
-        await prisma.flightsRoutes.create({ data: { sequenceId: 1, flightId: '1', routeId: '1'}})
-        await prisma.route.create({ data: {}})
-        console.log(await prisma.route.findMany())
-        const cart: Cart = await prisma.cart.create({ data: { routeId: req.body.routeId } });
-        return res.status(201).json({ message: 'Cart created', cart });
+        console.log(`req.body - ${JSON.parse(req.body).routeId}`)
+        const cart: Cart = await prisma.cart.create({
+          data: { routeId: JSON.parse(req.body).routeId },
+        });
+        return res.status(201).json({ message: "Cart created", cart });
       }
+      case "DELETE":
+        await prisma.cart.delete({where: { id:(await prisma.cart.findFirst())?.id } })
+        res.status(200).json({ message: "Cart deleted" })
     }
   } catch (e) {
     console.log("error - ", e);
