@@ -100,6 +100,10 @@ export default function BookingPage() {
       company,
       dateFrom,
       timeFrom,
+      fromAirport,
+      toAirport,
+      fromDatetime: String(fromDatetime),
+      toDatetime: String(toDatetime)
     }).toString();
 
     router.push(`/booking-success-page?${query}`);

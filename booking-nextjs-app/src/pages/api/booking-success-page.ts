@@ -16,6 +16,7 @@ export default async function saveReservation(
     case "GET":
       return res.json({ reservations: await prisma.reservation.findMany() });
     case "POST": {
+      console.log(req.query)
       await prisma.reservation.create({
         data: {
           data: {

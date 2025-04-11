@@ -14,10 +14,8 @@ export default async function handler(
   try {
     switch (req.method) {
       case "GET":
-        console.log(await prisma.reservation.findMany())
         return res.status(200).json({ cart: await prisma.cart.findFirst() });
       case "POST": {
-        console.log(`req.body - ${JSON.parse(req.body).routeId}`)
         const cart: Cart = await prisma.cart.create({
           data: { routeId: JSON.parse(req.body).routeId },
         });
