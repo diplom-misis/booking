@@ -60,17 +60,19 @@ model VerificationRequest {
 }
 
 model Flight {
-  id            String   @id @default(uuid())
-  fromAirport   Airport  @relation(name: "Departure", fields: [fromAirportId], references: [id])
+  id            String      @id @default(uuid())
+  fromAirport   Airport     @relation(name: "Departure", fields: [fromAirportId], references: [id])
   fromAirportId String
   fromDatetime  DateTime
-  toAirport     Airport  @relation(name: "Arrival", fields: [toAirportId], references: [id])
+  toAirport     Airport     @relation(name: "Arrival", fields: [toAirportId], references: [id])
   toAirportId   String
   toDatetime    DateTime
   company       String
+  flightNumber  String
+  ticketClass   TicketClass @default(ECONOMY)
   price         Float
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 
   flightRoutes FlightsRoutes[]
 }
@@ -89,12 +91,13 @@ model Airport {
 
 model City {
   id      String    @id @default(uuid())
-  name    String
+  name    String    @unique
   Airport Airport[]
 }
 
 model Route {
   id           String          @id @default(uuid())
+  hash         String          @unique
   flightRoutes FlightsRoutes[]
   carts        Cart[]
 }
@@ -127,4 +130,11 @@ model Reservation {
 enum Status {
   IN_PROCESSING
   COMPLETE
+}
+
+enum TicketClass {
+  ECONOMY
+  COMFORT
+  BUSINESS
+  FIRST
 }
