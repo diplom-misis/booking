@@ -10,12 +10,17 @@ export default async function handler(
     return res.status(405).json({ message: "Method not allowed" });
   }
 
+  const authHeader = req.headers["authorization"];
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
   try {
     const startTime = Date.now();
     console.log("[ROUTE_GENERATION] Начало генерации маршрутов");
 
     const now = DateTime.utc();
-    const endDate = now.plus({ months: 1 });
+    const endDate = now.plus({ months: 12 });
     let currentDate = now;
 
     while (currentDate < endDate) {
