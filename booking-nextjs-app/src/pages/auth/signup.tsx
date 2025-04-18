@@ -20,7 +20,7 @@ export default function SignUpPage() {
             </div>
             <div className="flex flex-col gap-1">
               <p className="text-sm text-gray-500">Уже зарегистрированы?</p>
-              <Link href="#" className="text-blue-500 font-bold">
+              <Link href="/auth/signin" className="text-blue-500 font-bold">
                 Войти в аккаунт
               </Link>
             </div>

@@ -74,6 +74,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             className="outline-1 rounded-full hover:outline hover:outline-blue-600 active:outline-2 cursor-pointer w-6 h-6 md:w-10 md:h-10"
             alt="Аватар пользователя"
           />
+          {/* Добавить дропдаун на Image, где будет выбор или перейти к профилю или выйти. Для выхода вызвать signOut из next-auth */}
         </nav>
       </header>
       <div className="pl-5 pr-7 pt-5 md:py-8 flex-1">{children}</div>
