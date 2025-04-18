@@ -2,17 +2,17 @@ import React from "react";
 
 interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
-  placeholder: string;
+  placeholder?: string;
   width?: string;
   linkComponent?: React.ReactNode;
   className?: string;
-  error?: { message?: string }; // Для отображения ошибки
+  error?: { message?: string };
 }
 
 export default function InputField({
   label,
   type = "text",
-  placeholder,
+  placeholder = "",
   width = "w-full",
   linkComponent,
   className = "",

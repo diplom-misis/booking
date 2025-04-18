@@ -1,14 +1,15 @@
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signUpSchema, SignUpSchema } from "@/schemas/signup";
 import InputField from "@/components/InputField";
 import { useRouter } from "next/navigation";
+import { useSignUp } from "@/hooks/useSignUp";
+import PrimaryButton from "../PrimaryButton";
 
 export default function SignUpForm() {
   const router = useRouter();
+  const { mutate, isPending, isError, error } = useSignUp();
 
-  const [error, setError] = useState("");
   const {
     register,
     handleSubmit,
@@ -17,26 +18,10 @@ export default function SignUpForm() {
     resolver: zodResolver(signUpSchema),
   });
 
-  const onSubmit = async (data: SignUpSchema) => {
-    try {
-      const response = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        setError(errorData.error || "Ошибка регистрации");
-        return;
-      }
-
-      router.push("/auth/signin");
-    } catch (err) {
-      setError("Произошла ошибка. Попробуйте позже.");
-    }
+  const onSubmit = (data: SignUpSchema) => {
+    mutate(data, {
+      onSuccess: () => router.push("/auth/signin"),
+    });
   };
 
   return (
@@ -80,14 +65,15 @@ export default function SignUpForm() {
         error={errors.confirmPassword}
       />
 
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {isError && (
+        <p className="text-red-500 text-sm">
+          {(error as Error)?.message || "Произошла ошибка"}
+        </p>
+      )}
 
-      <button
-        type="submit"
-        className="w-full bg-blue-500 text-white py-2 rounded"
-      >
-        Зарегистрироваться
-      </button>
+      <PrimaryButton type="submit" className="mt-4" disabled={isPending}>
+        {isPending ? "Регистрируем..." : "Зарегистрироваться"}
+      </PrimaryButton>
     </form>
   );
 }
