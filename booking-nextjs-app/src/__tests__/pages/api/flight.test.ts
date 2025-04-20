@@ -36,6 +36,7 @@ const validFlightData = {
   arrivalAirport: "goj",
   arrivalDateTime: "2025-01-01T14:00:00Z",
   company: "Pobeda",
+  flightNumber: "DP742",
   ticketClass: TicketClass.ECONOMY,
   price: 299.99,
 };
@@ -164,6 +165,7 @@ describe("/api/flights", () => {
           toAirportId: "2", // GOJ
           toDatetime: new Date("2025-01-01T14:00:00Z"),
           company: "Pobeda",
+          flightNumber: "DP742",
           ticketClass: TicketClass.ECONOMY,
           price: 299.99,
         },
@@ -182,6 +184,7 @@ describe("/api/flights", () => {
         fromDatetime: new Date("2025-01-01T10:00:00Z"),
         toDatetime: new Date("2025-01-01T14:00:00Z"),
         company: "Pobeda",
+        flightNumber: "DP742",
         ticketClass: TicketClass.ECONOMY,
       },
     ]);
@@ -224,6 +227,7 @@ describe("/api/flights", () => {
           toAirportId: "2",
           toDatetime: new Date("2025-01-02T14:00:00Z"),
           company: "Pobeda",
+          flightNumber: "DP742",
           ticketClass: TicketClass.ECONOMY,
           price: 299.99,
         },

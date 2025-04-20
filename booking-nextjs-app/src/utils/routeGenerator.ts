@@ -1,5 +1,6 @@
 import { DateTime } from "luxon";
 import prisma from "@/utils/prisma";
+import { Flight } from "@prisma/client";
 
 const MAX_TRANSFERS = 3;
 const MAX_WAIT_HOURS = 24;
@@ -66,12 +67,12 @@ export async function generateRoutes(fromDateTime: DateTime | null = null) {
   const batchSize = 10000;
   for (let i = 0; i < allRoutes.length; i += batchSize) {
     console.log(`Начинаем обработку с ${i} по ${i + batchSize}`);
-    await saveRoutes(allRoutes.slice(i, i + batchSize));
+    await saveRoutes(allRoutes.slice(i, i + batchSize), flights);
     console.log(`Закончили обработку с ${i} по ${i + batchSize}`);
   }
 }
 
-async function saveRoutes(routes: string[][]) {
+async function saveRoutes(routes: string[][], flights: Flight[]) {
   await prisma.$transaction(async (tx) => {
     console.log("Начинаем создание Route's.");
     console.log("Количество маршуртов:", routes.length);
@@ -108,6 +109,8 @@ async function saveRoutes(routes: string[][]) {
 
     console.log("Начинаем создание FlightsRoutes.");
 
+    const flightIdToDate = new Map(flights.map((f) => [f.id, f.fromDatetime]));
+
     const flightsRoutesData = validRoutes.flatMap((path) => {
       const hash = path.join("-");
       const routeId = hashToId.get(hash)!;
@@ -115,6 +118,7 @@ async function saveRoutes(routes: string[][]) {
         sequenceId: i,
         routeId,
         flightId,
+        flightDate: flightIdToDate.get(flightId)!,
       }));
     });
 
