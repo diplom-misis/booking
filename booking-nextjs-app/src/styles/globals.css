@@ -28,3 +28,9 @@ body {
   background-size: cover;
   background-position: center;
 }
+
+h1 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  font-family: system-ui, -apple-system, sans-serif;
+}

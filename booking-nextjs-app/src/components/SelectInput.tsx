@@ -45,7 +45,7 @@ export default function SelectInput(props: SelectInputProps) {
     required,
     value,
     onChange,
-    onSearch
+    onSearch,
   } = props;
   const [query, setQuery] = useState("");
 
@@ -97,7 +97,7 @@ export default function SelectInput(props: SelectInputProps) {
               }}
               onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
                 const regex = /^[a-zA-Zа-яА-ЯёЁ\s]$/;
-                if (!regex.test(event.key) && event.key !== 'Backspace') {
+                if (!regex.test(event.key) && event.key !== "Backspace") {
                   event.preventDefault();
                 }
               }}
@@ -111,7 +111,7 @@ export default function SelectInput(props: SelectInputProps) {
           </div>
 
           <ComboboxOptions
-            anchor='bottom'
+            anchor="bottom"
             className={cn(
               "w-[var(--input-width)] rounded-xl mt-1 border bg-white py-2 empty:invisible",
               "transition duration-100 ease-in",
@@ -122,9 +122,11 @@ export default function SelectInput(props: SelectInputProps) {
               <ComboboxOption
                 key={item.id}
                 value={item}
-                className="h-9 flex items-center justify-center data-[focus]:bg-gray-100"
+                className="group flex min-h-9 items-center justify-center px-3 data-[focus]:bg-gray-100"
               >
-                {item && "code" in item ? item.code : item.name}
+                <span className="text-center whitespace-normal break-words">
+                  {"code" in item ? item.code : item.name}
+                </span>
               </ComboboxOption>
             ))}
           </ComboboxOptions>
@@ -133,4 +135,3 @@ export default function SelectInput(props: SelectInputProps) {
     </div>
   );
 }
-

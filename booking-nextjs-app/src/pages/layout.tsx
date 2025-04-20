@@ -3,6 +3,7 @@ import Image from "next/image";
 import defaultAvatar from "../images/default-avatar.svg";
 import Link from "next/link";
 import { useState } from "react";
+import { ToastContainer } from "react-toastify";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [currentPage, setCurrentPage] = useState<
@@ -78,6 +79,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </nav>
       </header>
       <div className="pl-5 pr-7 pt-5 md:py-8 flex-1">{children}</div>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={3000}
+        pauseOnHover={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        draggable
+        pauseOnFocusLoss={false}
+      />
     </div>
   );
 }

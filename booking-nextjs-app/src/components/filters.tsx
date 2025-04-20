@@ -28,8 +28,8 @@ interface FiltersProps {
 }
 
 const typeSort = [
-  { id: '1', name: 'дешевые → дорогие' },
-  { id: '2', name: 'дорогие → дешевые' },
+  { id: '1', name: 'дешевые → дорогие', type: 'asc' },
+  { id: '2', name: 'дорогие → дешевые', type: 'desc' },
 ]
 
 export default function Filters(props: FiltersProps) {

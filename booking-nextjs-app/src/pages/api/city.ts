@@ -61,14 +61,15 @@ export default async function handler(
 
       const cities: City[] = await prisma.city.findMany({
         where: search
-          ? {
-              OR: [
-                { name: { contains: search } },
-                { name: { contains: search.toLowerCase() } },
-                { name: { contains: search.toUpperCase() } },
-              ],
-            }
-          : {},
+        ? {
+            OR: [
+              { name: { contains: search } },
+              { name: { contains: search.toLowerCase() } },
+              { name: { contains: search.toUpperCase() } },
+              { name: { contains: search[0].toUpperCase() + search.slice(1).toLowerCase() } },
+            ],
+          }
+        : {},
       });
 
       return res.status(200).json({ cities });
