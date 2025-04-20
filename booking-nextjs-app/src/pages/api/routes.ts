@@ -21,6 +21,8 @@ const querySchema = z
     airline: z.union([z.string(), z.array(z.string())]).optional(),
     sortByPrice: z.enum(["asc", "desc"]).optional(),
     passengers: z.coerce.number().int().min(1).default(1),
+    page: z.coerce.number().int().min(1).default(1),
+    limit: z.coerce.number().int().min(1).default(4),
   })
   .refine(
     (data) => {
@@ -170,7 +172,11 @@ export default async function handler(
         : priceA - priceB;
     });
 
-    const result = sortedRoutes.map((route) => {
+    const startIndex = (parsedQuery.page - 1) * parsedQuery.limit;
+    const endIndex = parsedQuery.page * parsedQuery.limit;
+    const paginatedRoutes = sortedRoutes.slice(startIndex, endIndex);
+
+    const result = paginatedRoutes.map((route) => {
       const flights = route.flightRoutes.map((fr) => fr.flight);
       const totalPrice = flights.reduce((sum, flight) => sum + flight.price, 0) * parsedQuery.passengers;
 
@@ -212,7 +218,11 @@ export default async function handler(
       };
     });
 
-    return res.status(200).json(result);
+    return res.status(200).json({
+      data: result,
+      hasMore: endIndex < sortedRoutes.length,
+      total: sortedRoutes.length,
+    });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({

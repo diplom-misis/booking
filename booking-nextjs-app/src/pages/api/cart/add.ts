@@ -1,8 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { PrismaClient } from '@prisma/client'
 import { z } from 'zod'
-
-const prisma = new PrismaClient()
+import prisma from "@/utils/prisma";
 
 const schema = z.object({
   routeId: z.string().uuid(),

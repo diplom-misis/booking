@@ -1,12 +1,14 @@
 import { Layout } from "../layout";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Filters from "@/components/filters";
 import { Arrow } from "@/components/arrow";
 import { useSearchParams } from "next/navigation";
 import CheapFilter from "@/components/CheapFilter";
 import RouteCard from "@/components/RouteCard";
 import HotelsList from "@/components/HotelsList";
-import { useRouteStore } from "@/store/useRouteStore";
+import { useRoutesQuery } from "@/hooks/useRoutesQuery";
+import { useInView } from "react-intersection-observer";
+import React from "react";
 
 const layovers = [
   { id: 1, name: "Без пересадок", state: "noTransfers" },
@@ -120,15 +122,6 @@ export default function ResultsSearch() {
   const [airlines, setAirlines] = useState<
     { id: number; name: string; state: string }[]
   >([]);
-  const {
-    oneWayRoutes,
-    returnRoutes,
-    isLoading,
-    error,
-    fetchOneWayRoutes,
-    fetchReturnRoutes,
-  } = useRouteStore();
-
   const [transfersCheckboxes, setTransfersCheckboxes] = useState({
     noTransfers: false,
     oneTransfer: false,
@@ -148,6 +141,9 @@ export default function ResultsSearch() {
     name: "дешевые → дорогие",
     type: "asc",
   });
+
+  const [oneWayRef, oneWayInView] = useInView();
+  const [returnRef, returnInView] = useInView();
 
   // const sortedRoutesThere = routesThere.sort(
   //   (a, b) => a.totalPrice - b.totalPrice,
@@ -213,84 +209,120 @@ export default function ResultsSearch() {
     airlines,
   ]);
 
+  const oneWayParams = useMemo(
+    () => ({
+      fromAirport: airportFrom,
+      toAirport: airportTo,
+      departureDate: parseDateToISO(dateFrom),
+      sortByPrice: selectedSort.type,
+      ticketClass: ticketClassMap[classTicket],
+      minPrice: priceRange.from,
+      maxPrice: priceRange.to,
+      passengers: passengers,
+      airline: selectedAirlines.length > 0 ? selectedAirlines : undefined,
+      allowedStops: selectedTransfers,
+    }),
+    [
+      airportFrom,
+      airportTo,
+      classTicket,
+      dateFrom,
+      passengers,
+      priceRange.from,
+      priceRange.to,
+      selectedAirlines,
+      selectedSort.type,
+      selectedTransfers,
+    ],
+  );
+
+  const returnParams = useMemo(
+    () => ({
+      fromAirport: airportTo,
+      toAirport: airportFrom,
+      departureDate: parseDateToISO(dateTo),
+      sortByPrice: selectedSort.type,
+      ticketClass: ticketClassMap[classTicket],
+      minPrice: priceRange.from,
+      maxPrice: priceRange.to,
+      passengers: passengers,
+      airline: selectedAirlines.length > 0 ? selectedAirlines : undefined,
+      allowedStops: selectedTransfers,
+    }),
+    [
+      airportFrom,
+      airportTo,
+      classTicket,
+      dateTo,
+      passengers,
+      priceRange.from,
+      priceRange.to,
+      selectedAirlines,
+      selectedSort.type,
+      selectedTransfers,
+    ],
+  );
+
+  const {
+    data: oneWayData,
+    fetchNextPage: fetchNextOneWay,
+    hasNextPage: hasNextOneWay,
+    isFetching: isFetchingOneWay,
+  } = useRoutesQuery(oneWayParams, !!dateFrom);
+
+  const {
+    data: returnData,
+    fetchNextPage: fetchNextReturn,
+    hasNextPage: hasNextReturn,
+    isFetching: isFetchingReturn,
+  } = useRoutesQuery(returnParams, !!dateTo);
+
   useEffect(() => {
-    const allRoutes = [...oneWayRoutes, ...returnRoutes];
+    if (oneWayInView && hasNextOneWay && !isFetchingOneWay) {
+      fetchNextOneWay();
+    }
+  }, [oneWayInView, hasNextOneWay, isFetchingOneWay, fetchNextOneWay]);
+
+  useEffect(() => {
+    if (returnInView && hasNextReturn && !isFetchingReturn) {
+      fetchNextReturn();
+    }
+  }, [returnInView, hasNextReturn, isFetchingReturn, fetchNextReturn]);
+
+  useEffect(() => {
+    const oneWayPages = oneWayData?.pages ?? [];
+    const returnPages = returnData?.pages ?? [];
+  
+    const allRoutes = [...oneWayPages, ...returnPages];
   
     if (allRoutes.length > 0) {
       const uniqueAirlines = Array.from(
         new Set<string>(
-          allRoutes.flatMap((route) => route.airlines).filter(Boolean)
-        )
+          allRoutes.flatMap(
+            (route) => route.data?.flatMap((item) => item.airlines ?? []) ?? [],
+          ).filter(Boolean),
+        ),
       );
   
       const airlinesList = uniqueAirlines.map((airline, index) => ({
         id: index + 1,
         name: airline,
-        state: airline.toLowerCase().replace(/\s+/g, '-'),
+        state: airline.toLowerCase().replace(/\s+/g, "-"),
       }));
   
       setAirlines(airlinesList);
   
       setAirlineCheckboxes((prev) => {
-        const newState = airlinesList.reduce(
-          (acc, airline) => {
-            acc[airline.state] = prev[airline.state] || false;
-            return acc;
-          },
-          {} as Record<string, boolean>,
-        );
+        const newState = { ...prev };
+        airlinesList.forEach((airline) => {
+          if (!(airline.state in newState)) {
+            newState[airline.state] = false;
+          }
+        });
         return newState;
       });
     }
-  }, [oneWayRoutes, returnRoutes]);
-
-  useEffect(() => {
-    if (!airportFrom || !airportTo || !classTicket || !passengers) return;
-
-    if (dateFrom) {
-      fetchOneWayRoutes({
-        fromAirport: airportFrom,
-        toAirport: airportTo,
-        departureDate: parseDateToISO(dateFrom),
-        sortByPrice: selectedSort.type,
-        ticketClass: ticketClassMap[classTicket],
-        minPrice: priceRange.from,
-        maxPrice: priceRange.to,
-        passengers: passengers,
-        airline: selectedAirlines.length > 0 ? selectedAirlines : undefined,
-        allowedStops: selectedTransfers,
-      });
-    }
-
-    if (dateTo) {
-      fetchReturnRoutes({
-        fromAirport: airportTo,
-        toAirport: airportFrom,
-        departureDate: parseDateToISO(dateTo),
-        sortByPrice: selectedSort.type,
-        ticketClass: ticketClassMap[classTicket],
-        minPrice: priceRange.from,
-        maxPrice: priceRange.to,
-        passengers: passengers,
-        airline: selectedAirlines.length > 0 ? selectedAirlines : undefined,
-        allowedStops: selectedTransfers,
-      });
-    }
-  }, [
-    airportFrom,
-    airportTo,
-    classTicket,
-    dateFrom,
-    dateTo,
-    fetchOneWayRoutes,
-    fetchReturnRoutes,
-    passengers,
-    priceRange.from,
-    priceRange.to,
-    selectedAirlines,
-    selectedSort.type,
-    selectedTransfers,
-  ]);
+  }, [oneWayData, returnData]);
 
   const handleCheckboxChange = (key: string) => (checked: boolean) => {
     if (key in transfersCheckboxes) {
@@ -314,9 +346,8 @@ export default function ResultsSearch() {
       }
     } else if (key in airlineCheckboxes) {
       setAirlineCheckboxes((prev) => ({ ...prev, [key]: checked }));
-      
-      // Находим полное название авиалинии по state
-      const airline = airlines.find(a => a.state === key);
+
+      const airline = airlines.find((a) => a.state === key);
       if (airline) {
         if (checked) {
           setSelectedAirlines((prev) => [...prev, airline.name]);
@@ -368,21 +399,21 @@ export default function ResultsSearch() {
       const layover = layovers.find((l) => l.name === filter);
       if (layover) {
         setTransfersCheckboxes((prev) => ({ ...prev, [layover.state]: false }));
-  
+
         const transfersMap: Record<string, number> = {
           noTransfers: 0,
           oneTransfer: 1,
           twoTransfers: 2,
           threeTransfers: 3,
         };
-  
+
         const transferCount = transfersMap[layover.state];
         setSelectedTransfers((prev) =>
           prev.filter((count) => count !== transferCount),
         );
         return;
       }
-  
+
       const airline = airlines.find((a) => a.name === filter);
       if (airline) {
         setAirlineCheckboxes((prev) => ({ ...prev, [airline.state]: false }));
@@ -391,7 +422,7 @@ export default function ResultsSearch() {
         );
         return;
       }
-  
+
       if (filter.startsWith("От")) {
         setPriceRange((prev) => ({ ...prev, from: "" }));
         return;
@@ -400,7 +431,7 @@ export default function ResultsSearch() {
         setPriceRange((prev) => ({ ...prev, to: "" }));
         return;
       }
-  
+
       if (filter === selectedSort.name) {
         setSelectedSort({ id: "1", name: "дешевые → дорогие", type: "asc" });
         return;
@@ -449,18 +480,21 @@ export default function ResultsSearch() {
           </div>
         </div>
         <div className="flex flex-row gap-5">
-          <Filters
-            layovers={layovers}
-            airlines={airlines}
-            transfersCheckboxes={transfersCheckboxes}
-            airlineCheckboxes={airlineCheckboxes}
-            priceRange={priceRange}
-            selectedSort={selectedSort}
-            onCheckboxChange={handleCheckboxChange}
-            onPriceChange={handlePriceChange}
-            onSortChange={handleSortChange}
-            onClearFilters={handleClearFilters}
-          />
+          <div className="sticky top-4 h-fit">
+            <Filters
+              layovers={layovers}
+              airlines={airlines}
+              transfersCheckboxes={transfersCheckboxes}
+              airlineCheckboxes={airlineCheckboxes}
+              priceRange={priceRange}
+              selectedSort={selectedSort}
+              onCheckboxChange={handleCheckboxChange}
+              onPriceChange={handlePriceChange}
+              onSortChange={handleSortChange}
+              onClearFilters={handleClearFilters}
+            />
+          </div>
+
           <div className="flex flex-col gap-2 max-w-[650px]">
             <div className="flex flex-row gap-2 overflow-x-auto">
               {filtersCheap.map((filter, index) => (
@@ -485,15 +519,30 @@ export default function ResultsSearch() {
                     routeThere={route}
                   />
                 ))} */}
-            {oneWayRoutes.map((route) => (
-              <RouteCard
-                key={route.id}
-                routeThere={route}
-                passengers={passengers}
-              />
-            ))}
+            {oneWayData?.pages ? (
+              oneWayData.pages.map((page, i) => (
+                <React.Fragment key={i}>
+                  {page.data.map((route) => (
+                    <RouteCard
+                      key={route.id}
+                      routeThere={route}
+                      passengers={passengers}
+                    />
+                  ))}
+                </React.Fragment>
+              ))
+            ) : !isFetchingOneWay ? (
+              <div className="text-center py-4">Маршруты не найдены</div>
+            ) : null}
+            {hasNextOneWay && (
+              <div ref={oneWayRef} className="flex justify-center py-4">
+                {isFetchingOneWay ? "Загрузка..." : null}
+              </div>
+            )}
           </div>
-          <HotelsList hotels={hotels} />
+          <div className="sticky top-4 h-fit">
+            <HotelsList hotels={hotels} />
+          </div>
         </div>
       </div>
     </Layout>
