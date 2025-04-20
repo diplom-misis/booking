@@ -57,7 +57,6 @@ export default NextAuth({
 
   callbacks: {
     async jwt({ token, user }) {
-      console.log("ddebug1", token, user);
       if (user) {
         token.id = user.id;
         token.email = user.email;
@@ -66,7 +65,6 @@ export default NextAuth({
     },
 
     async session({ session, token }) {
-      console.log("ddebug2", session, token);
       if (session.user) {
         session.user = {
           id: token.id,

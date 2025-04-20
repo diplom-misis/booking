@@ -6,13 +6,33 @@ import Image from "next/image";
 import InputField from "@/components/InputField";
 import { withAuthPage } from "@/utils/withAuthPage";
 import { Session } from "next-auth";
+import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ProfileSchema, profileSchema } from "@/schemas/profile";
 
 interface ProfilePageProps {
   session: Session;
 }
 
 export default function ProfilePage({ session }: ProfilePageProps) {
-  console.log(session.user.email);
+  const { data: user, isLoading } = useProfile();
+  const { mutate: updateProfile, isPending } = useUpdateProfile();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<ProfileSchema>({
+    resolver: zodResolver(profileSchema),
+    values: user
+  });
+
+  const onSubmit = (data) => updateProfile(data);
+
+  if (isLoading) return <div>Loading...</div>;
+
   return (
     <Layout>
       <div className="flex flex-col justify-self-center w-full md:w-auto gap-3">
@@ -43,18 +63,21 @@ export default function ProfilePage({ session }: ProfilePageProps) {
           </div>
           <form className="flex flex-col gap-3">
             <div className="flex gap-2">
-              <InputField label="Имя" value="Ярополк" width="w-[262px]" />
+              <InputField
+                label="Имя" value="Ярополк" width="w-[262px]" />
               <InputField label="Фамилия" value="Иванов" width="w-[262px]" />
             </div>
             <div className="flex gap-2">
               <InputField
                 label="Email"
-                value="ivanov@yandex.ru"
+                {...register("email")}
+                error={errors.firstName}
                 width="w-[262px]"
               />
               <InputField
                 label="Имя аккаунта"
-                value="Yaropolk"
+                {...register("username")}
+                error={errors.username}
                 width="w-[262px]"
               />
             </div>
