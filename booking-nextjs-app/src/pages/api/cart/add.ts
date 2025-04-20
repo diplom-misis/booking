@@ -1,0 +1,57 @@
+import { NextApiRequest, NextApiResponse } from 'next'
+import { PrismaClient } from '@prisma/client'
+import { z } from 'zod'
+
+const prisma = new PrismaClient()
+
+const schema = z.object({
+  routeId: z.string().uuid(),
+  passengersCount: z.number().int().min(1).max(10)
+})
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' })
+  }
+
+  // Валидация
+  const result = schema.safeParse(req.body)
+  if (!result.success) {
+    return res.status(400).json({
+      error: 'Invalid data',
+      details: result.error.flatten()
+    })
+  }
+
+  const { routeId, passengersCount } = result.data
+
+  try {
+    // Проверка маршрута
+    const routeExists = await prisma.route.findUnique({ where: { id: routeId } })
+    if (!routeExists) {
+      return res.status(404).json({ error: 'Route not found' })
+    }
+
+    // Создаём несколько записей
+    const createOperations = Array(passengersCount).fill(null).map(() => 
+      prisma.cart.create({
+        data: { routeId },
+        include: { route: true }
+      })
+    )
+
+    const carts = await Promise.all(createOperations)
+
+    res.status(201).json({
+      success: true,
+      count: carts.length,
+      items: carts
+    })
+  } catch (error) {
+    console.error('Add to cart error:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+}

@@ -4,11 +4,11 @@ import { createClient } from "@libsql/client/web";
 
 const TURSO_DATABASE_URL = process.env.TURSO_DATABASE_URL;
 const TURSO_AUTH_TOKEN = process.env.TURSO_AUTH_TOKEN;
+const USE_SQLITE = process.env.USE_SQLITE;
 
-let prisma;
+let prisma = new PrismaClient({});
 
-console.log(TURSO_DATABASE_URL, TURSO_AUTH_TOKEN);
-if (TURSO_DATABASE_URL && TURSO_AUTH_TOKEN) {
+if (TURSO_DATABASE_URL && TURSO_AUTH_TOKEN && USE_SQLITE !== "1") {
   const libsql = createClient({
     url: TURSO_DATABASE_URL,
     authToken: TURSO_AUTH_TOKEN,

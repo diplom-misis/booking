@@ -1,4 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
+import AuthPage from "./auth";
+import BookingAirplane from "./booking-airplane";
 import BookingPage from "./booking-page";
 
 const geistSans = Geist({
@@ -14,7 +16,7 @@ const geistMono = Geist_Mono({
 export default function Home() {
   return (
     <div>
-      <BookingPage />
+      <BookingAirplane />
     </div>
   );
 }

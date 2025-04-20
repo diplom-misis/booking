@@ -1,25 +1,18 @@
 import { Layout } from "../layout";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Filters from "@/components/filters";
 import { Arrow } from "@/components/arrow";
 import { useSearchParams } from "next/navigation";
 import CheapFilter from "@/components/CheapFilter";
 import RouteCard from "@/components/RouteCard";
-import { routesBack, routesThere } from "@/common/constants";
 import HotelsList from "@/components/HotelsList";
+import { useRouteStore } from "@/store/useRouteStore";
 
 const layovers = [
   { id: 1, name: "Без пересадок", state: "noTransfers" },
   { id: 2, name: "1 пересадка", state: "oneTransfer" },
   { id: 3, name: "2 пересадки", state: "twoTransfers" },
   { id: 4, name: "3 пересадки", state: "threeTransfers" },
-];
-
-const airlines = [
-  { id: 1, name: "Аэрофлот", state: "aeroflot" },
-  { id: 2, name: "S7 Airlines", state: "s7" },
-  { id: 3, name: "Utair", state: "utair" },
-  { id: 4, name: "Победа", state: "pobeda" },
 ];
 
 const monthNames = [
@@ -73,6 +66,45 @@ const hotels = [
   },
 ];
 
+const monthsMap: Record<string, number> = {
+  января: 0,
+  февраля: 1,
+  марта: 2,
+  апреля: 3,
+  мая: 4,
+  июня: 5,
+  июля: 6,
+  августа: 7,
+  сентября: 8,
+  октября: 9,
+  ноября: 10,
+  декабря: 11,
+};
+
+const parseDateToISO = (dateStr: string): string | null => {
+  if (!dateStr) return null;
+
+  const [dayStr, monthStr, yearStr] = dateStr.split(" ");
+
+  const month = monthsMap[monthStr.toLowerCase()];
+  if (month === undefined) {
+    return null;
+  }
+
+  const day = dayStr.padStart(2, "0");
+  const year = yearStr;
+
+  const isoDate = `${year}-${String(month + 1).padStart(2, "0")}-${day}`;
+  return isoDate;
+};
+
+const ticketClassMap: Record<string, string> = {
+  Эконом: "ECONOMY",
+  Комфорт: "COMFORT",
+  Бизнес: "BUSINESS",
+  Первый: "FIRST",
+};
+
 export default function ResultsSearch() {
   const searchParams = useSearchParams();
 
@@ -85,6 +117,17 @@ export default function ResultsSearch() {
   const [dateTo, setDateTo] = useState("");
   const [classTicket, setClassTicket] = useState("");
   const [filtersCheap, setFiltersCheap] = useState<string[]>([]);
+  const [airlines, setAirlines] = useState<
+    { id: number; name: string; state: string }[]
+  >([]);
+  const {
+    oneWayRoutes,
+    returnRoutes,
+    isLoading,
+    error,
+    fetchOneWayRoutes,
+    fetchReturnRoutes,
+  } = useRouteStore();
 
   const [transfersCheckboxes, setTransfersCheckboxes] = useState({
     noTransfers: false,
@@ -93,30 +136,30 @@ export default function ResultsSearch() {
     threeTransfers: false,
   });
 
-  const [airlineCheckboxes, setAirlineCheckboxes] = useState({
-    aeroflot: false,
-    s7: false,
-    utair: false,
-    pobeda: false,
-  });
+  const [airlineCheckboxes, setAirlineCheckboxes] = useState<
+    Record<string, boolean>
+  >({});
+  const [selectedAirlines, setSelectedAirlines] = useState<string[]>([]);
+  const [selectedTransfers, setSelectedTransfers] = useState<number[]>([]);
 
   const [priceRange, setPriceRange] = useState({ from: "", to: "" });
   const [selectedSort, setSelectedSort] = useState({
     id: "1",
     name: "дешевые → дорогие",
+    type: "asc",
   });
 
-  const sortedRoutesThere = routesThere.sort(
-    (a, b) => a.totalPrice - b.totalPrice,
-  );
-  const sortedRoutesBack = routesBack.sort(
-    (a, b) => a.totalPrice - b.totalPrice,
-  );
+  // const sortedRoutesThere = routesThere.sort(
+  //   (a, b) => a.totalPrice - b.totalPrice,
+  // );
+  // const sortedRoutesBack = routesBack.sort(
+  //   (a, b) => a.totalPrice - b.totalPrice,
+  // );
 
-  const pairedRoutes = sortedRoutesThere.map((routeThere, index) => ({
-    routeThere,
-    routeBack: sortedRoutesBack[index],
-  }));
+  // const pairedRoutes = sortedRoutesThere.map((routeThere, index) => ({
+  //   routeThere,
+  //   routeBack: sortedRoutesBack[index],
+  // }));
 
   useEffect(() => {
     setCityFrom(searchParams.get("cityFrom") || "");
@@ -129,8 +172,6 @@ export default function ResultsSearch() {
     setClassTicket(searchParams.get("class") || "");
   }, [searchParams]);
 
-  // делать фильтрацию городов и скролл
-  // Использовать Zustand для аэропортов
   useEffect(() => {
     const getCheapFilters = () => {
       const cheapFilters: string[] = [];
@@ -164,13 +205,127 @@ export default function ResultsSearch() {
 
     const filters = getCheapFilters();
     setFiltersCheap(filters);
-  }, [transfersCheckboxes, airlineCheckboxes, priceRange, selectedSort.name]);
+  }, [
+    transfersCheckboxes,
+    airlineCheckboxes,
+    priceRange,
+    selectedSort.name,
+    airlines,
+  ]);
+
+  useEffect(() => {
+    const allRoutes = [...oneWayRoutes, ...returnRoutes];
+  
+    if (allRoutes.length > 0) {
+      const uniqueAirlines = Array.from(
+        new Set<string>(
+          allRoutes.flatMap((route) => route.airlines).filter(Boolean)
+        )
+      );
+  
+      const airlinesList = uniqueAirlines.map((airline, index) => ({
+        id: index + 1,
+        name: airline,
+        state: airline.toLowerCase().replace(/\s+/g, '-'),
+      }));
+  
+      setAirlines(airlinesList);
+  
+      setAirlineCheckboxes((prev) => {
+        const newState = airlinesList.reduce(
+          (acc, airline) => {
+            acc[airline.state] = prev[airline.state] || false;
+            return acc;
+          },
+          {} as Record<string, boolean>,
+        );
+        return newState;
+      });
+    }
+  }, [oneWayRoutes, returnRoutes]);
+
+  useEffect(() => {
+    if (!airportFrom || !airportTo || !classTicket || !passengers) return;
+
+    if (dateFrom) {
+      fetchOneWayRoutes({
+        fromAirport: airportFrom,
+        toAirport: airportTo,
+        departureDate: parseDateToISO(dateFrom),
+        sortByPrice: selectedSort.type,
+        ticketClass: ticketClassMap[classTicket],
+        minPrice: priceRange.from,
+        maxPrice: priceRange.to,
+        passengers: passengers,
+        airline: selectedAirlines.length > 0 ? selectedAirlines : undefined,
+        allowedStops: selectedTransfers,
+      });
+    }
+
+    if (dateTo) {
+      fetchReturnRoutes({
+        fromAirport: airportTo,
+        toAirport: airportFrom,
+        departureDate: parseDateToISO(dateTo),
+        sortByPrice: selectedSort.type,
+        ticketClass: ticketClassMap[classTicket],
+        minPrice: priceRange.from,
+        maxPrice: priceRange.to,
+        passengers: passengers,
+        airline: selectedAirlines.length > 0 ? selectedAirlines : undefined,
+        allowedStops: selectedTransfers,
+      });
+    }
+  }, [
+    airportFrom,
+    airportTo,
+    classTicket,
+    dateFrom,
+    dateTo,
+    fetchOneWayRoutes,
+    fetchReturnRoutes,
+    passengers,
+    priceRange.from,
+    priceRange.to,
+    selectedAirlines,
+    selectedSort.type,
+    selectedTransfers,
+  ]);
 
   const handleCheckboxChange = (key: string) => (checked: boolean) => {
     if (key in transfersCheckboxes) {
       setTransfersCheckboxes((prev) => ({ ...prev, [key]: checked }));
+
+      const transfersMap: Record<string, number> = {
+        noTransfers: 0,
+        oneTransfer: 1,
+        twoTransfers: 2,
+        threeTransfers: 3,
+      };
+
+      const transferCount = transfersMap[key];
+
+      if (checked) {
+        setSelectedTransfers((prev) => [...prev, transferCount]);
+      } else {
+        setSelectedTransfers((prev) =>
+          prev.filter((count) => count !== transferCount),
+        );
+      }
     } else if (key in airlineCheckboxes) {
       setAirlineCheckboxes((prev) => ({ ...prev, [key]: checked }));
+      
+      // Находим полное название авиалинии по state
+      const airline = airlines.find(a => a.state === key);
+      if (airline) {
+        if (checked) {
+          setSelectedAirlines((prev) => [...prev, airline.name]);
+        } else {
+          setSelectedAirlines((prev) =>
+            prev.filter((name) => name !== airline.name),
+          );
+        }
+      }
     }
   };
 
@@ -192,43 +347,67 @@ export default function ResultsSearch() {
       twoTransfers: false,
       threeTransfers: false,
     });
-    setAirlineCheckboxes({
-      aeroflot: false,
-      s7: false,
-      utair: false,
-      pobeda: false,
-    });
+    setSelectedTransfers([]);
+
+    const resetAirlines = Object.keys(airlineCheckboxes).reduce(
+      (acc, key) => {
+        acc[key] = false;
+        return acc;
+      },
+      {} as Record<string, boolean>,
+    );
+
+    setAirlineCheckboxes(resetAirlines);
+    setSelectedAirlines([]);
     setPriceRange({ from: "", to: "" });
-    setSelectedSort({ id: "1", name: "дешевые → дорогие" });
+    setSelectedSort({ id: "1", name: "дешевые → дорогие", type: "asc" });
   };
 
-  const handleRemoveFilter = (filter: string) => {
-    const layover = layovers.find((l) => l.name === filter);
-    if (layover) {
-      setTransfersCheckboxes((prev) => ({ ...prev, [layover.state]: false }));
-      return;
-    }
-
-    const airline = airlines.find((a) => a.name === filter);
-    if (airline) {
-      setAirlineCheckboxes((prev) => ({ ...prev, [airline.state]: false }));
-      return;
-    }
-
-    if (filter.startsWith("От")) {
-      setPriceRange((prev) => ({ ...prev, from: "" }));
-      return;
-    }
-    if (filter.startsWith("До")) {
-      setPriceRange((prev) => ({ ...prev, to: "" }));
-      return;
-    }
-
-    if (filter === selectedSort.name) {
-      setSelectedSort({ id: "1", name: "дешевые → дорогие" });
-      return;
-    }
-  };
+  const handleRemoveFilter = useCallback(
+    (filter: string) => {
+      const layover = layovers.find((l) => l.name === filter);
+      if (layover) {
+        setTransfersCheckboxes((prev) => ({ ...prev, [layover.state]: false }));
+  
+        const transfersMap: Record<string, number> = {
+          noTransfers: 0,
+          oneTransfer: 1,
+          twoTransfers: 2,
+          threeTransfers: 3,
+        };
+  
+        const transferCount = transfersMap[layover.state];
+        setSelectedTransfers((prev) =>
+          prev.filter((count) => count !== transferCount),
+        );
+        return;
+      }
+  
+      const airline = airlines.find((a) => a.name === filter);
+      if (airline) {
+        setAirlineCheckboxes((prev) => ({ ...prev, [airline.state]: false }));
+        setSelectedAirlines((prev) =>
+          prev.filter((name) => name !== airline.name),
+        );
+        return;
+      }
+  
+      if (filter.startsWith("От")) {
+        setPriceRange((prev) => ({ ...prev, from: "" }));
+        return;
+      }
+      if (filter.startsWith("До")) {
+        setPriceRange((prev) => ({ ...prev, to: "" }));
+        return;
+      }
+  
+      if (filter === selectedSort.name) {
+        setSelectedSort({ id: "1", name: "дешевые → дорогие", type: "asc" });
+        return;
+      }
+    },
+    [airlines, selectedSort.name],
+  );
 
   return (
     <Layout>
@@ -282,7 +461,7 @@ export default function ResultsSearch() {
             onSortChange={handleSortChange}
             onClearFilters={handleClearFilters}
           />
-          <div className="flex flex-col gap-2 w-[600px]">
+          <div className="flex flex-col gap-2 max-w-[650px]">
             <div className="flex flex-row gap-2 overflow-x-auto">
               {filtersCheap.map((filter, index) => (
                 <CheapFilter
@@ -292,22 +471,27 @@ export default function ResultsSearch() {
                 />
               ))}
             </div>
-            {dateTo !== ""
+            {/* {dateTo !== ""
               ? pairedRoutes.map(({ routeThere, routeBack }, index) => (
                   <RouteCard
                     key={index}
                     routeThere={routeThere}
                     routeBack={routeBack}
-                    passengersCount={passengers}
                   />
                 ))
-              : sortedRoutesThere.map((route) => (
+              : oneWayRoutes.map((route) => (
                   <RouteCard
                     key={route.id}
                     routeThere={route}
-                    passengersCount={passengers}
                   />
-                ))}
+                ))} */}
+            {oneWayRoutes.map((route) => (
+              <RouteCard
+                key={route.id}
+                routeThere={route}
+                passengers={passengers}
+              />
+            ))}
           </div>
           <HotelsList hotels={hotels} />
         </div>
