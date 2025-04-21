@@ -1,10 +1,11 @@
 import NextAuth from "next-auth";
+import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "@/utils/prisma";
 import { compare } from "bcrypt";
 
-export default NextAuth({
+export const authOptions: NextAuthOptions = {
   pages: { signIn: "/auth/signin" },
   adapter: PrismaAdapter(prisma),
   session: {
@@ -74,4 +75,6 @@ export default NextAuth({
       return session;
     },
   },
-});
+};
+
+export default NextAuth(authOptions);

@@ -1,8 +1,9 @@
 import { profileSchema } from "@/schemas/profile";
 import prisma from "@/utils/prisma";
 import { withAuth } from "@/utils/withAuth";
+import { withErrorHandler } from "@/utils/withErrorHandler";
 
-export default withAuth(async (req, res) => {
+const handler = withAuth(async (req, res) => {
   const session = (req as any).session;
 
   if (req.method === "GET") {
@@ -12,7 +13,6 @@ export default withAuth(async (req, res) => {
     });
     return res.status(200).json({ user });
   } else if (req.method === "PATCH") {
-
     const validationResult = profileSchema.safeParse(req.body);
 
     if (!validationResult.success) {
@@ -33,8 +33,12 @@ export default withAuth(async (req, res) => {
       },
     });
 
-    return res.status(200).json({ message: "Profile updated successfully", user: updatedUser });
+    return res
+      .status(200)
+      .json({ message: "Profile updated successfully", user: updatedUser });
   } else {
     return res.status(405).json({ message: "Method Not Allowed" });
   }
 });
+
+export default withErrorHandler(handler);

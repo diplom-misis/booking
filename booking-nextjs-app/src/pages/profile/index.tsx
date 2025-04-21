@@ -26,7 +26,7 @@ export default function ProfilePage({ session }: ProfilePageProps) {
     reset,
   } = useForm<ProfileSchema>({
     resolver: zodResolver(profileSchema),
-    values: user
+    values: user,
   });
 
   const onSubmit = (data) => updateProfile(data);
@@ -63,8 +63,7 @@ export default function ProfilePage({ session }: ProfilePageProps) {
           </div>
           <form className="flex flex-col gap-3">
             <div className="flex gap-2">
-              <InputField
-                label="Имя" value="Ярополк" width="w-[262px]" />
+              <InputField label="Имя" value="Ярополк" width="w-[262px]" />
               <InputField label="Фамилия" value="Иванов" width="w-[262px]" />
             </div>
             <div className="flex gap-2">

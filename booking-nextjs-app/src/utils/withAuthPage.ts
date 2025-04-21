@@ -4,7 +4,7 @@ import {
   GetServerSidePropsResult,
 } from "next";
 import { getServerSession, Session } from "next-auth";
-import authOptions from "@/pages/api/auth/[...nextauth]";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
 
 export function withAuthPage<P extends { [key: string]: any } = {}>(
   getServerSidePropsFunc?: GetServerSideProps<P>,
