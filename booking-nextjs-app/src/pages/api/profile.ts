@@ -22,6 +22,11 @@ const handler = withAuth(async (req, res) => {
       });
     }
 
+    if (validationResult.data.country) {
+      // TODO
+      // await prisma.country.findUnique
+    }
+
     const updatedUser = await prisma.user.update({
       where: { id: session.user.id },
       data: validationResult.data,
@@ -30,6 +35,7 @@ const handler = withAuth(async (req, res) => {
         email: true,
         firstName: true,
         lastName: true,
+        // country: true,
       },
     });
 

@@ -17,19 +17,18 @@ interface ProfilePageProps {
 
 export default function ProfilePage({ session }: ProfilePageProps) {
   const { data: user, isLoading } = useProfile();
-  const { mutate: updateProfile, isPending } = useUpdateProfile();
+  const { mutate, isPending } = useUpdateProfile();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset,
   } = useForm<ProfileSchema>({
     resolver: zodResolver(profileSchema),
     values: user,
   });
 
-  const onSubmit = (data) => updateProfile(data);
+  const onSubmit = (data: ProfileSchema) => mutate(data);
 
   if (isLoading) return <div>Loading...</div>;
 
@@ -61,28 +60,45 @@ export default function ProfilePage({ session }: ProfilePageProps) {
               История бронирований
             </PrimaryButton>
           </div>
-          <form className="flex flex-col gap-3">
+          <form className="flex flex-col gap-3" onSubmit={handleSubmit(onSubmit)}>
             <div className="flex gap-2">
-              <InputField label="Имя" value="Ярополк" width="w-[262px]" />
-              <InputField label="Фамилия" value="Иванов" width="w-[262px]" />
+              <InputField
+                label="Имя"
+                value="Ярополк"
+                width="w-[262px]"
+                error={errors.firstName}
+                {...register("firstName")}
+              />
+              <InputField
+                label="Фамилия"
+                value="Иванов"
+                width="w-[262px]"
+                error={errors.lastName}
+                {...register("lastName")}
+              />
             </div>
             <div className="flex gap-2">
               <InputField
                 label="Email"
-                {...register("email")}
-                error={errors.firstName}
                 width="w-[262px]"
+                error={errors.email}
+                {...register("email")}
               />
               <InputField
-                label="Имя аккаунта"
-                {...register("username")}
-                error={errors.username}
+                label="Страна"
+                helpText="Нужен для отображения рекомендаций"
                 width="w-[262px]"
+                error={errors.country}
+                {...register("country")}
               />
             </div>
             <div className="flex justify-start mt-2">
-              <PrimaryButton className="w-[262px] h-[2.5rem]">
-                Сохранить изменения
+              <PrimaryButton
+                type="submit"
+                className="mt-2"
+                disabled={isPending}
+              >
+                {isPending ? "Сохраняем..." : "Сохранить изменения"}
               </PrimaryButton>
             </div>
           </form>
