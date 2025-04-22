@@ -11,15 +11,23 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ProfileSchema, profileSchema } from "@/schemas/profile";
 import React from "react";
+import { useCountries } from "@/hooks/useCountries";
 
 interface ProfilePageProps {
   session: Session;
 }
 
 export default function ProfilePage({ session }: ProfilePageProps) {
-  const { data: result } = useProfile();
-  const user = result?.user;
+  const { data: resultUser } = useProfile();
+  const user = resultUser?.user;
   const { mutate, isPending, isError, error } = useUpdateProfile();
+  const { data: resultCountry } = useCountries();
+  const countries = resultCountry?.countries;
+
+  const countryOptions = countries.map((c: { name: string; code: string }) => ({
+    label: c.name,
+    value: c.code,
+  }));
 
   const {
     register,
@@ -100,10 +108,10 @@ export default function ProfilePage({ session }: ProfilePageProps) {
               />
             </div>
             {isError && (
-                <p className="text-red-500 text-sm">
-                  {(error as Error)?.message || "Произошла ошибка"}
-                </p>
-              )}
+              <p className="text-red-500 text-sm">
+                {(error as Error)?.message || "Произошла ошибка"}
+              </p>
+            )}
             <div className="flex justify-start mt-2">
               <PrimaryButton
                 type="submit"
