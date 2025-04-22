@@ -41,7 +41,7 @@ const handler = withAuth(async (req, res) => {
 
     return res
       .status(200)
-      .json({ message: "Profile updated successfully", user: updatedUser });
+      .json({ message: "Profile updated successfully", user: {email: updatedUser.email, firstName: updatedUser.firstName, lastName: updatedUser.lastName, country: ''} });
   } else {
     return res.status(405).json({ message: "Method Not Allowed" });
   }

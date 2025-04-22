@@ -10,27 +10,33 @@ import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ProfileSchema, profileSchema } from "@/schemas/profile";
+import React from "react";
 
 interface ProfilePageProps {
   session: Session;
 }
 
 export default function ProfilePage({ session }: ProfilePageProps) {
-  const { data: user, isLoading } = useProfile();
-  const { mutate, isPending } = useUpdateProfile();
+  const { data: result } = useProfile();
+  const user = result?.user;
+  const { mutate, isPending, isError, error } = useUpdateProfile();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<ProfileSchema>({
     resolver: zodResolver(profileSchema),
-    values: user,
   });
 
-  const onSubmit = (data: ProfileSchema) => mutate(data);
+  React.useEffect(() => {
+    if (user) {
+      reset(user);
+    }
+  }, [user, reset]);
 
-  if (isLoading) return <div>Loading...</div>;
+  const onSubmit = (data: ProfileSchema) => mutate(data);
 
   return (
     <Layout>
@@ -60,18 +66,19 @@ export default function ProfilePage({ session }: ProfilePageProps) {
               История бронирований
             </PrimaryButton>
           </div>
-          <form className="flex flex-col gap-3" onSubmit={handleSubmit(onSubmit)}>
+          <form
+            className="flex flex-col gap-3"
+            onSubmit={handleSubmit(onSubmit)}
+          >
             <div className="flex gap-2">
               <InputField
                 label="Имя"
-                value="Ярополк"
                 width="w-[262px]"
                 error={errors.firstName}
                 {...register("firstName")}
               />
               <InputField
                 label="Фамилия"
-                value="Иванов"
                 width="w-[262px]"
                 error={errors.lastName}
                 {...register("lastName")}
@@ -92,6 +99,11 @@ export default function ProfilePage({ session }: ProfilePageProps) {
                 {...register("country")}
               />
             </div>
+            {isError && (
+                <p className="text-red-500 text-sm">
+                  {(error as Error)?.message || "Произошла ошибка"}
+                </p>
+              )}
             <div className="flex justify-start mt-2">
               <PrimaryButton
                 type="submit"
