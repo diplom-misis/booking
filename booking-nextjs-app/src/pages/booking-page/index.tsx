@@ -14,6 +14,7 @@ const data = {
   fromDatetime: new Date('2025-03-02T14:46:22.449Z'),
   toDatetime: new Date('2025-03-02T15:46:22.449Z'),
   passengerCount: 3,
+  price: 6000
 };
 
 export default function BookingPage() {
@@ -52,6 +53,7 @@ export default function BookingPage() {
     fromDatetime,
     toDatetime,
     passengerCount,
+    price
   } = data;
 
   const dayFrom = fromDatetime.getDate();
@@ -103,7 +105,8 @@ export default function BookingPage() {
       fromAirport,
       toAirport,
       fromDatetime: String(fromDatetime),
-      toDatetime: String(toDatetime)
+      toDatetime: String(toDatetime),
+      price: String(price)
     }).toString();
 
     router.push(`/booking-success-page?${query}`);
@@ -309,7 +312,7 @@ export default function BookingPage() {
             </div>
             <div className='flex justify-between items-end'>
               <p className='text-gray-500 text-xs'>Общая сумма:</p>
-              <p className='text-green-500 text-2xl font-bold'>6 000 ₽</p>
+              <p className='text-green-500 text-2xl font-bold'>{price} ₽</p>
             </div>
             <button
               type='submit'

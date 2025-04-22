@@ -1,7 +1,6 @@
-import { PrismaClient } from '@prisma/client';
-import { PrismaLibSQL } from '@prisma/adapter-libsql';
-import { createClient } from '@libsql/client/web';
+import { PrismaClient } from "@prisma/client";
 
+<<<<<<< HEAD
 // const TURSO_DATABASE_URL = process.env.TURSO_DATABASE_URL;
 // const TURSO_AUTH_TOKEN = process.env.TURSO_AUTH_TOKEN;
 
@@ -22,4 +21,10 @@ import { createClient } from '@libsql/client/web';
 
 const prisma = new PrismaClient();
 
+=======
+const prisma = new PrismaClient({
+  // log: ["query"],
+});
+
+>>>>>>> 47537556e7febe9b005b42f30b803c2ba06cab56
 export default prisma;

@@ -1,72 +1,122 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { City, Airport } from "@prisma/client";
+import { Airport } from "@prisma/client";
 import prisma from "@/utils/prisma";
+import { z } from "zod";
 
-interface ApiResponse {
-  message?: string;
-  cities?: City[];
-  airports?: Airport[];
-  city?: City;
-  airport?: Airport;
+const AirportCreateSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  code: z
+    .string()
+    .length(3, "Airport code must be exactly 3 characters")
+    .transform((s) => s.toUpperCase()),
+  cityId: z.string().min(1, "City ID is required"),
+  country: z.string().min(2, "Country must be at least 2 characters"),
+});
+
+const AirportQuerySchema = z.object({
+  cityId: z.string().optional(),
+});
+
+interface GetAirportsRequest extends NextApiRequest {
+  query: {
+    cityId?: string;
+  };
 }
 
+interface CreateAirportRequest extends NextApiRequest {
+  body: z.infer<typeof AirportCreateSchema>;
+}
+
+interface AirportsResponse {
+  airports: Airport[];
+}
+
+interface AirportResponse {
+  message: string;
+  airport: Airport;
+}
+
+interface ErrorResponse {
+  message: string;
+  errors?: z.ZodIssue[];
+}
+
+type ApiResponse = AirportsResponse | AirportResponse | ErrorResponse;
+
 export default async function handler(
-  req: NextApiRequest,
+  req: GetAirportsRequest | CreateAirportRequest,
   res: NextApiResponse<ApiResponse>,
 ) {
   try {
     if (req.method === "GET") {
-      if (req.query.cityId) {
-        // Получение списка аэропортов для конкретного города
-        const airports: Airport[] = await prisma.airport.findMany({
-          where: { cityId: String(req.query.cityId) },
+      const validatedQuery = AirportQuerySchema.safeParse(req.query);
+
+      if (!validatedQuery.success) {
+        return res.status(400).json({
+          message: "Invalid query parameters",
+          errors: validatedQuery.error.errors,
+        });
+      }
+
+      const { cityId } = validatedQuery.data;
+
+      if (cityId) {
+        const airports = await prisma.airport.findMany({
+          where: { cityId },
         });
         return res.status(200).json({ airports });
       }
 
-      // Получение списка всех городов
-      const searchQuery = req.query.search as string | undefined;
-      const cities: City[] = await prisma.city.findMany({
-        where: searchQuery ? {
-          OR: [
-            { name: { contains: searchQuery } },
-            { name: { contains: searchQuery.toLowerCase() } },
-            { name: { contains: searchQuery.toUpperCase() } },
-          ]
-        } : {}
+      const airports = await prisma.airport.findMany();
+      return res.status(200).json({ airports });
+    } else if (req.method === "POST") {
+      const validationResult = AirportCreateSchema.safeParse(req.body);
+
+      if (!validationResult.success) {
+        return res.status(400).json({
+          message: "Validation failed",
+          errors: validationResult.error.errors,
+        });
+      }
+
+      const { name, code, cityId, country } = validationResult.data;
+
+      const cityExists = await prisma.city.findUnique({
+        where: { id: cityId },
       });
-      return res.status(200).json({ cities });
-    }
 
-    if (req.method === "POST") {
-      const { name, code, cityId, country } = req.body;
-
-      if (req.query.type === "city") {
-        // Создание города
-        const newCity: City = await prisma.city.create({
-          data: { name },
+      if (!cityExists) {
+        return res.status(400).json({
+          message: "Specified city does not exist",
         });
-        return res.status(201).json({ message: "City created", city: newCity });
       }
 
-      if (req.query.type === "airport") {
-        // Создание аэропорта
-        if (!name || !code || !cityId || !country) {
-          return res
-            .status(400)
-            .json({ message: "Missing required fields for airport" });
-        }
+      const existingAirport = await prisma.airport.findFirst({
+        where: { code },
+      });
 
-        const newAirport: Airport = await prisma.airport.create({
-          data: { name, code, cityId, country },
+      if (existingAirport) {
+        return res.status(409).json({
+          message: "Airport with this name already exists",
         });
-        return res
-          .status(201)
-          .json({ message: "Airport created", airport: newAirport });
       }
-    }
 
-    return res.status(405).json({ message: "Method not allowed" });
+      const airport = await prisma.airport.create({
+        data: {
+          name,
+          code,
+          cityId,
+          country,
+        },
+      });
+
+      return res.status(201).json({
+        message: "Airport created successfully",
+        airport,
+      });
+    } else {
+      return res.status(405).json({ message: "Method not allowed" });
+    }
   } catch (error) {
     console.error("Error processing request:", error);
     return res.status(500).json({ message: "Internal server error" });

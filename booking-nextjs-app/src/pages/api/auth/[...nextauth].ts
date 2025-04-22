@@ -4,7 +4,11 @@ import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import prisma from '@/utils/prisma';
 
 export default NextAuth({
+<<<<<<< HEAD
   // pages: { signIn: '/auth/signin' },
+=======
+  pages: { signIn: '/auth/signin' },
+>>>>>>> 47537556e7febe9b005b42f30b803c2ba06cab56
   adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({

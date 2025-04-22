@@ -41,6 +41,7 @@ export default function BookingSuccessPage() {
       toAirport: searchParams.get('toAirport')!,
       fromDatetime: searchParams.get('fromDatetime')!,
       toDatetime: searchParams.get('toDatetime')!,
+      price: searchParams.get('price')!
     })
 
     await fetch(`/api/booking-success-page?${query}`, {

@@ -15,8 +15,7 @@ export default async function saveReservation(
   switch (req.method) {
     case "GET":
       return res.json({ reservations: await prisma.reservation.findMany() });
-    case "POST": {
-      console.log(req.query)
+    case "POST":
       await prisma.reservation.create({
         data: {
           data: {
@@ -27,14 +26,16 @@ export default async function saveReservation(
             company: req.query.company,
             fromDatetime: req.query.fromDatetime,
             toDatetime: req.query.toDatetime,
+            price: req.query.price,
           },
         },
       });
 
       return res.status(201).json({ message: "reservation created" });
-    }
     case "DELETE":
-      await prisma.reservation.delete({ where: { id: (await prisma.reservation.findFirst())!.id } });
+      await prisma.reservation.delete({
+        where: { id: (await prisma.reservation.findFirst())!.id },
+      });
       return res.status(200).json({ message: "Reservation deleted" });
   }
 }
