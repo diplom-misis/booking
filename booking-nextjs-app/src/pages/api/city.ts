@@ -12,6 +12,7 @@ const CityCreateSchema = z.object({
       /^[a-zA-Zа-яА-Я\s\-']+$/,
       "City name can only contain letters, spaces, hyphens and apostrophes",
     ),
+  countryId: z.string().uuid("countryId must be uuid"),
 });
 
 const CityQuerySchema = z.object({
@@ -83,12 +84,15 @@ export default async function handler(
         });
       }
 
-      const { name } = validationResult.data;
+      const { name, countryId } = validationResult.data;
 
       const existingCity = await prisma.city.findFirst({
         where: {
           name: {
             equals: name,
+          },
+          countryId: {
+            equals: countryId,
           },
         },
       });
@@ -100,7 +104,7 @@ export default async function handler(
       }
 
       const newCity = await prisma.city.create({
-        data: { name },
+        data: { name, countryId },
       });
 
       return res.status(201).json({

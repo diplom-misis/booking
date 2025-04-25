@@ -7,6 +7,7 @@ interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   linkComponent?: React.ReactNode;
   className?: string;
   error?: { message?: string };
+  helpText?: string;
 }
 
 export default function InputField({
@@ -18,6 +19,7 @@ export default function InputField({
   className = "",
   id,
   error,
+  helpText = "",
   ...inputProps
 }: InputFieldProps) {
   return (
@@ -32,8 +34,10 @@ export default function InputField({
         className={`border ${error ? "border-red-500" : "border-gray-300"} rounded px-3.5 py-2 w-full ${className}`}
         {...inputProps}
       />
-      {error && error.message && (
+      {error && error.message ? (
         <p className="text-red-500 text-xs">{error.message}</p>
+      ) : (
+        helpText && <p className="text-gray-500 text-xs">{helpText}</p>
       )}
       {linkComponent && <div className="text-right">{linkComponent}</div>}
     </div>

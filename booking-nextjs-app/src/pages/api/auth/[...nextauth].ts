@@ -1,10 +1,11 @@
 import NextAuth from "next-auth";
+import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "@/utils/prisma";
 import { compare } from "bcrypt";
 
-export default NextAuth({
+export const authOptions: NextAuthOptions = {
   pages: { signIn: "/auth/signin" },
   adapter: PrismaAdapter(prisma),
   session: {
@@ -57,7 +58,6 @@ export default NextAuth({
 
   callbacks: {
     async jwt({ token, user }) {
-      console.log("ddebug1", token, user);
       if (user) {
         token.id = user.id;
         token.email = user.email;
@@ -66,7 +66,6 @@ export default NextAuth({
     },
 
     async session({ session, token }) {
-      console.log("ddebug2", session, token);
       if (session.user) {
         session.user = {
           id: token.id,
@@ -76,4 +75,6 @@ export default NextAuth({
       return session;
     },
   },
-});
+};
+
+export default NextAuth(authOptions);

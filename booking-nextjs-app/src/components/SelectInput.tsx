@@ -64,8 +64,8 @@ export default function SelectInput(props: SelectInputProps) {
 
   return (
     <div>
-      <Field>
-        <Label className="text-gray-400 text-s">{title}</Label>
+      <Field className="flex flex-col gap-1">
+        <Label className="text-gray-400 text-xs">{title}</Label>
         <Combobox
           value={value}
           onChange={onChange}
@@ -74,7 +74,7 @@ export default function SelectInput(props: SelectInputProps) {
           <div className="relative">
             <ComboboxInput
               className={cn(
-                `rounded-[4px] border border-gray-300 bg-white text-sm`,
+                `rounded-[4px] border border-gray-300 bg-white text-m`,
                 className,
               )}
               disabled={disabled}
