@@ -9,7 +9,13 @@ const handler = withAuth(async (req, res) => {
   if (req.method === "GET") {
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { id: true, firstName: true, lastName: true, email: true },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        defaultCountry: true,
+      },
     });
     return res.status(200).json({ user });
   } else if (req.method === "PATCH") {
@@ -22,26 +28,37 @@ const handler = withAuth(async (req, res) => {
       });
     }
 
-    if (validationResult.data.country) {
-      // TODO
-      // await prisma.country.findUnique
+    const { firstName, lastName, email, defaultCountry } =
+      validationResult.data;
+
+    if (defaultCountry) {
+      const countryExists = await prisma.country.findUnique({
+        where: { id: defaultCountry.id },
+      });
+
+      if (!countryExists) {
+        return res.status(400).json({
+          message: "Specified country does not exist",
+        });
+      }
     }
 
     const updatedUser = await prisma.user.update({
       where: { id: session.user.id },
-      data: validationResult.data,
+      data: { firstName, lastName, email, defaultCountryId: defaultCountry.id },
       select: {
         id: true,
         email: true,
         firstName: true,
         lastName: true,
-        // country: true,
+        defaultCountry: true,
       },
     });
 
-    return res
-      .status(200)
-      .json({ message: "Profile updated successfully", user: {email: updatedUser.email, firstName: updatedUser.firstName, lastName: updatedUser.lastName, country: ''} });
+    return res.status(200).json({
+      message: "Profile updated successfully",
+      user: updatedUser,
+    });
   } else {
     return res.status(405).json({ message: "Method Not Allowed" });
   }

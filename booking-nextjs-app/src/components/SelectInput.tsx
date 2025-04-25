@@ -45,7 +45,7 @@ export default function SelectInput(props: SelectInputProps) {
     required,
     value,
     onChange,
-    onSearch
+    onSearch,
   } = props;
   const [query, setQuery] = useState("");
 
@@ -64,8 +64,8 @@ export default function SelectInput(props: SelectInputProps) {
 
   return (
     <div>
-      <Field>
-        <Label className="text-gray-400 text-s">{title}</Label>
+      <Field className="flex flex-col gap-1">
+        <Label className="text-gray-400 text-xs">{title}</Label>
         <Combobox
           value={value}
           onChange={onChange}
@@ -74,7 +74,7 @@ export default function SelectInput(props: SelectInputProps) {
           <div className="relative">
             <ComboboxInput
               className={cn(
-                `rounded-[4px] border border-gray-300 bg-white text-sm`,
+                `rounded-[4px] border border-gray-300 bg-white text-m`,
                 className,
               )}
               disabled={disabled}
@@ -97,7 +97,7 @@ export default function SelectInput(props: SelectInputProps) {
               }}
               onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
                 const regex = /^[a-zA-Zа-яА-ЯёЁ\s]$/;
-                if (!regex.test(event.key) && event.key !== 'Backspace') {
+                if (!regex.test(event.key) && event.key !== "Backspace") {
                   event.preventDefault();
                 }
               }}
@@ -111,7 +111,7 @@ export default function SelectInput(props: SelectInputProps) {
           </div>
 
           <ComboboxOptions
-            anchor='bottom'
+            anchor="bottom"
             className={cn(
               "w-[var(--input-width)] rounded-xl mt-1 border bg-white py-2 empty:invisible",
               "transition duration-100 ease-in",
@@ -133,4 +133,3 @@ export default function SelectInput(props: SelectInputProps) {
     </div>
   );
 }
-

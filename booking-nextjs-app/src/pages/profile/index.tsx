@@ -7,11 +7,12 @@ import InputField from "@/components/InputField";
 import { withAuthPage } from "@/utils/withAuthPage";
 import { Session } from "next-auth";
 import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ProfileSchema, profileSchema } from "@/schemas/profile";
 import React from "react";
 import { useCountries } from "@/hooks/useCountries";
+import SelectInput from "@/components/SelectInput";
 
 interface ProfilePageProps {
   session: Session;
@@ -22,18 +23,14 @@ export default function ProfilePage({ session }: ProfilePageProps) {
   const user = resultUser?.user;
   const { mutate, isPending, isError, error } = useUpdateProfile();
   const { data: resultCountry } = useCountries();
-  const countries = resultCountry?.countries;
-
-  const countryOptions = countries.map((c: { name: string; code: string }) => ({
-    label: c.name,
-    value: c.code,
-  }));
+  const countryList = resultCountry?.countries || [];
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    control,
   } = useForm<ProfileSchema>({
     resolver: zodResolver(profileSchema),
   });
@@ -99,13 +96,28 @@ export default function ProfilePage({ session }: ProfilePageProps) {
                 error={errors.email}
                 {...register("email")}
               />
-              <InputField
-                label="Страна"
-                helpText="Нужен для отображения рекомендаций"
-                width="w-[262px]"
-                error={errors.country}
-                {...register("country")}
+              <Controller
+                name="defaultCountry"
+                control={control}
+                render={({ field }) => (
+                  <SelectInput
+                    {...register("defaultCountry")}
+                    title="Страна"
+                    className="w-[262px] px-[14px] py-[8px]"
+                    data={countryList}
+                    typeCombobox={true}
+                    placeholder="Выберите страну"
+                    value={field.value ?? null}
+                    onChange={field.onChange}
+                    required
+                  />
+                )}
               />
+              {errors.defaultCountry && (
+                <p className="text-sm text-red-500">
+                  {errors.defaultCountry.message || "Произошла ошибка"}
+                </p>
+              )}
             </div>
             {isError && (
               <p className="text-red-500 text-sm">
@@ -115,7 +127,7 @@ export default function ProfilePage({ session }: ProfilePageProps) {
             <div className="flex justify-start mt-2">
               <PrimaryButton
                 type="submit"
-                className="mt-2"
+                className="mt-2 w-[262px]"
                 disabled={isPending}
               >
                 {isPending ? "Сохраняем..." : "Сохранить изменения"}

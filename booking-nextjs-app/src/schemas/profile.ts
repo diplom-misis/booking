@@ -10,7 +10,10 @@ export const profileSchema = z.object({
     .min(2, "Фамилия слишком короткая")
     .max(100, "Фамилия слишком длинная"),
   email: z.string().email("Некорректный email"),
-  country: z.string().optional(),
+  defaultCountry: z.object({
+    id: z.string(),
+    name: z.string(),
+  }),
 });
 
 export type ProfileSchema = z.infer<typeof profileSchema>;

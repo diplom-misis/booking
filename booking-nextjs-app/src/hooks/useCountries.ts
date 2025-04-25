@@ -2,9 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 
 export const useCountries = () => {
   return useQuery({
-    queryKey: ["countries"],
+    queryKey: ["country"],
     queryFn: async () => {
-      const res = await fetch("/api/countries", { method: "GET" });
+      const res = await fetch("/api/country", { method: "GET" });
 
       const result = await res.json();
 
