@@ -1,11 +1,12 @@
 import Link from "next/link";
 import SignUpForm from "@/components/forms/SignUpForm";
 import AuthLayout from "@/components/layouts/AuthLayout";
+import { withoutAuthPage } from "@/utils/withoutAuthPage";
 
 export default function SignUpPage() {
   return (
     <AuthLayout
-      additionalLeftBlock={
+      additionalBlock={
         <div className="flex flex-col gap-1">
           <p className="text-sm text-gray-500">Уже зарегистрированы?</p>
           <Link href="/auth/signin" className="text-blue-500 font-bold">
@@ -19,3 +20,5 @@ export default function SignUpPage() {
     </AuthLayout>
   );
 }
+
+export const getServerSideProps = withoutAuthPage();

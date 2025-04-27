@@ -34,7 +34,6 @@ export default function SignInForm() {
       <InputField
         label="Email или логин"
         placeholder="ivanov@yandex.ru"
-        width="w-[332px]"
         error={errors.email}
         {...register("email")}
       />
@@ -42,7 +41,6 @@ export default function SignInForm() {
         label="Пароль"
         type="password"
         placeholder="******"
-        width="w-[332px]"
         error={errors.password}
         {...register("password")}
         linkComponent={

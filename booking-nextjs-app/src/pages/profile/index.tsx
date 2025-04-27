@@ -81,6 +81,12 @@ export default function ProfilePage({ session }: ProfilePageProps) {
     }
   };
 
+  const bookingHistoryButton = (
+    <PrimaryButton className="w-full md:w-[262px] h-[2.5rem]">
+      История бронирований
+    </PrimaryButton>
+  );
+
   return (
     <Layout>
       <div className="flex flex-col justify-self-center w-full md:w-auto gap-3">
@@ -88,7 +94,7 @@ export default function ProfilePage({ session }: ProfilePageProps) {
           <h1 className="text-xl md:text-3xl font-bold">Профиль</h1>
         </div>
         <div className="flex flex-col gap-6 bg-white px-6 py-[2.5rem] shadow-[0_4px_8px_rgba(0,0,0,0.15)] rounded-lg font-sans">
-          <div className="flex justify-between">
+          <div className="flex justify-center md:justify-between">
             <div className="relative">
               <button
                 className="relative cursor-pointer"
@@ -119,32 +125,30 @@ export default function ProfilePage({ session }: ProfilePageProps) {
                 className="hidden"
               />
             </div>
-            <PrimaryButton className="w-[262px] h-[2.5rem]">
-              История бронирований
-            </PrimaryButton>
+            <div className="hidden md:block">{bookingHistoryButton}</div>
           </div>
           <form
             className="flex flex-col gap-3"
             onSubmit={handleSubmit(onSubmit)}
           >
-            <div className="flex gap-2">
+            <div className="flex flex-col md:flex-row gap-2">
               <InputField
                 label="Имя"
-                width="w-[262px]"
+                width="w-full md:w-[262px]"
                 error={errors.firstName}
                 {...register("firstName")}
               />
               <InputField
                 label="Фамилия"
-                width="w-[262px]"
+                width="w-full md:w-[262px]"
                 error={errors.lastName}
                 {...register("lastName")}
               />
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-col md:flex-row gap-2">
               <InputField
                 label="Email"
-                width="w-[262px]"
+                width="w-full md:w-[262px]"
                 error={errors.email}
                 {...register("email")}
               />
@@ -155,7 +159,7 @@ export default function ProfilePage({ session }: ProfilePageProps) {
                   <SelectInput
                     {...register("defaultCountry")}
                     title="Страна"
-                    className="w-[262px] px-[14px] py-[8px]"
+                    className="w-full md:w-[262px] px-[14px] py-[8px]"
                     data={countryList}
                     typeCombobox={true}
                     placeholder="Выберите страну"
@@ -179,13 +183,16 @@ export default function ProfilePage({ session }: ProfilePageProps) {
             <div className="flex justify-start mt-2">
               <LightButton
                 type="submit"
-                className="mt-2 w-[262px]"
+                className="mt-2 w-full md:w-[262px]"
                 disabled={isPending}
               >
                 {isPending ? "Сохраняем..." : "Сохранить изменения"}
               </LightButton>
             </div>
           </form>
+        </div>
+        <div className="font-sans mt-4 block md:hidden">
+          {bookingHistoryButton}
         </div>
       </div>
     </Layout>

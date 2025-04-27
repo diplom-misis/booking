@@ -1,11 +1,12 @@
 import SignInForm from "@/components/forms/SignInForm";
 import AuthLayout from "@/components/layouts/AuthLayout";
+import { withoutAuthPage } from "@/utils/withoutAuthPage";
 import Link from "next/link";
 
 export default function SignInPage() {
   return (
     <AuthLayout
-      additionalLeftBlock={
+      additionalBlock={
         <div className="flex flex-col gap-1">
           <p className="text-sm text-gray-500">У вас ещё нет аккаунта?</p>
           <Link href="/auth/signup" className="text-blue-500 font-bold">
@@ -19,3 +20,5 @@ export default function SignInPage() {
     </AuthLayout>
   );
 }
+
+export const getServerSideProps = withoutAuthPage();
