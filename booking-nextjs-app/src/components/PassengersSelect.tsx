@@ -53,7 +53,7 @@ export default function PassengersSelect({ value, onChange }: PassengersSelectPr
   return (
     <Menu>
       <Field className="flex flex-col">
-      <Label className="text-gray-400 text-s">Пассажиры</Label>
+      <Label className="text-gray-400 text-xs mb-1">Пассажиры</Label>
       <MenuButton className={cn('w-[262px] h-11 px-[14px] py-[10px] rounded-[4px] border border-gray-300 bg-white text-sm text-left')}>
         <p>{totalPassengers} {getPassengersLabel(totalPassengers)}</p>
       </MenuButton>
