@@ -21,7 +21,7 @@ export const useCartStore = create<CartState>((set, get) => ({
 
   addToCart: async (route, passengers) => {
     try {
-      const { data } = await axios.post('/api/cart/add', {
+      const { data } = await axios.post('/api/cart', {
         routeId: route.id,
         passengersCount: passengers
       })
@@ -42,7 +42,7 @@ export const useCartStore = create<CartState>((set, get) => ({
 
   removeFromCart: async (routeId) => {
     try {
-      await axios.delete('/api/cart/remove', { data: { routeId } })
+      await axios.delete('/api/cart', { data: { routeId } })
       
       set(state => ({
         items: state.items.filter(item => item.routeId !== routeId)

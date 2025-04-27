@@ -5,6 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { Separator } from "./separator";
 import { RouteDto } from "@/store/useRouteStore";
 import { useCartStore } from "@/store/cartStore";
+import { useRouter } from "next/router";
 
 interface RouteCardProps {
   routeThere: RouteDto;
@@ -31,24 +32,18 @@ function getMonthName(monthIndex: any) {
 }
 
 export default function RouteCard(props: RouteCardProps) {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const { routeThere, routeBack, passengers } = props;
-  const { addToCart, removeFromCart, isInCart } = useCartStore();
-  const isSelected =
-    isInCart(routeThere.id) || (routeBack && isInCart(routeBack.id));
+  const { addToCart } = useCartStore();
 
   const handleButtonClick = async () => {
     setIsLoading(true);
     try {
-      if (isSelected) {
-        await removeFromCart(routeThere.id);
-        if (routeBack) await removeFromCart(routeBack.id);
-        toast.success("Маршрут удален из бронирования");
-      } else {
         await addToCart(routeThere, passengers);
         if (routeBack) await addToCart(routeBack, passengers);
         toast.success("Маршрут добавлен в бронирование");
-      }
+        router.push(`/booking-page`);
     } catch (error) {
       console.log(error);
     } finally {
@@ -233,7 +228,7 @@ export default function RouteCard(props: RouteCardProps) {
             disabled={isLoading}
             className="rounded-lg bg-sky-600 py-2 px-4 text-m font-semibold text-white data-[hover]:bg-sky-500 data-[active]:bg-sky-700"
           >
-            {isSelected ? "Убрать" : "Выбрать"}
+            Выбрать
           </Button>
         </div>
       </div>
