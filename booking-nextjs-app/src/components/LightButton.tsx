@@ -1,7 +1,7 @@
 import React from "react";
 import BaseButton from "./BaseButton";
 
-interface PrimaryButtonProps {
+interface LightButtonProps {
   type?: "button" | "submit" | "reset";
   onClick?: () => void;
   children: React.ReactNode;
@@ -9,8 +9,8 @@ interface PrimaryButtonProps {
   disabled?: boolean;
 }
 
-const PrimaryButton: React.FC<PrimaryButtonProps> = (props) => {
-  return <BaseButton {...props} variant="primary" />;
+const LightButton: React.FC<LightButtonProps> = (props) => {
+  return <BaseButton {...props} variant="light" />;
 };
 
-export default PrimaryButton;
+export default LightButton;

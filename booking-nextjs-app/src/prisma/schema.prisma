@@ -13,6 +13,7 @@ model User {
   lastName         String
   defaultCountryId String?
   defaultCountry   Country?  @relation(fields: [defaultCountryId], references: [id])
+  imageUrl         String?
   email            String    @unique
   emailVerified    DateTime?
   password         String
