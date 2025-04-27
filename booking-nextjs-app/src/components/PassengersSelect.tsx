@@ -19,6 +19,7 @@ type PassengersCount = {
 };
 
 interface PassengersSelectProps {
+  className?: string;
   value: PassengersCount;
   onChange: (value: PassengersCount) => void;
 }
@@ -33,7 +34,7 @@ const getPassengersLabel = (count: number) => {
   }
 };
 
-export default function PassengersSelect({ value, onChange }: PassengersSelectProps) {
+export default function PassengersSelect({ value, onChange, className }: PassengersSelectProps) {
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault();
   };
@@ -54,10 +55,10 @@ export default function PassengersSelect({ value, onChange }: PassengersSelectPr
     <Menu>
       <Field className="flex flex-col">
       <Label className="text-gray-400 text-xs mb-1">Пассажиры</Label>
-      <MenuButton className={cn('w-[262px] h-11 px-[14px] py-[10px] rounded-[4px] border border-gray-300 bg-white text-sm text-left')}>
+      <MenuButton className={cn('h-11 px-[14px] py-[10px] rounded-[4px] border border-gray-300 bg-white text-sm text-left', className)}>
         <p>{totalPassengers} {getPassengersLabel(totalPassengers)}</p>
       </MenuButton>
-      <MenuItems anchor="bottom" className={cn('w-[262px] rounded-xl mt-1 border bg-white empty:invisible transition duration-100 ease-in px-4 py-4 flex flex-col gap-3')}>
+      <MenuItems anchor="bottom" className={cn('w-[var(--button-width)] rounded-xl mt-1 border bg-white empty:invisible transition duration-100 ease-in px-4 py-4 flex flex-col gap-3')}>
         {passengers.map((item) => (
           <MenuItem key={item.id} as="div" onClick={handleClick} className="flex flex-row justify-between">
             <p className="text-sm">

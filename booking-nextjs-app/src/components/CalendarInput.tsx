@@ -7,8 +7,10 @@ import "react-day-picker/dist/style.css";
 import { useRoutePrices } from "@/hooks/useRoutePrices";
 import { useEffect, useState } from "react";
 import React from "react";
+import { cn } from "@/utils/cn";
 
 interface CalendarInputProps {
+  className?: string;
   disabled?: boolean;
   placeholder: string;
   hideCalendarIcon?: boolean;
@@ -55,6 +57,7 @@ const PricesContext = React.createContext<{ prices: PriceData[] }>({ prices: [] 
 
 export default function CalendarInput(props: CalendarInputProps) {
   const {
+    className,
     disabled,
     placeholder,
     hideCalendarIcon,
@@ -127,7 +130,7 @@ export default function CalendarInput(props: CalendarInputProps) {
             <>
               <Popover.Button
                 disabled={disabled}
-                className="border p-2 rounded-[4px] flex items-center w-[262px] justify-between bg-white"
+                className={cn("border p-2 rounded-[4px] flex items-center justify-between bg-white", className)}
                 style={{
                   backgroundColor: disabled ? "#F9FAFB" : "",
                 }}
