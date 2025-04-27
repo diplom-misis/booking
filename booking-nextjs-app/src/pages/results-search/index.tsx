@@ -1,11 +1,10 @@
 import { Layout } from "../layout";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Filters from "@/components/filters";
 import { Arrow } from "@/components/arrow";
 import { useSearchParams } from "next/navigation";
 import CheapFilter from "@/components/CheapFilter";
 import RouteCard from "@/components/RouteCard";
-import HotelsList from "@/components/HotelsList";
 import { useRoutesQuery } from "@/hooks/useRoutesQuery";
 import { useInView } from "react-intersection-observer";
 import React from "react";
@@ -52,21 +51,6 @@ const formatDate = (dateStr: string) => {
 
   return `${day} ${monthNames[month]} ${year}`;
 };
-
-const hotels = [
-  {
-    id: "1",
-    name: "Златая палата",
-    price: 2000,
-    rating: 4.4,
-  },
-  {
-    id: "2",
-    name: "Златая палата",
-    price: 2000,
-    rating: 4.4,
-  },
-];
 
 const monthsMap: Record<string, number> = {
   января: 0,
@@ -144,18 +128,6 @@ export default function ResultsSearch() {
 
   const [oneWayRef, oneWayInView] = useInView();
   const [returnRef, returnInView] = useInView();
-
-  // const sortedRoutesThere = routesThere.sort(
-  //   (a, b) => a.totalPrice - b.totalPrice,
-  // );
-  // const sortedRoutesBack = routesBack.sort(
-  //   (a, b) => a.totalPrice - b.totalPrice,
-  // );
-
-  // const pairedRoutes = sortedRoutesThere.map((routeThere, index) => ({
-  //   routeThere,
-  //   routeBack: sortedRoutesBack[index],
-  // }));
 
   useEffect(() => {
     setCityFrom(searchParams.get("cityFrom") || "");
@@ -277,6 +249,18 @@ export default function ResultsSearch() {
     isFetching: isFetchingReturn,
   } = useRoutesQuery(returnParams, !!dateTo);
 
+  const pairedRoutes = useMemo(() => {
+    if (!dateTo || !oneWayData?.pages || !returnData?.pages) return [];
+
+    const allRoutesThere = oneWayData.pages.flatMap((page) => page.data);
+    const allRoutesBack = returnData.pages.flatMap((page) => page.data);
+
+    return allRoutesThere.map((routeThere, index) => ({
+      routeThere,
+      routeBack: allRoutesBack[index],
+    }));
+  }, [oneWayData, returnData, dateTo]);
+
   useEffect(() => {
     if (oneWayInView && hasNextOneWay && !isFetchingOneWay) {
       fetchNextOneWay();
@@ -292,26 +276,29 @@ export default function ResultsSearch() {
   useEffect(() => {
     const oneWayPages = oneWayData?.pages ?? [];
     const returnPages = returnData?.pages ?? [];
-  
+
     const allRoutes = [...oneWayPages, ...returnPages];
-  
+
     if (allRoutes.length > 0) {
       const uniqueAirlines = Array.from(
         new Set<string>(
-          allRoutes.flatMap(
-            (route) => route.data?.flatMap((item) => item.airlines ?? []) ?? [],
-          ).filter(Boolean),
+          allRoutes
+            .flatMap(
+              (route) =>
+                route.data?.flatMap((item) => item.airlines ?? []) ?? [],
+            )
+            .filter(Boolean),
         ),
       );
-  
+
       const airlinesList = uniqueAirlines.map((airline, index) => ({
         id: index + 1,
         name: airline,
         state: airline.toLowerCase().replace(/\s+/g, "-"),
       }));
-  
+
       setAirlines(airlinesList);
-  
+
       setAirlineCheckboxes((prev) => {
         const newState = { ...prev };
         airlinesList.forEach((airline) => {
@@ -505,21 +492,57 @@ export default function ResultsSearch() {
                 />
               ))}
             </div>
-            {/* {dateTo !== ""
-              ? pairedRoutes.map(({ routeThere, routeBack }, index) => (
-                  <RouteCard
-                    key={index}
-                    routeThere={routeThere}
-                    routeBack={routeBack}
-                  />
-                ))
-              : oneWayRoutes.map((route) => (
-                  <RouteCard
-                    key={route.id}
-                    routeThere={route}
-                  />
-                ))} */}
-            {oneWayData?.pages ? (
+            {dateTo ? (
+              <>
+                {pairedRoutes.length > 0 ? (
+                  pairedRoutes.map(({ routeThere, routeBack }, index) => (
+                    <RouteCard
+                      key={`paired-${index}`}
+                      routeThere={routeThere}
+                      routeBack={routeBack}
+                      passengers={passengers}
+                    />
+                  ))
+                ) : (
+                  <div className="text-center py-4">
+                    {isFetchingOneWay || isFetchingReturn
+                      ? "Загрузка..."
+                      : "Маршруты не найдены"}
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                {oneWayData?.pages ? (
+                  oneWayData.pages.map((page, i) => (
+                    <React.Fragment key={`oneway-${i}`}>
+                      {page.data.map((route) => (
+                        <RouteCard
+                          key={route.id}
+                          routeThere={route}
+                          passengers={passengers}
+                        />
+                      ))}
+                    </React.Fragment>
+                  ))
+                ) : !isFetchingOneWay ? (
+                  <div className="text-center py-4">Маршруты не найдены</div>
+                ) : null}
+              </>
+            )}
+
+            {/* Индикаторы загрузки дополнительных маршрутов */}
+            {hasNextOneWay && (
+              <div ref={oneWayRef} className="flex justify-center py-4">
+                {isFetchingOneWay ? "Загрузка..." : null}
+              </div>
+            )}
+            {dateTo && hasNextReturn && (
+              <div ref={returnRef} className="flex justify-center py-4">
+                {isFetchingReturn ? "Загрузка..." : null}
+              </div>
+            )}
+            {/* {oneWayData?.pages ? (
               oneWayData.pages.map((page, i) => (
                 <React.Fragment key={i}>
                   {page.data.map((route) => (
@@ -538,10 +561,7 @@ export default function ResultsSearch() {
               <div ref={oneWayRef} className="flex justify-center py-4">
                 {isFetchingOneWay ? "Загрузка..." : null}
               </div>
-            )}
-          </div>
-          <div className="sticky top-4 h-fit">
-            <HotelsList hotels={hotels} />
+            )} */}
           </div>
         </div>
       </div>

@@ -312,6 +312,8 @@ export default function BookingAirplane() {
                   value={formValues.departureDate}
                   placeholder={"Выберите дату*"}
                   onChange={(date) => setValue("departureDate", date)}
+                  fromAirport={formValues.fromAirport?.code}
+                  toAirport={formValues.toAirport?.code}
                 />
                 {errors.departureDate && (
                   <p className="text-red-500 text-xs">{errors.departureDate.message}</p>
@@ -329,6 +331,8 @@ export default function BookingAirplane() {
                   }
                   hideCalendarIcon={formValues.isOneWay}
                   onChange={(date) => setValue("returnDate", date)}
+                  fromAirport={formValues.toAirport?.code}
+                  toAirport={formValues.fromAirport?.code}
                 />
                 {errors.returnDate && (
                   <p className="text-red-500 text-xs break-words whitespace-normal max-w-[262px]">{errors.returnDate.message}</p>

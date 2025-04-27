@@ -188,35 +188,24 @@ export default function RouteCard(props: RouteCardProps) {
                     <div className="w-[10px] h-[10px] bg-blue-500 rounded-full"></div>
                     <div className="h-[2px] bg-blue-500 flex-grow"></div>
 
-                    <div className="flex flex-col items-center mt-1">
-                      <div className="flex items-center w-full relative">
+                    {routeBack.layovers.map((layover, index) => (
+                      <div key={index} className="flex items-center relative">
                         <div className="w-[10px] h-[10px] bg-blue-500 rounded-full"></div>
-                        <div className="h-[2px] bg-blue-500 flex-grow"></div>
-                        {routeBack.layovers.map((layover, index) => (
-                          <div
-                            key={index}
-                            className="flex items-center relative"
-                          >
-                            <div className="w-[10px] h-[10px] bg-blue-500 rounded-full"></div>
-                            <div className="h-[2px] bg-gray-300 w-[30px] mx-1 rounded-full"></div>
-                            <div className="w-[10px] h-[10px] bg-blue-500 rounded-full"></div>
-                            {index < routeThere.layovers.length - 1 && (
-                              <div className="h-[2px] bg-blue-500 w-[30px]"></div>
-                            )}
-                            <div className="absolute top-4 text-center text-gray-400 text-xs">
-                              <p style={{ whiteSpace: "nowrap" }}>
-                                {layover.airport.name}
-                              </p>
-                              <p style={{ whiteSpace: "nowrap" }}>
-                                {layover.durationString}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
-                        <div className="h-[2px] bg-blue-500 flex-grow"></div>
+                        <div className="h-[2px] bg-gray-300 w-[30px] mx-1 rounded-full"></div>
                         <div className="w-[10px] h-[10px] bg-blue-500 rounded-full"></div>
+                        {index < routeBack.layovers.length - 1 && (
+                          <div className="h-[2px] bg-blue-500 w-[30px]"></div>
+                        )}
+                        <div className="absolute top-4 text-center text-gray-400 text-xs">
+                          <p style={{ whiteSpace: "nowrap" }}>
+                            {layover.airport.name}
+                          </p>
+                          <p style={{ whiteSpace: "nowrap" }}>
+                            {layover.durationString}
+                          </p>
+                        </div>
                       </div>
-                    </div>
+                    ))}
 
                     <div className="h-[2px] bg-blue-500 flex-grow"></div>
                     <div className="w-[10px] h-[10px] bg-blue-500 rounded-full"></div>
@@ -228,7 +217,6 @@ export default function RouteCard(props: RouteCardProps) {
                     {routeBack.flights[routeThere.flights.length - 1].to.name}
                   </p>
                 </div>
-                <div></div>
               </div>
             </div>
           )}
