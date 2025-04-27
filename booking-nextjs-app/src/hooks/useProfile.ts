@@ -2,7 +2,7 @@ import { ProfileSchema } from "@/schemas/profile";
 import { queryClient } from "@/utils/queryClient";
 import { useQuery, useMutation } from "@tanstack/react-query";
 
-const PROFILE_QUERY_KEY = ["profile"];
+export const PROFILE_QUERY_KEY = ["profile"];
 
 export const useProfile = () => {
   return useQuery({

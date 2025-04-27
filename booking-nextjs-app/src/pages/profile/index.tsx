@@ -6,13 +6,19 @@ import Image from "next/image";
 import InputField from "@/components/InputField";
 import { withAuthPage } from "@/utils/withAuthPage";
 import { Session } from "next-auth";
-import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
+import {
+  PROFILE_QUERY_KEY,
+  useProfile,
+  useUpdateProfile,
+} from "@/hooks/useProfile";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ProfileSchema, profileSchema } from "@/schemas/profile";
-import React from "react";
+import React, { useRef } from "react";
 import { useCountries } from "@/hooks/useCountries";
 import SelectInput from "@/components/SelectInput";
+import { queryClient } from "@/utils/queryClient";
+import LightButton from "@/components/LightButton";
 
 interface ProfilePageProps {
   session: Session;
@@ -43,6 +49,38 @@ export default function ProfilePage({ session }: ProfilePageProps) {
 
   const onSubmit = (data: ProfileSchema) => mutate(data);
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("avatar", file);
+
+    try {
+      const response = await fetch("/api/profile/upload-avatar", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Upload failed");
+      }
+
+      const data = await response.json();
+      if (data.url) {
+        queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY });
+      }
+    } catch (error) {
+      console.error("Error uploading avatar:", error);
+    }
+  };
+
   return (
     <Layout>
       <div className="flex flex-col justify-self-center w-full md:w-auto gap-3">
@@ -51,22 +89,36 @@ export default function ProfilePage({ session }: ProfilePageProps) {
         </div>
         <div className="flex flex-col gap-6 bg-white px-6 py-[2.5rem] shadow-[0_4px_8px_rgba(0,0,0,0.15)] rounded-lg font-sans">
           <div className="flex justify-between">
-            <button className="relative cursor-pointer">
-              <Image
-                src={defaultAvatar}
-                width={92}
-                height={92}
-                className="rounded-full"
-                alt="Аватар пользователя"
+            <div className="relative">
+              <button
+                className="relative cursor-pointer"
+                onClick={handleAvatarClick}
+              >
+                <div className="w-[92px] h-[92px] rounded-full overflow-hidden">
+                  <Image
+                    src={user?.imageUrl || defaultAvatar}
+                    width={92}
+                    height={92}
+                    className="object-cover w-full h-full"
+                    alt="Аватар пользователя"
+                  />
+                </div>
+                <Image
+                  src={avatarUpload}
+                  width={40}
+                  height={40}
+                  className="absolute bottom-0 right-[-20px] w-[40px] h-[40px] rounded-full"
+                  alt="Загрузить аватар"
+                />
+              </button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="image/*"
+                className="hidden"
               />
-              <Image
-                src={avatarUpload}
-                width={40}
-                height={40}
-                className="absolute bottom-0 right-[-20px] w-[40px] h-[40px] rounded-full"
-                alt="Загрузить аватар"
-              />
-            </button>
+            </div>
             <PrimaryButton className="w-[262px] h-[2.5rem]">
               История бронирований
             </PrimaryButton>
@@ -125,13 +177,13 @@ export default function ProfilePage({ session }: ProfilePageProps) {
               </p>
             )}
             <div className="flex justify-start mt-2">
-              <PrimaryButton
+              <LightButton
                 type="submit"
                 className="mt-2 w-[262px]"
                 disabled={isPending}
               >
                 {isPending ? "Сохраняем..." : "Сохранить изменения"}
-              </PrimaryButton>
+              </LightButton>
             </div>
           </form>
         </div>
