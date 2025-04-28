@@ -93,7 +93,7 @@ export default function BookingPage() {
 
     await fetch(`/api/booking-page`, {
       method: 'POST',
-      body: JSON.stringify({ "routeId": 'bfdb8a43-6618-45f6-9a2c-60876a2208ad' })
+      body: JSON.stringify({ routeId: 'dc9ffa56-3069-495b-bb8f-68874104dbe9' })
     })
 
     const query = new URLSearchParams({

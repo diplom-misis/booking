@@ -8,16 +8,18 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  firstName     String
-  lastName      String
-  email         String    @unique
-  emailVerified DateTime?
-  password      String
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  accounts      Account[]
-  sessions      Session[]
+  id              String    @id @default(cuid())
+  firstName       String
+  lastName        String
+  defaultCountryId String?
+  defaultCountry   Country? @relation(fields: [defaultCountryId], references: [id])
+  email           String    @unique
+  emailVerified   DateTime?
+  password        String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  accounts        Account[]
+  sessions        Session[]
 }
 
 model Account {
@@ -82,21 +84,29 @@ model Flight {
 }
 
 model Airport {
-  id      String @id @default(uuid())
-  name    String
-  code    String @unique
-  cityId  String
-  city    City   @relation(fields: [cityId], references: [id])
-  country String
+  id     String @id @default(uuid())
+  name   String
+  code   String @unique
+  cityId String
+  city   City   @relation(fields: [cityId], references: [id])
 
   flightsFrom Flight[] @relation(name: "Departure")
   flightsTo   Flight[] @relation(name: "Arrival")
 }
 
 model City {
-  id      String    @id @default(uuid())
-  name    String    @unique
-  Airport Airport[]
+  id        String    @id @default(uuid())
+  name      String    @unique
+  countryId String?
+  country   Country?  @relation(fields: [countryId], references: [id])
+  airports  Airport[]
+}
+
+model Country {
+  id     String @id @default(uuid())
+  name   String @unique
+  cities City[]
+  users  User[]
 }
 
 model Route {
@@ -104,7 +114,6 @@ model Route {
   hash         String          @unique
   flightRoutes FlightsRoutes[]
   carts        Cart[]
-  flightRoutes FlightsRoutes[]
 }
 
 model FlightsRoutes {
@@ -115,8 +124,6 @@ model FlightsRoutes {
   flightDate DateTime // Дублирует Flight.fromDatetime
   route      Route    @relation(fields: [routeId], references: [id])
   routeId    String
-  route      Route  @relation(fields: [routeId], references: [id])
-  flight     Flight @relation(fields: [flightId], references: [id])
 
   @@unique([sequenceId, routeId])
 }

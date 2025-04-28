@@ -28,3 +28,9 @@ body {
   background-size: cover;
   background-position: center;
 }
+
+@media (width <= 376px) {
+  body {
+    background-image: none;
+  }
+}

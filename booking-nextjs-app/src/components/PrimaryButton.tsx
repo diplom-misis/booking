@@ -1,29 +1,33 @@
-import React from 'react';
+import React from "react";
+import clsx from "clsx";
 
 interface PrimaryButtonProps {
-<<<<<<< HEAD
-=======
-  type: 'button' | 'submit' | 'reset' | undefined;
->>>>>>> 47537556e7febe9b005b42f30b803c2ba06cab56
+  type: "button" | "submit" | "reset" | undefined;
   onClick?: () => void;
   children: React.ReactNode;
   className?: string;
+  disabled?: boolean;
 }
 
-<<<<<<< HEAD
-const PrimaryButton: React.FC<PrimaryButtonProps> = ({ onClick = () => {}, children, className = '' }) => {
-  return (
-    <button
-      type='button'
-      onClick={onClick}
-=======
-const PrimaryButton: React.FC<PrimaryButtonProps> = ({ type = 'button', onClick = () => {}, children, className = '' }) => {
+const PrimaryButton: React.FC<PrimaryButtonProps> = ({
+  type = "button",
+  onClick = () => {},
+  children,
+  className = "",
+  disabled = false,
+}) => {
   return (
     <button
       type={type}
-      // onClick={onClick}
->>>>>>> 47537556e7febe9b005b42f30b803c2ba06cab56
-      className={`bg-blue-500 text-gray-100 py-2 rounded-lg font-bold ${className}`}
+      onClick={onClick}
+      disabled={disabled}
+      className={clsx(
+        "bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white py-2 px-4 rounded-lg font-bold transition-all duration-200 ease-in-out",
+        {
+          "opacity-50 cursor-not-allowed": disabled,
+        },
+        className,
+      )}
     >
       {children}
     </button>
