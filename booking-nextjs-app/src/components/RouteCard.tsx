@@ -40,10 +40,10 @@ export default function RouteCard(props: RouteCardProps) {
   const handleButtonClick = async () => {
     setIsLoading(true);
     try {
-        await addToCart(routeThere, passengers);
-        if (routeBack) await addToCart(routeBack, passengers);
-        toast.success("Маршрут добавлен в бронирование");
-        router.push(`/booking-page`);
+      await addToCart(routeThere, passengers);
+      if (routeBack) await addToCart(routeBack, passengers);
+      toast.success("Маршрут добавлен в бронирование");
+      router.push(`/booking-page`);
     } catch (error) {
       console.log(error);
     } finally {
@@ -84,8 +84,8 @@ export default function RouteCard(props: RouteCardProps) {
   }
 
   return (
-    <div>
-      <div className="bg-white rounded-xl shadow-[rgba(0,0,0,0.15)_0px_4px_8px] flex flex-row justify-between gap-6 px-6 py-5">
+    <div className="bg-white rounded-xl shadow-[rgba(0,0,0,0.15)_0px_4px_8px]">
+      <div className="hidden md:flex flex-row justify-between gap-6 px-6 py-5">
         <div className="flex flex-col gap-3">
           <div className="flex flex-row gap-3">
             {routeThere.airlines.map((airline, index) => (
@@ -230,6 +230,160 @@ export default function RouteCard(props: RouteCardProps) {
           >
             Выбрать
           </Button>
+        </div>
+      </div>
+
+      <div className="md:hidden p-4">
+        <div className="mb-4">
+          <div className="flex flex-col">
+            <div className="flex flex-row gap-3 mb-2">
+              {routeThere.airlines.map((airline, index) => (
+                <h2 key={index} className="font-bold text-base text-blue-500">
+                  {`«${airline}»`}
+                </h2>
+              ))}
+            </div>
+
+            <p className="text-sm text-gray-500 mb-3">
+              В пути {routeThere.durationString}
+            </p>
+
+            <div className="flex flex-col">
+              <div className="flex items-start gap-3">
+                <div className="flex flex-col items-center">
+                  <div className="w-4 h-4 bg-blue-500 rounded-full mt-1"></div>
+                  <div className="w-0.5 h-5 bg-blue-500"></div>
+                </div>
+                <div className="flex flex-row items-center gap-3">
+                  <p className="font-medium">{departureTimeOneWay}</p>
+                  <p className="text-sm text-gray-500">
+                    {formattedDepartureDateOneWay}
+                  </p>
+                  <p className="text-sm">{routeThere.flights[0].from.name}</p>
+                </div>
+              </div>
+
+              {routeThere.layovers.map((layover, index) => (
+                <div key={index} className="flex items-start gap-3">
+                  <div className="flex flex-col items-center">
+                    <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
+                    <div className="w-0.5 h-4 bg-gray-300 rounded-full"></div>
+                    <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
+                    {index < routeThere.layovers.length - 1 && (
+                      <div className="w-0.5 h-4 bg-blue-500"></div>
+                    )}
+                  </div>
+                  <div className="flex flex-row gap-3 pt-3">
+                    <p className="text-sm text-gray-500">
+                      {layover.durationString}
+                    </p>
+                    <p className="text-sm">{layover.airport.name}</p>
+                  </div>
+                </div>
+              ))}
+
+              <div className="flex items-end gap-3">
+                <div className="flex flex-col items-center">
+                  <div className="w-0.5 h-5 bg-blue-500"></div>
+                  <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
+                </div>
+                <div className="flex flex-row items-center gap-3">
+                  <p className="font-medium">{arrivalTimeOneWay}</p>
+                  <p className="text-sm text-gray-500">
+                    {formattedArrivalDateOneWay}
+                  </p>
+                  <p className="text-sm">
+                    {routeThere.flights[routeThere.flights.length - 1].to.name}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {routeBack && (
+          <div className="mb-4 pt-4 border-t">
+            <div className="flex flex-col">
+              <div className="flex flex-row gap-3 mb-2">
+                {routeBack.airlines.map((airline, index) => (
+                  <h2 key={index} className="font-bold text-base text-blue-500">
+                    {`«${airline}»`}
+                  </h2>
+                ))}
+              </div>
+
+              <p className="text-sm text-gray-500 mb-3">
+                В пути {routeBack.durationString}
+              </p>
+
+              <div className="flex flex-col">
+                <div className="flex items-start gap-3">
+                  <div className="flex flex-col items-center">
+                    <div className="w-4 h-4 bg-blue-500 rounded-full mt-1"></div>
+                    <div className="w-0.5 h-5 bg-blue-500"></div>
+                  </div>
+                  <div className="flex flex-row items-center gap-3">
+                    <p className="font-medium">{departureTimeReturn}</p>
+                    <p className="text-sm text-gray-500">
+                      {formattedDepartureDateReturn}
+                    </p>
+                    <p className="text-sm">{routeBack.flights[0].from.name}</p>
+                  </div>
+                </div>
+
+                {routeBack.layovers.map((layover, index) => (
+                  <div key={index} className="flex items-start gap-3">
+                    <div className="flex flex-col items-center">
+                      <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
+                      <div className="w-0.5 h-4 bg-gray-300 rounded-full"></div>
+                      <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
+                      {index < routeBack.layovers.length - 1 && (
+                        <div className="w-0.5 h-4 bg-blue-500"></div>
+                      )}
+                    </div>
+                    <div className="flex flex-row gap-3 pt-3">
+                      <p className="text-sm text-gray-500">
+                        {layover.durationString}
+                      </p>
+                      <p className="text-sm">{layover.airport.name}</p>
+                    </div>
+                  </div>
+                ))}
+
+                <div className="flex items-end gap-3">
+                  <div className="flex flex-col items-center">
+                    <div className="w-0.5 h-5 bg-blue-500"></div>
+                    <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
+                  </div>
+                  <div className="flex flex-row items-center gap-3">
+                    <p className="font-medium">{arrivalTimeReturn}</p>
+                    <p className="text-sm text-gray-500">
+                      {formattedArrivalDateReturn}
+                    </p>
+                    <p className="text-sm">
+                      {routeBack.flights[routeBack.flights.length - 1].to.name}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="flex justify-between items-center mt-4">
+          <Button
+            onClick={handleButtonClick}
+            disabled={isLoading}
+            className="rounded-lg bg-sky-600 py-2 px-4 text-m font-semibold text-white data-[hover]:bg-sky-500 data-[active]:bg-sky-700"
+          >
+            Выбрать
+          </Button>
+          <p className="text-2xl text-green-500 font-bold">
+            {routeBack
+              ? (routeThere.totalPrice + routeBack.totalPrice).toLocaleString()
+              : routeThere.totalPrice.toLocaleString()}{" "}
+            ₽
+          </p>
         </div>
       </div>
     </div>
