@@ -10,7 +10,6 @@ const AirportCreateSchema = z.object({
     .length(3, "Airport code must be exactly 3 characters")
     .transform((s) => s.toUpperCase()),
   cityId: z.string().min(1, "City ID is required"),
-  country: z.string().min(2, "Country must be at least 2 characters"),
 });
 
 const AirportQuerySchema = z.object({
@@ -79,7 +78,7 @@ export default async function handler(
         });
       }
 
-      const { name, code, cityId, country } = validationResult.data;
+      const { name, code, cityId } = validationResult.data;
 
       const cityExists = await prisma.city.findUnique({
         where: { id: cityId },
@@ -106,7 +105,6 @@ export default async function handler(
           name,
           code,
           cityId,
-          country,
         },
       });
 

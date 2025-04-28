@@ -62,10 +62,10 @@ export default function InputField({
         {...inputProps}
 >>>>>>> 47537556e7febe9b005b42f30b803c2ba06cab56
       />
-      {(error && error.message) ? (
+      {error && error.message ? (
         <p className="text-red-500 text-xs">{error.message}</p>
-      ): helpText && (
-        <p className="text-gray-500 text-xs">{helpText}</p>
+      ) : (
+        helpText && <p className="text-gray-500 text-xs">{helpText}</p>
       )}
       {linkComponent && <div className="text-right">{linkComponent}</div>}
     </div>

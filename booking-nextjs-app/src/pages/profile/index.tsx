@@ -7,31 +7,41 @@ import InputField from "@/components/InputField";
 import { withAuthPage } from "@/utils/withAuthPage";
 import { Session } from "next-auth";
 import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ProfileSchema, profileSchema } from "@/schemas/profile";
+import React from "react";
+import { useCountries } from "@/hooks/useCountries";
+import SelectInput from "@/components/SelectInput";
 
 interface ProfilePageProps {
   session: Session;
 }
 
 export default function ProfilePage({ session }: ProfilePageProps) {
-  const { data: user, isLoading } = useProfile();
-  const { mutate: updateProfile, isPending } = useUpdateProfile();
+  const { data: resultUser } = useProfile();
+  const user = resultUser?.user;
+  const { mutate, isPending, isError, error } = useUpdateProfile();
+  const { data: resultCountry } = useCountries();
+  const countryList = resultCountry?.countries || [];
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    control,
   } = useForm<ProfileSchema>({
     resolver: zodResolver(profileSchema),
-    values: user,
   });
 
-  const onSubmit = (data) => updateProfile(data);
+  React.useEffect(() => {
+    if (user) {
+      reset(user);
+    }
+  }, [user, reset]);
 
-  if (isLoading) return <div>Loading...</div>;
+  const onSubmit = (data: ProfileSchema) => mutate(data);
 
   return (
     <Layout>
@@ -61,28 +71,66 @@ export default function ProfilePage({ session }: ProfilePageProps) {
               История бронирований
             </PrimaryButton>
           </div>
-          <form className="flex flex-col gap-3">
+          <form
+            className="flex flex-col gap-3"
+            onSubmit={handleSubmit(onSubmit)}
+          >
             <div className="flex gap-2">
-              <InputField label="Имя" value="Ярополк" width="w-[262px]" />
-              <InputField label="Фамилия" value="Иванов" width="w-[262px]" />
+              <InputField
+                label="Имя"
+                width="w-[262px]"
+                error={errors.firstName}
+                {...register("firstName")}
+              />
+              <InputField
+                label="Фамилия"
+                width="w-[262px]"
+                error={errors.lastName}
+                {...register("lastName")}
+              />
             </div>
             <div className="flex gap-2">
               <InputField
                 label="Email"
+                width="w-[262px]"
+                error={errors.email}
                 {...register("email")}
-                error={errors.firstName}
-                width="w-[262px]"
               />
-              <InputField
-                label="Имя аккаунта"
-                {...register("username")}
-                error={errors.username}
-                width="w-[262px]"
+              <Controller
+                name="defaultCountry"
+                control={control}
+                render={({ field }) => (
+                  <SelectInput
+                    {...register("defaultCountry")}
+                    title="Страна"
+                    className="w-[262px] px-[14px] py-[8px]"
+                    data={countryList}
+                    typeCombobox={true}
+                    placeholder="Выберите страну"
+                    value={field.value ?? null}
+                    onChange={field.onChange}
+                    required
+                  />
+                )}
               />
+              {errors.defaultCountry && (
+                <p className="text-sm text-red-500">
+                  {errors.defaultCountry.message || "Произошла ошибка"}
+                </p>
+              )}
             </div>
+            {isError && (
+              <p className="text-red-500 text-sm">
+                {(error as Error)?.message || "Произошла ошибка"}
+              </p>
+            )}
             <div className="flex justify-start mt-2">
-              <PrimaryButton className="w-[262px] h-[2.5rem]">
-                Сохранить изменения
+              <PrimaryButton
+                type="submit"
+                className="mt-2 w-[262px]"
+                disabled={isPending}
+              >
+                {isPending ? "Сохраняем..." : "Сохранить изменения"}
               </PrimaryButton>
             </div>
           </form>
