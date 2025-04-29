@@ -1,43 +1,5 @@
 import { create } from "zustand";
-
-interface Airport {
-  id: string;
-  cityId: string;
-  code: string;
-  name: string;
-}
-
-interface Flight {
-  id: string;
-  from: Airport;
-  to: Airport;
-  departure: string;
-  arrival: string;
-  company: string;
-  flightNumber: string;
-  ticketClass: string;
-  price: number;
-}
-
-interface Layover {
-  id: string
-  airport: Airport
-  durationMs: number
-  durationString: string
-  fromFlightId: string
-  toFlightId: string
-}
-
-export interface RouteDto {
-  id: string;
-  hash: string;
-  totalPrice: number;
-  stops: number;
-  durationString: string
-  airlines: string[]
-  flights: Flight[];
-  layovers: Layover[]
-}
+import { RouteDto } from "@/types/SearchResult";
 
 interface RouteStore {
   oneWayRoutes: RouteDto[];

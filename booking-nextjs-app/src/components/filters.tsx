@@ -2,6 +2,7 @@ import { Field, Label, Button, Input } from "@headlessui/react";
 import Checkbox from "./Checkbox";
 import SelectInput from "./SelectInput";
 import { cn } from "@/utils/cn";
+import { typeSort } from "@/types/SearchResult";
 
 interface LayoversState {
   id: number;
@@ -30,11 +31,6 @@ interface FiltersProps {
   isMobile?: boolean;
   onApplyFilters?: () => void;
 }
-
-const typeSort = [
-  { id: "1", name: "дешевые → дорогие", type: "asc" },
-  { id: "2", name: "дорогие → дешевые", type: "desc" },
-];
 
 export default function Filters(props: FiltersProps) {
   const {
