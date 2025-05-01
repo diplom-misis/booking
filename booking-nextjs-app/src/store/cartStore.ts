@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import axios from 'axios'
-import { RouteDto } from './useRouteStore'
+import { RouteDto } from '@/types/SearchResult'
 
 interface CartItem {
   id: string

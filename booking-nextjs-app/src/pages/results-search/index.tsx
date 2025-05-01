@@ -8,29 +8,7 @@ import RouteCard from "@/components/RouteCard";
 import { useRoutesQuery } from "@/hooks/useRoutesQuery";
 import { useInView } from "react-intersection-observer";
 import React from "react";
-
-const layovers = [
-  { id: 1, name: "Без пересадок", state: "noTransfers" },
-  { id: 2, name: "1 пересадка", state: "oneTransfer" },
-  { id: 3, name: "2 пересадки", state: "twoTransfers" },
-  { id: 4, name: "3 пересадки", state: "threeTransfers" },
-];
-
-const monthNames = [
-  "",
-  "января",
-  "февраля",
-  "марта",
-  "апреля",
-  "мая",
-  "июня",
-  "июля",
-  "августа",
-  "сентября",
-  "октября",
-  "ноября",
-  "декабря",
-];
+import { layovers, monthNames, monthsMap, ticketClassMap } from "@/types/SearchResult";
 
 const getPassengersLabel = (count: number) => {
   if (count === 1) {
@@ -52,21 +30,6 @@ const formatDate = (dateStr: string) => {
   return `${day} ${monthNames[month]} ${year}`;
 };
 
-const monthsMap: Record<string, number> = {
-  января: 0,
-  февраля: 1,
-  марта: 2,
-  апреля: 3,
-  мая: 4,
-  июня: 5,
-  июля: 6,
-  августа: 7,
-  сентября: 8,
-  октября: 9,
-  ноября: 10,
-  декабря: 11,
-};
-
 const parseDateToISO = (dateStr: string): string | null => {
   if (!dateStr) return null;
 
@@ -82,13 +45,6 @@ const parseDateToISO = (dateStr: string): string | null => {
 
   const isoDate = `${year}-${String(month + 1).padStart(2, "0")}-${day}`;
   return isoDate;
-};
-
-const ticketClassMap: Record<string, string> = {
-  Эконом: "ECONOMY",
-  Комфорт: "COMFORT",
-  Бизнес: "BUSINESS",
-  Первый: "FIRST",
 };
 
 export default function ResultsSearch() {

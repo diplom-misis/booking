@@ -8,6 +8,7 @@ import { useRoutePrices } from "@/hooks/useRoutePrices";
 import { useEffect, useState } from "react";
 import React from "react";
 import { cn } from "@/utils/cn";
+import { PriceData } from "@/types/Search";
 
 interface CalendarInputProps {
   className?: string;
@@ -19,21 +20,17 @@ interface CalendarInputProps {
   onChange: (date: Date | null) => void;
   fromAirport?: string | null;
   toAirport?: string | null;
-}
-
-interface PriceData {
-  date: string;
-  minPrice: number;
+  error?: boolean;
 }
 
 function DayPrice(props: DayButtonProps) {
   const { day, modifiers, ...buttonProps } = props;
   const { prices } = React.useContext(PricesContext);
 
-  const dateString = DateTime.fromJSDate(day.date).toFormat('yyyy-MM-dd');
-  
+  const dateString = DateTime.fromJSDate(day.date).toFormat("yyyy-MM-dd");
+
   const priceInfo = prices.find((item: PriceData) => {
-    const itemDate = DateTime.fromISO(item.date).toFormat('yyyy-MM-dd');
+    const itemDate = DateTime.fromISO(item.date).toFormat("yyyy-MM-dd");
     return itemDate === dateString;
   });
 
@@ -48,12 +45,16 @@ function DayPrice(props: DayButtonProps) {
         <span className="text-xs text-green-500">
           {formatPrice(priceInfo.minPrice)}
         </span>
-      ) : <div className="h-4"></div>}
+      ) : (
+        <div className="h-4"></div>
+      )}
     </div>
   );
 }
 
-const PricesContext = React.createContext<{ prices: PriceData[] }>({ prices: [] });
+const PricesContext = React.createContext<{ prices: PriceData[] }>({
+  prices: [],
+});
 
 export default function CalendarInput(props: CalendarInputProps) {
   const {
@@ -66,6 +67,7 @@ export default function CalendarInput(props: CalendarInputProps) {
     onChange,
     fromAirport,
     toAirport,
+    error
   } = props;
 
   const [wasOpened, setWasOpened] = useState(false);
@@ -130,12 +132,23 @@ export default function CalendarInput(props: CalendarInputProps) {
             <>
               <Popover.Button
                 disabled={disabled}
-                className={cn("border p-2 rounded-[4px] flex items-center justify-between bg-white", className)}
+                className={cn(
+                  `border ${
+                    error
+                      ? "border-red-500"
+                      : open
+                      ? "border-blue-500"
+                      : "border-gray-300"
+                  } p-2 rounded-[4px] flex items-center justify-between bg-white`,
+                  className,
+                )}
                 style={{
                   backgroundColor: disabled ? "#F9FAFB" : "",
                 }}
               >
-                <span className={`${!value ? "text-gray-300" : "text-gray-800"}`}>
+                <span
+                  className={`${!value ? "text-gray-300" : "text-gray-800"}`}
+                >
                   {value
                     ? DateTime.fromJSDate(value).toFormat("d MMMM yyyy", {
                         locale: "ru",

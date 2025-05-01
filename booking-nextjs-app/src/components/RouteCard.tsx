@@ -3,9 +3,10 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Separator } from "./separator";
-import { RouteDto } from "@/store/useRouteStore";
 import { useCartStore } from "@/store/cartStore";
 import { useRouter } from "next/router";
+import { RouteDto } from "@/types/SearchResult";
+import { useSession } from "next-auth/react";
 
 interface RouteCardProps {
   routeThere: RouteDto;
@@ -36,20 +37,28 @@ export default function RouteCard(props: RouteCardProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { routeThere, routeBack, passengers } = props;
   const { addToCart } = useCartStore();
+  const session = useSession();
 
   const handleButtonClick = async () => {
+    if (session.status !== "authenticated") {
+      toast.error("Необходимо авторизоваться для бронирования");
+      router.push(`/auth/signin`);
+      return;
+    }
+
     setIsLoading(true);
     try {
-      await addToCart(routeThere, passengers);
-      if (routeBack) await addToCart(routeBack, passengers);
-      toast.success("Маршрут добавлен в бронирование");
-      router.push(`/booking-page`);
+        await addToCart(routeThere, passengers);
+        if (routeBack) await addToCart(routeBack, passengers);
+        toast.success("Маршрут добавлен в бронирование");
+        router.push(`/booking-page`);
     } catch (error) {
       console.log(error);
     } finally {
       setIsLoading(false);
     }
   };
+
 
   const departureDateOneWay = new Date(routeThere.flights[0].departure);
   const formattedDepartureDateOneWay = `${departureDateOneWay.getDate()} ${getMonthName(departureDateOneWay.getMonth())}`;
