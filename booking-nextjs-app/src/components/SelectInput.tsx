@@ -61,7 +61,7 @@ export default function SelectInput(props: SelectInputProps) {
   return (
     <div>
       <Field className="flex flex-col gap-1">
-        <Label className="text-gray-400 text-xs">{title}</Label>
+        <Label className="text-gray-400 text-xs font-inter">{title}</Label>
         <Combobox
           value={value}
           onChange={onChange}
@@ -70,8 +70,8 @@ export default function SelectInput(props: SelectInputProps) {
           <div className="relative">
             <ComboboxInput
               className={cn(
-                `rounded-[4px] border bg-white text-m 
-     focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+                `rounded-[4px] border bg-white text-base 
+     focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 font-inter
      ${error ? "border-red-500" : "border-gray-300"}`,
                 className,
               )}
@@ -122,7 +122,7 @@ export default function SelectInput(props: SelectInputProps) {
                 value={item}
                 className="group flex min-h-9 items-center justify-center px-3 data-[focus]:bg-gray-100"
               >
-                <span className="text-center whitespace-normal break-words">
+                <span className="text-center whitespace-normal break-words font-inter text-base">
                   {"code" in item ? item.code : item.name}
                 </span>
               </ComboboxOption>

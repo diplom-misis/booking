@@ -63,10 +63,12 @@ export default function PassengersSelect({
     <Menu>
       {({ open }) => (
         <Field className="flex flex-col">
-          <Label className="text-gray-400 text-xs mb-1">Пассажиры</Label>
+          <Label className="text-gray-400 text-xs mb-1 font-inter">
+            Пассажиры
+          </Label>
           <MenuButton
             className={cn(
-              "border h-11 px-[14px] py-[10px] rounded-[4px] bg-white text-sm text-left focus:outline-none",
+              "border h-11 px-[14px] py-[10px] rounded-[4px] bg-white text-base text-left focus:outline-none font-inter",
               open ? "border-blue-500 ring-blue-500" : "border-gray-300",
               className,
             )}
