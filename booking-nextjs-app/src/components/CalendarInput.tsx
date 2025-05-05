@@ -67,7 +67,7 @@ export default function CalendarInput(props: CalendarInputProps) {
     onChange,
     fromAirport,
     toAirport,
-    error
+    error,
   } = props;
 
   const [wasOpened, setWasOpened] = useState(false);
@@ -137,8 +137,8 @@ export default function CalendarInput(props: CalendarInputProps) {
                     error
                       ? "border-red-500"
                       : open
-                      ? "border-blue-500"
-                      : "border-gray-300"
+                        ? "border-blue-500"
+                        : "border-gray-300"
                   } p-2 rounded-[4px] flex items-center justify-between bg-white`,
                   className,
                 )}
@@ -147,7 +147,7 @@ export default function CalendarInput(props: CalendarInputProps) {
                 }}
               >
                 <span
-                  className={`${!value ? "text-gray-300" : "text-gray-800"}`}
+                  className={`${!value ? "text-gray-300" : "text-gray-800"} font-inter`}
                 >
                   {value
                     ? DateTime.fromJSDate(value).toFormat("d MMMM yyyy", {

@@ -8,7 +8,14 @@ import RouteCard from "@/components/RouteCard";
 import { useRoutesQuery } from "@/hooks/useRoutesQuery";
 import { useInView } from "react-intersection-observer";
 import React from "react";
-import { layovers, monthNames, monthsMap, ticketClassMap } from "@/types/SearchResult";
+import {
+  layovers,
+  monthNames,
+  monthsMap,
+  ticketClassMap,
+} from "@/types/SearchResult";
+import Image from "next/image";
+import filter from "@/images/filter.svg";
 
 const getPassengersLabel = (count: number) => {
   if (count === 1) {
@@ -390,37 +397,47 @@ export default function ResultsSearch() {
       <div className="flex flex-col justify-self-center gap-6">
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="hidden lg:flex flex-row gap-6">
-            <h1 className="text-3xl font-bold">Результаты поиска</h1>
+            <h1 className="text-3xl font-bold font-roboto">
+              Результаты поиска
+            </h1>
             <div className="flex flex-row gap-6 pt-3 items-center">
               <div className="flex flex-row gap-2 items-center">
                 <div className="flex flex-row gap-1 items-center">
-                  <p className="text-sm text-gray-500">{cityFrom}</p>
-                  <p className="text-base text-gray-400">{airportFrom}</p>
+                  <p className="text-sm text-gray-500 font-inter">{cityFrom}</p>
+                  <p className="text-base text-gray-400 font-inter">
+                    {airportFrom}
+                  </p>
                 </div>
                 <Arrow className="rotate-180 w-5 h-2.5 [&>path]:stroke-gray-500" />
                 <div className="flex flex-row gap-1 items-center">
-                  <p className="text-sm text-gray-500">{cityTo}</p>
-                  <p className="text-base text-gray-400">{airportTo}</p>
+                  <p className="text-sm text-gray-500 font-inter">{cityTo}</p>
+                  <p className="text-base text-gray-400 font-inter">
+                    {airportTo}
+                  </p>
                 </div>
               </div>
               <div>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 font-inter">
                   {passengers} {getPassengersLabel(passengers)}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">{classTicket}</p>
+                <p className="text-sm text-gray-500 font-inter">
+                  {classTicket}
+                </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">{dateFrom}</p>
+                <p className="text-sm text-gray-500 font-inter">{dateFrom}</p>
               </div>
               {dateTo ? (
                 <div>
-                  <p className="text-sm text-gray-500">{dateTo}</p>
+                  <p className="text-sm text-gray-500 font-inter">{dateTo}</p>
                 </div>
               ) : (
                 <div>
-                  <p className="text-sm text-gray-500">В одну сторону</p>
+                  <p className="text-sm text-gray-500 font-inter">
+                    В одну сторону
+                  </p>
                 </div>
               )}
             </div>
@@ -433,20 +450,7 @@ export default function ResultsSearch() {
                 className="flex items-center gap-1"
                 onClick={() => setIsFiltersOpen(!isFiltersOpen)}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="size-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75"
-                  />
-                </svg>
+                <Image src={filter} alt="Иконка фильтров" />
               </button>
             </div>
 

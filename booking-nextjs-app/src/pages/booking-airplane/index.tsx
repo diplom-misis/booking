@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Layout } from "../layout";
 import { Field, Label, Button, Checkbox } from "@headlessui/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import CalendarInput from "@/components/CalendarInput";
 import SelectInput from "@/components/SelectInput";
 import { useForm } from "react-hook-form";
@@ -27,6 +27,7 @@ const formatDate = (date: Date | null | undefined) => {
 };
 
 export default function BookingAirplane() {
+  const searchParams = useSearchParams();
   const router = useRouter();
   const {
     register,
@@ -61,6 +62,20 @@ export default function BookingAirplane() {
 
   const [toSearchQuery, setToSearchQuery] = useState("");
   const debouncedToSearch = useDebounce(toSearchQuery, 300);
+
+  useEffect(() => {
+    const cityTo = searchParams.get("toCity");
+
+    if (cityTo) {
+      setToSearchQuery(cityTo);
+      searchFromCities(toSearchQuery);
+      const matchedCity = toCities.find((city) => city.name === cityTo);
+
+      if (matchedCity) {
+        setValue("toCity", matchedCity);
+      }
+    }
+  }, [searchParams, toCities, setValue, searchFromCities, toSearchQuery]);
 
   useEffect(() => {
     if (debouncedFromSearch) {
@@ -120,6 +135,11 @@ export default function BookingAirplane() {
 
   useEffect(() => {
     localStorage.setItem("formData", JSON.stringify(formValues));
+    if (typeof window !== "undefined" && window.location.search) {
+      const url = new URL(window.location.href);
+      url.search = "";
+      window.history.replaceState({}, document.title, url.toString());
+    }
   }, [formValues]);
 
   const handleCheckboxChange = () => {
@@ -173,7 +193,7 @@ export default function BookingAirplane() {
   return (
     <Layout>
       <div className="flex flex-col justify-self-center">
-        <h1 className="text-xl sm:text-2xl font-bold mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold mb-6 font-roboto">
           Поиск авиабилетов
         </h1>
         <div className="sm:bg-white sm:rounded-xl sm:border">
@@ -343,7 +363,7 @@ export default function BookingAirplane() {
                       <div className="absolute size-[10px] bg-blue-500 rounded-sm"></div>
                     )}
                   </Checkbox>
-                  <Label className="text-sm text-gray-800">
+                  <Label className="text-sm font-inter text-gray-800">
                     Обратный билет не нужен
                   </Label>
                 </Field>
@@ -351,9 +371,9 @@ export default function BookingAirplane() {
             </div>
             <Button
               type="submit"
-              className="w-full sm:w-[262px] rounded bg-blue-500 py-2 px-4 text-m font-semibold text-white data-[hover]:bg-sky-500 data-[active]:bg-sky-700"
+              className="w-full sm:w-[262px] rounded bg-blue-500 py-2 px-4 text-gray-100 data-[hover]:bg-sky-500 data-[active]:bg-sky-700 "
             >
-              Найти
+              <p className="text-base font-inter font-bold">Найти</p>
             </Button>
           </form>
         </div>
