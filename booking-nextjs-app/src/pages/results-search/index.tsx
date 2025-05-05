@@ -16,6 +16,8 @@ import {
 } from "@/types/SearchResult";
 import Image from "next/image";
 import filter from "@/images/filter.svg";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../api/auth/[...nextauth]";
 
 const getPassengersLabel = (count: number) => {
   if (count === 1) {
@@ -54,7 +56,17 @@ const parseDateToISO = (dateStr: string): string | null => {
   return isoDate;
 };
 
-export default function ResultsSearch() {
+export async function getServerSideProps(context: any) {
+  const session = await getServerSession(context.req, context.res, authOptions);
+
+  return {
+    props: {
+      isAuthenticated: !!session,
+    },
+  };
+}
+
+export default function ResultsSearch({ isAuthenticated }) {
   const searchParams = useSearchParams();
 
   const [cityFrom, setCityFrom] = useState("");
@@ -548,6 +560,7 @@ export default function ResultsSearch() {
                         routeThere={routeThere}
                         routeBack={routeBack}
                         passengers={passengers}
+                        isAuthenticated={isAuthenticated}
                       />
                     ))
                   ) : (
@@ -568,6 +581,7 @@ export default function ResultsSearch() {
                             key={route.id}
                             routeThere={route}
                             passengers={passengers}
+                            isAuthenticated={isAuthenticated}
                           />
                         ))}
                       </React.Fragment>
