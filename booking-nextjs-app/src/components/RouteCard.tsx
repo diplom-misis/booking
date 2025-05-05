@@ -48,17 +48,16 @@ export default function RouteCard(props: RouteCardProps) {
 
     setIsLoading(true);
     try {
-        await addToCart(routeThere, passengers);
-        if (routeBack) await addToCart(routeBack, passengers);
-        toast.success("Маршрут добавлен в бронирование");
-        router.push(`/booking-page`);
+      await addToCart(routeThere, passengers);
+      if (routeBack) await addToCart(routeBack, passengers);
+      toast.success("Маршрут добавлен в бронирование");
+      router.push(`/booking-page`);
     } catch (error) {
       console.log(error);
     } finally {
       setIsLoading(false);
     }
   };
-
 
   const departureDateOneWay = new Date(routeThere.flights[0].departure);
   const formattedDepartureDateOneWay = `${departureDateOneWay.getDate()} ${getMonthName(departureDateOneWay.getMonth())}`;
@@ -100,7 +99,7 @@ export default function RouteCard(props: RouteCardProps) {
             {routeThere.airlines.map((airline, index) => (
               <h2
                 key={index}
-                className="font-bold text-base text-blue-500"
+                className="font-bold text-base font-inter text-blue-500"
               >{`«${airline}»`}</h2>
             ))}
           </div>
@@ -108,19 +107,19 @@ export default function RouteCard(props: RouteCardProps) {
           <div className="w-[404px]">
             <div className="flex justify-between">
               <div className="text-center">
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 font-inter">
                   {formattedDepartureDateOneWay}
                 </p>
-                <p className="text-2xl">{departureTimeOneWay}</p>
+                <p className="text-2xl font-inter">{departureTimeOneWay}</p>
               </div>
               <div className="flex items-end">
                 <p className="text-xs">В пути {routeThere.durationString}</p>
               </div>
               <div className="text-center">
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 font-inter">
                   {formattedArrivalDateOneWay}
                 </p>
-                <p className="text-2xl">{arrivalTimeOneWay}</p>
+                <p className="text-2xl font-inter">{arrivalTimeOneWay}</p>
               </div>
             </div>
 
@@ -136,7 +135,7 @@ export default function RouteCard(props: RouteCardProps) {
                     {index < routeThere.layovers.length - 1 && (
                       <div className="h-[2px] bg-blue-500 w-[30px]"></div>
                     )}
-                    <div className="absolute top-4 text-center text-gray-400 text-xs">
+                    <div className="absolute top-4 text-center text-gray-400 text-xs font-inter">
                       <p style={{ whiteSpace: "nowrap" }}>
                         {layover.airport.name}
                       </p>
@@ -152,8 +151,10 @@ export default function RouteCard(props: RouteCardProps) {
             </div>
 
             <div className="flex flex-row justify-between">
-              <p className="text-sm">{routeThere.flights[0].from.name}</p>
-              <p className="text-sm">
+              <p className="text-sm font-inter">
+                {routeThere.flights[0].from.name}
+              </p>
+              <p className="text-sm font-inter">
                 {routeThere.flights[routeThere.flights.length - 1].to.name}
               </p>
             </div>
@@ -171,19 +172,21 @@ export default function RouteCard(props: RouteCardProps) {
               <div className="w-[404px]">
                 <div className="flex justify-between">
                   <div className="text-center">
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 font-inter">
                       {formattedDepartureDateReturn}
                     </p>
-                    <p className="text-2xl">{departureTimeReturn}</p>
+                    <p className="text-2xl font-inter">{departureTimeReturn}</p>
                   </div>
                   <div className="flex items-end">
-                    <p className="text-xs">В пути {routeBack.durationString}</p>
+                    <p className="text-xs font-inter">
+                      В пути {routeBack.durationString}
+                    </p>
                   </div>
                   <div className="text-center">
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 font-inter">
                       {formattedArrivalDateReturn}
                     </p>
-                    <p className="text-2xl">{arrivalTimeReturn}</p>
+                    <p className="text-2xl font-inter">{arrivalTimeReturn}</p>
                   </div>
                 </div>
 
@@ -200,13 +203,14 @@ export default function RouteCard(props: RouteCardProps) {
                         {index < routeBack.layovers.length - 1 && (
                           <div className="h-[2px] bg-blue-500 w-[30px]"></div>
                         )}
-                        <div className="absolute top-4 text-center text-gray-400 text-xs">
+                        <div className="absolute top-4 text-center text-gray-400 text-xs font-inter">
                           <p style={{ whiteSpace: "nowrap" }}>
                             {layover.airport.name}
                           </p>
                           <p style={{ whiteSpace: "nowrap" }}>
                             {layover.durationString}
-                          </p>
+                          </p>{" "}
+                          font-inter
                         </div>
                       </div>
                     ))}
@@ -216,8 +220,10 @@ export default function RouteCard(props: RouteCardProps) {
                   </div>
                 </div>
                 <div className="flex flex-row justify-between">
-                  <p className="text-sm">{routeBack.flights[0].from.name}</p>
-                  <p className="text-sm">
+                  <p className="text-sm font-inter">
+                    {routeBack.flights[0].from.name}
+                  </p>
+                  <p className="text-sm font-inter">
                     {routeBack.flights[routeThere.flights.length - 1].to.name}
                   </p>
                 </div>
@@ -226,7 +232,7 @@ export default function RouteCard(props: RouteCardProps) {
           )}
         </div>
         <div className="flex flex-col gap-2 self-end">
-          <p className="text-3xl text-green-500 font-bold">
+          <p className="text-3xl text-green-500 font-bold font-roboto">
             {routeBack
               ? (routeThere.totalPrice + routeBack.totalPrice).toLocaleString()
               : routeThere.totalPrice.toLocaleString()}{" "}
@@ -235,7 +241,7 @@ export default function RouteCard(props: RouteCardProps) {
           <Button
             onClick={handleButtonClick}
             disabled={isLoading}
-            className="rounded-lg bg-sky-600 py-2 px-4 text-m font-semibold text-white data-[hover]:bg-sky-500 data-[active]:bg-sky-700"
+            className="rounded-lg bg-sky-600 py-2 px-4 text-m font-semibold font-inter text-white data-[hover]:bg-sky-500 data-[active]:bg-sky-700"
           >
             Выбрать
           </Button>
