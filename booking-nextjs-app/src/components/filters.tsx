@@ -1,39 +1,40 @@
 import { Field, Label, Button, Input } from "@headlessui/react";
 import Checkbox from "./Checkbox";
 import SelectInput from "./SelectInput";
+import { cn } from "@/utils/cn";
+import { typeSort } from "@/types/SearchResult";
 
 interface LayoversState {
-  id: number
-  name: string
-  state: string
+  id: number;
+  name: string;
+  state: string;
 }
 
 interface AirlinesState {
-  id: number
-  name: string
-  state: string
+  id: number;
+  name: string;
+  state: string;
 }
 
 interface FiltersProps {
-  layovers: LayoversState[]
-  airlines: AirlinesState[]
-  transfersCheckboxes: { [key: string]: boolean }
-  airlineCheckboxes: { [key: string]: boolean }
-  priceRange: { from: string, to: string }
-  selectedSort: { id: string, name: string }
-  onCheckboxChange: (key: string) => (checked: boolean) => void
-  onPriceChange: (key: "from" | "to", value: string) => void
-  onSortChange: (value: any) => void
-  onClearFilters: () => void
+  className?: string;
+  layovers: LayoversState[];
+  airlines: AirlinesState[];
+  transfersCheckboxes: { [key: string]: boolean };
+  airlineCheckboxes: { [key: string]: boolean };
+  priceRange: { from: string; to: string };
+  selectedSort: { id: string; name: string };
+  onCheckboxChange: (key: string) => (checked: boolean) => void;
+  onPriceChange: (key: "from" | "to", value: string) => void;
+  onSortChange: (value: any) => void;
+  onClearFilters: () => void;
+  isMobile?: boolean;
+  onApplyFilters?: () => void;
 }
-
-const typeSort = [
-  { id: '1', name: 'дешевые → дорогие', type: 'asc' },
-  { id: '2', name: 'дорогие → дешевые', type: 'desc' },
-]
 
 export default function Filters(props: FiltersProps) {
   const {
+    className,
     layovers,
     airlines,
     transfersCheckboxes,
@@ -43,11 +44,13 @@ export default function Filters(props: FiltersProps) {
     onCheckboxChange,
     onPriceChange,
     onSortChange,
-    onClearFilters
+    onClearFilters,
+    isMobile,
+    onApplyFilters,
   } = props;
 
   return (
-    <div className="bg-white rounded-xl shadow-[rgba(0,0,0,0.15)_0px_4px_8px] max-h-max">
+    <div className={cn("bg-white max-h-max", className)}>
       <form className="flex px-6 pt-8 flex-col gap-4">
         <h2 className="font-bold text-base">Сортировка</h2>
         <SelectInput
@@ -89,7 +92,11 @@ export default function Filters(props: FiltersProps) {
             <Checkbox
               key={layover.id}
               title={layover.name}
-              checked={transfersCheckboxes[layover.state as keyof typeof transfersCheckboxes]}
+              checked={
+                transfersCheckboxes[
+                  layover.state as keyof typeof transfersCheckboxes
+                ]
+              }
               onChange={onCheckboxChange(layover.state)}
             />
           ))}
@@ -100,17 +107,41 @@ export default function Filters(props: FiltersProps) {
             <Checkbox
               key={airline.id}
               title={airline.name}
-              checked={airlineCheckboxes[airline.state as keyof typeof airlineCheckboxes]}
+              checked={
+                airlineCheckboxes[
+                  airline.state as keyof typeof airlineCheckboxes
+                ]
+              }
               onChange={onCheckboxChange(airline.state)}
             />
           ))}
         </div>
       </form>
-      <div className="flex justify-center px-6 pb-8 pt-6">
-        <Button onClick={onClearFilters} className="w-full border border-gray-300 rounded-lg bg-white py-2 px-4 text-m font-bold text-black">
-          Очистить фильтры
-        </Button>
-      </div>
+      {isMobile ? (
+        <div className="flex flex-col gap-4 justify-center px-6 pb-8 pt-6">
+          <Button
+            onClick={onClearFilters}
+            className="w-full border border-gray-300 rounded-lg bg-white py-2 px-4 text-m font-bold text-black"
+          >
+            Очистить фильтры
+          </Button>
+          <Button
+            onClick={onApplyFilters}
+            className="w-ful rounded-lg bg-blue-500 py-2 px-4 text-m font-bold text-white"
+          >
+            Применить
+          </Button>
+        </div>
+      ) : (
+        <div className="flex justify-center px-6 pb-8 pt-6">
+          <Button
+            onClick={onClearFilters}
+            className="w-full border border-gray-300 rounded-lg bg-white py-2 px-4 text-m font-bold text-black"
+          >
+            Очистить фильтры
+          </Button>
+        </div>
+      )}
     </div>
-  )
+  );
 }

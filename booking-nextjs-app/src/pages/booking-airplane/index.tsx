@@ -3,10 +3,7 @@ import { Layout } from "../layout";
 import { Field, Label, Button, Checkbox } from "@headlessui/react";
 import { useRouter } from "next/navigation";
 import CalendarInput from "@/components/CalendarInput";
-import SelectInput, {
-  selectData,
-  selectDataAirport,
-} from "@/components/SelectInput";
+import SelectInput from "@/components/SelectInput";
 import { useForm } from "react-hook-form";
 import PassengersSelect from "@/components/PassengersSelect";
 import { useCityStore } from "@/store/useCityStore";
@@ -14,13 +11,12 @@ import { useAirportStore } from "@/store/useAirportStore";
 import { useDebounce } from "@/hooks/useDebounce";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { bookingSchema } from "../../schemas/booking";
-
-const typeClass = [
-  { id: "1", name: "Эконом" },
-  { id: "2", name: "Комфорт" },
-  { id: "3", name: "Бизнес" },
-  { id: "4", name: "Первый" },
-];
+import {
+  selectDataAirport,
+  typeClass,
+  FormData,
+  FormDataKeys,
+} from "@/types/Search";
 
 const formatDate = (date: Date | null | undefined) => {
   if (!date) return "";
@@ -29,20 +25,6 @@ const formatDate = (date: Date | null | undefined) => {
   const year = date.getFullYear();
   return `${day}${month}${year}`;
 };
-
-type FormData = {
-  fromCity: selectData | null;
-  fromAirport: selectDataAirport | null;
-  toCity: selectData | null;
-  toAirport: selectDataAirport | null;
-  passengers: { Взрослые: number; Дети: number; Младенцы: number };
-  classType: selectData | null;
-  departureDate: Date | null;
-  returnDate?: Date | null | undefined;
-  isOneWay: boolean;
-};
-
-type FormDataKeys = keyof FormData;
 
 export default function BookingAirplane() {
   const router = useRouter();
@@ -71,12 +53,8 @@ export default function BookingAirplane() {
 
   const formValues = watch();
 
-  const {
-    fromCities,
-    toCities,
-    searchFromCities,
-    searchToCities,
-  } = useCityStore();
+  const { fromCities, toCities, searchFromCities, searchToCities } =
+    useCityStore();
 
   const [fromSearchQuery, setFromSearchQuery] = useState("");
   const debouncedFromSearch = useDebounce(fromSearchQuery, 300);
@@ -96,12 +74,8 @@ export default function BookingAirplane() {
     }
   }, [debouncedToSearch, searchToCities]);
 
-  const {
-    airportsFrom,
-    airportsTo,
-    loadAirportsFrom,
-    loadAirportsTo,
-  } = useAirportStore();
+  const { airportsFrom, airportsTo, loadAirportsFrom, loadAirportsTo } =
+    useAirportStore();
 
   useEffect(() => {
     if (formValues.fromCity?.id) {
@@ -199,7 +173,9 @@ export default function BookingAirplane() {
   return (
     <Layout>
       <div className="flex flex-col justify-self-center">
-        <h1 className="text-xl sm:text-2xl font-bold mb-6">Поиск авиабилетов</h1>
+        <h1 className="text-xl sm:text-2xl font-bold mb-6">
+          Поиск авиабилетов
+        </h1>
         <div className="sm:bg-white sm:rounded-xl sm:border">
           <form
             onSubmit={handleSubmit(onSubmit)}
@@ -218,9 +194,12 @@ export default function BookingAirplane() {
                     placeholder={"Лукоморье*"}
                     onChange={(value) => setValue("fromCity", value)}
                     onSearch={handleFromCitySearch}
+                    error={!!errors.fromCity}
                   />
                   {errors.fromCity && (
-                    <p className="text-red-500 text-xs">{errors.fromCity.message}</p>
+                    <p className="text-red-500 text-xs">
+                      {errors.fromCity.message}
+                    </p>
                   )}
                 </div>
                 <div className="flex flex-col gap-1 w-[88px]">
@@ -236,9 +215,12 @@ export default function BookingAirplane() {
                     onChange={(value) =>
                       setValue("fromAirport", value as selectDataAirport)
                     }
-                  />  
+                    error={!!errors.fromAirport}
+                  />
                   {errors.fromAirport && (
-                    <p className="text-red-500 text-xs break-words whitespace-normal max-w-[88px]">{errors.fromAirport.message}</p>
+                    <p className="text-red-500 text-xs break-words whitespace-normal max-w-[88px]">
+                      {errors.fromAirport.message}
+                    </p>
                   )}
                 </div>
               </div>
@@ -254,6 +236,7 @@ export default function BookingAirplane() {
                     {...register("toCity")}
                     onChange={(value) => setValue("toCity", value)}
                     onSearch={handleToCitySearch}
+                    error={!!errors.toCity}
                   />
                   {errors.toCity && (
                     <p className="text-red-500 text-xs">
@@ -274,6 +257,7 @@ export default function BookingAirplane() {
                     onChange={(value) =>
                       setValue("toAirport", value as selectDataAirport)
                     }
+                    error={!!errors.toAirport}
                   />
                   {errors.toAirport && (
                     <p className="text-red-500 text-xs break-words whitespace-normal max-w-[88px]">
@@ -300,9 +284,12 @@ export default function BookingAirplane() {
                   defaultValue={typeClass[0].name}
                   typeCombobox={true}
                   onChange={(value) => setValue("classType", value)}
+                  error={!!errors.classType}
                 />
                 {errors.classType && (
-                  <p className="text-red-500 text-xs">{errors.classType.message}</p>
+                  <p className="text-red-500 text-xs">
+                    {errors.classType.message}
+                  </p>
                 )}
               </div>
             </div>
@@ -316,9 +303,12 @@ export default function BookingAirplane() {
                   onChange={(date) => setValue("departureDate", date)}
                   fromAirport={formValues.fromAirport?.code}
                   toAirport={formValues.toAirport?.code}
+                  error={!!errors.departureDate}
                 />
                 {errors.departureDate && (
-                  <p className="text-red-500 text-xs">{errors.departureDate.message}</p>
+                  <p className="text-red-500 text-xs">
+                    {errors.departureDate.message}
+                  </p>
                 )}
               </div>
               <div className="flex flex-col gap-1 w-full sm:w-[262px]">
@@ -336,6 +326,7 @@ export default function BookingAirplane() {
                   onChange={(date) => setValue("returnDate", date)}
                   fromAirport={formValues.toAirport?.code}
                   toAirport={formValues.fromAirport?.code}
+                  error={!!errors.returnDate}
                 />
                 {errors.returnDate && (
                   <p className="text-red-500 text-xs break-words whitespace-normal">

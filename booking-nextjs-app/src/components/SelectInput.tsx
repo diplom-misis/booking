@@ -10,13 +10,7 @@ import {
 } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
-
-export type selectData = { id: string; name: string };
-export type selectDataAirport = {
-  id: string;
-  name: string;
-  code: string;
-};
+import { selectDataAirport, selectData } from "@/types/Search";
 
 interface SelectInputProps {
   className?: string;
@@ -32,6 +26,7 @@ interface SelectInputProps {
   value: selectData | selectDataAirport | null;
   onChange: (value: selectData | selectDataAirport | null) => void;
   onSearch?: (query: string) => void;
+  error?: boolean;
 }
 
 export default function SelectInput(props: SelectInputProps) {
@@ -46,6 +41,7 @@ export default function SelectInput(props: SelectInputProps) {
     value,
     onChange,
     onSearch,
+    error,
   } = props;
   const [query, setQuery] = useState("");
 
@@ -74,7 +70,9 @@ export default function SelectInput(props: SelectInputProps) {
           <div className="relative">
             <ComboboxInput
               className={cn(
-                `rounded-[4px] border border-gray-300 bg-white text-m`,
+                `rounded-[4px] border bg-white text-m 
+     focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+     ${error ? "border-red-500" : "border-gray-300"}`,
                 className,
               )}
               disabled={disabled}
