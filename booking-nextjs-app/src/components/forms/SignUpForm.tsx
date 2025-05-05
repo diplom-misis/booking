@@ -29,37 +29,31 @@ export default function SignUpForm() {
       <InputField
         label="Имя"
         placeholder="Ярополк"
-        width="w-[332px]"
         {...register("firstName")}
         error={errors.firstName}
       />
       <InputField
         label="Фамилия"
         placeholder="Иванов"
-        width="w-[332px]"
         {...register("lastName")}
         error={errors.lastName}
       />
       <InputField
         label="Email"
         placeholder="ivanov@yandex.ru"
-        width="w-[332px]"
         {...register("email")}
         error={errors.email}
       />
       <InputField
         label="Пароль"
         placeholder="Придумайте пароль"
-        width="w-[332px]"
         type="password"
         {...register("password")}
         error={errors.password}
       />
-
       <InputField
         label="Повторите пароль"
         placeholder="Пароль"
-        width="w-[332px]"
         type="password"
         {...register("confirmPassword")}
         error={errors.confirmPassword}

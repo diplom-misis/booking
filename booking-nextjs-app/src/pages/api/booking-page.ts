@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/utils/prisma";
 import { Cart } from "@prisma/client";
-import { th } from "react-day-picker/locale";
 
 type Data = {
   message?: string;
@@ -15,7 +14,6 @@ export default async function handler(
   try {
     switch (req.method) {
       case "GET":
-        // console.log(`routes - ${JSON.stringify(await prisma.route.findMany())}`)
         return res.status(200).json({ cart: await prisma.cart.findFirst() });
       case "POST": {
         const cart: Cart = await prisma.cart.create({

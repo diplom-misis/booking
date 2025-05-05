@@ -199,18 +199,18 @@ export default function BookingAirplane() {
   return (
     <Layout>
       <div className="flex flex-col justify-self-center">
-        <h1 className="text-2xl font-bold mb-6">Поиск авиабилетов</h1>
-        <div className="bg-white rounded-xl border">
+        <h1 className="text-xl sm:text-2xl font-bold mb-6">Поиск авиабилетов</h1>
+        <div className="sm:bg-white sm:rounded-xl sm:border">
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="px-6 py-8 flex flex-col gap-4"
+            className="sm:px-6 py-8 flex flex-col gap-4"
           >
-            <div className="flex flex-row gap-5">
-              <div className="flex flex-row gap-2">
-                <div className="flex flex-col gap-1">
+            <div className="flex flex-col md:flex-row gap-4 md:gap-5">
+              <div className="flex flex-row gap-2 w-full md:w-auto">
+                <div className="flex flex-col gap-1 w-full md:w-[160px]">
                   <SelectInput
                     {...register("fromCity")}
-                    className="h-10 w-[160px] px-[14px] py-[8px]"
+                    className="h-10 w-full md:w-[160px] px-[14px] py-[8px]"
                     title="Откуда"
                     data={fromCities}
                     value={formValues.fromCity}
@@ -223,7 +223,7 @@ export default function BookingAirplane() {
                     <p className="text-red-500 text-xs">{errors.fromCity.message}</p>
                   )}
                 </div>
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1 w-[88px]">
                   <SelectInput
                     {...register("fromAirport")}
                     className="h-10 w-[88px] px-[10px] py-[10px]"
@@ -242,10 +242,10 @@ export default function BookingAirplane() {
                   )}
                 </div>
               </div>
-              <div className="flex flex-row gap-2">
-                <div className="flex flex-col gap-1">
+              <div className="flex flex-row gap-2 w-full md:w-auto">
+                <div className="flex flex-col gap-1 w-full md:w-[160px]">
                   <SelectInput
-                    className="h-10 w-[160px] px-[14px] py-[8px]"
+                    className="h-10 w-full md:w-[160px] px-[14px] py-[8px]"
                     title="Куда"
                     data={toCities}
                     value={formValues.toCity}
@@ -261,7 +261,7 @@ export default function BookingAirplane() {
                     </p>
                   )}
                 </div>
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1 w-[88px]">
                   <SelectInput
                     {...register("toAirport")}
                     className="h-10 w-[88px] px-[10px] py-[10px]"
@@ -283,15 +283,16 @@ export default function BookingAirplane() {
                 </div>
               </div>
             </div>
-            <div className="flex flex-row gap-2">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-2">
               <PassengersSelect
+                className="w-full sm:w-[262px]"
                 value={formValues.passengers}
                 onChange={(value) => setValue("passengers", value)}
               />
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 w-full sm:w-[262px]">
                 <SelectInput
                   {...register("classType")}
-                  className="h-11 w-[262px] px-[14px] py-[10px]"
+                  className="h-11 w-full sm:w-[262px] px-[14px] py-[10px]"
                   title="Класс"
                   data={typeClass}
                   value={formValues.classType}
@@ -305,21 +306,25 @@ export default function BookingAirplane() {
                 )}
               </div>
             </div>
-            <div className="flex flex-row gap-2">
-              <div className="flex flex-col gap-1">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-2">
+              <div className="flex flex-col gap-1 w-full sm:w-[262px]">
                 <CalendarInput
                   {...register("departureDate")}
+                  className="w-full sm:w-[262px]"
                   value={formValues.departureDate}
                   placeholder={"Выберите дату*"}
                   onChange={(date) => setValue("departureDate", date)}
+                  fromAirport={formValues.fromAirport?.code}
+                  toAirport={formValues.toAirport?.code}
                 />
                 {errors.departureDate && (
                   <p className="text-red-500 text-xs">{errors.departureDate.message}</p>
                 )}
               </div>
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 w-full sm:w-[262px]">
                 <CalendarInput
                   {...register("returnDate")}
+                  className="w-full sm:w-[262px]"
                   value={formValues.returnDate || null}
                   disabled={formValues.isOneWay}
                   placeholder={
@@ -329,18 +334,22 @@ export default function BookingAirplane() {
                   }
                   hideCalendarIcon={formValues.isOneWay}
                   onChange={(date) => setValue("returnDate", date)}
+                  fromAirport={formValues.toAirport?.code}
+                  toAirport={formValues.fromAirport?.code}
                 />
                 {errors.returnDate && (
-                  <p className="text-red-500 text-xs break-words whitespace-normal max-w-[262px]">{errors.returnDate.message}</p>
+                  <p className="text-red-500 text-xs break-words whitespace-normal">
+                    {errors.returnDate.message}
+                  </p>
                 )}
-                <Field className="flex items-center gap-2">
+                <Field className="flex items-center gap-2 mt-2 sm:mt-0">
                   <Checkbox
                     checked={formValues.isOneWay}
                     onChange={handleCheckboxChange}
                     className="group flex items-center justify-center size-4 rounded-sm border border-blue-500 bg-white"
                   >
                     {formValues.isOneWay && (
-                      <div className="absolute  size-[10px] bg-blue-500 rounded-sm"></div>
+                      <div className="absolute size-[10px] bg-blue-500 rounded-sm"></div>
                     )}
                   </Checkbox>
                   <Label className="text-sm text-gray-800">
@@ -351,7 +360,7 @@ export default function BookingAirplane() {
             </div>
             <Button
               type="submit"
-              className="w-[262px] rounded bg-blue-500 py-2 px-4 text-m font-semibold text-white data-[hover]:bg-sky-500 data-[active]:bg-sky-700"
+              className="w-full sm:w-[262px] rounded bg-blue-500 py-2 px-4 text-m font-semibold text-white data-[hover]:bg-sky-500 data-[active]:bg-sky-700"
             >
               Найти
             </Button>

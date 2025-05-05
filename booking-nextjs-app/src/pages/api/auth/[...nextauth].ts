@@ -5,17 +5,8 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "@/utils/prisma";
 import { compare } from "bcrypt";
 
-<<<<<<< HEAD
-export default NextAuth({
-<<<<<<< HEAD
-  // pages: { signIn: '/auth/signin' },
-=======
-  pages: { signIn: '/auth/signin' },
->>>>>>> 47537556e7febe9b005b42f30b803c2ba06cab56
-=======
 export const authOptions: NextAuthOptions = {
   pages: { signIn: "/auth/signin" },
->>>>>>> 31c5d0f445f6c01f63b611ffddd055e7dd793f69
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt",

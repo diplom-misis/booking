@@ -3,11 +3,28 @@ import Image from "next/image";
 import defaultAvatar from "../images/default-avatar.svg";
 import Link from "next/link";
 import { useState } from "react";
+import { ToastContainer } from "react-toastify";
+import { useProfile } from "@/hooks/useProfile";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import { signOut } from "next-auth/react";
+import { useRouter } from "next/router";
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+
   const [currentPage, setCurrentPage] = useState<
     "booking" | "allBookings" | "profile"
   >("booking");
+
+  const { data: resultUser } = useProfile();
+  const user = resultUser?.user;
+
+  const onSubmitSignOut = async () => {
+    const isSignOut = await signOut();
+    if (isSignOut) {
+      router.push("/auth/signIn");
+    }
+  };
 
   return (
     <div className="flex flex-col">
@@ -67,17 +84,59 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
-          <Image
-            src={defaultAvatar}
-            width={40}
-            height={40}
-            className="outline-1 rounded-full hover:outline hover:outline-blue-600 active:outline-2 cursor-pointer w-6 h-6 md:w-10 md:h-10"
-            alt="Аватар пользователя"
-          />
-          {/* Добавить дропдаун на Image, где будет выбор или перейти к профилю или выйти. Для выхода вызвать signOut из next-auth */}
+          <Menu as="div" className="relative inline-block text-left">
+            <MenuButton className="w-6 h-6 md:w-10 md:h-10 rounded-full overflow-hidden outline-1 hover:outline hover:outline-blue-600 active:outline-2 cursor-pointer">
+              <Image
+                src={user?.imageUrl || defaultAvatar}
+                width={40}
+                height={40}
+                className="object-cover w-full h-full"
+                alt="Аватар пользователя"
+              />
+            </MenuButton>
+
+            <MenuItems className="absolute right-0 mt-2 w-40 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+              <div className="py-1">
+                <MenuItem>
+                  {({ focus }) => (
+                    <Link
+                      href="/profile"
+                      className={`${
+                        focus ? "bg-blue-100" : ""
+                      } block w-full text-left px-4 py-2 text-sm text-gray-700`}
+                    >
+                      Профиль
+                    </Link>
+                  )}
+                </MenuItem>
+                <MenuItem>
+                  {({ focus }) => (
+                    <button
+                      onClick={onSubmitSignOut}
+                      className={`${
+                        focus ? "bg-blue-100" : ""
+                      } block w-full text-left px-4 py-2 text-sm text-gray-700`}
+                    >
+                      Выйти
+                    </button>
+                  )}
+                </MenuItem>
+              </div>
+            </MenuItems>
+          </Menu>
         </nav>
       </header>
-      <div className="pl-5 pr-7 pt-5 md:py-8 flex-1 bg-none">{children}</div>
+      <div className="pl-5 pr-7 pt-5 md:py-8 flex-1">{children}</div>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={3000}
+        pauseOnHover={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        draggable
+        pauseOnFocusLoss={false}
+      />
     </div>
   );
 }

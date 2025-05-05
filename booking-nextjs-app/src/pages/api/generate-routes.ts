@@ -1,23 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { generateRoutes } from "@/utils/routeGenerator";
 import { DateTime } from "luxon";
-import prisma from "@/utils/prisma";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const updates = [{ oldName: "Russia", newName: "Россия" }];
-
-  for (const { oldName, newName } of updates) {
-    await prisma.country.updateMany({
-      where: { name: oldName },
-      data: { name: newName },
-    });
-  }
-
-  console.log("Обновление завершено.");
-
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Method not allowed" });
   }

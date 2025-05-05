@@ -23,7 +23,7 @@ export const useCityStore = create<CityState>((set) => ({
     
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`/api/airport?type=city&search=${encodeURIComponent(query)}`);
+      const response = await fetch(`/api/city?search=${encodeURIComponent(query)}`);
       const data = await response.json();
       set({ fromCities: data.cities || [], isLoading: false });
     } catch (err) {
@@ -36,7 +36,7 @@ export const useCityStore = create<CityState>((set) => ({
     
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`/api/airport?type=city&search=${encodeURIComponent(query)}`);
+      const response = await fetch(`/api/city?search=${encodeURIComponent(query)}`);
       const data = await response.json();
       set({ toCities: data.cities || [], isLoading: false });
     } catch (err) {

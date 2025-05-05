@@ -1,14 +1,11 @@
 import { Separator } from "@/components/separator";
 import { Layout } from "../layout";
+import { Reservation } from '@prisma/client';
 
-export default async function AllBookingsPage() {
-  const getReservations = async () => {
-    const reservations = await fetch(`/api/booking-success-page`).then((res) => res.json())
+export default async function handler() {
+  const reservations: Reservation[] = await fetch(`/api/booking-success-page`).then((res) => res.json())
 
-    console.log(reservations)
-  }
-
-  getReservations()
+  console.log(reservations)
   
   return (
     <Layout>

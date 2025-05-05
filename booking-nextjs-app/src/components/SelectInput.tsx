@@ -122,9 +122,11 @@ export default function SelectInput(props: SelectInputProps) {
               <ComboboxOption
                 key={item.id}
                 value={item}
-                className="h-9 flex items-center justify-center data-[focus]:bg-gray-100"
+                className="group flex min-h-9 items-center justify-center px-3 data-[focus]:bg-gray-100"
               >
-                {item && "code" in item ? item.code : item.name}
+                <span className="text-center whitespace-normal break-words">
+                  {"code" in item ? item.code : item.name}
+                </span>
               </ComboboxOption>
             ))}
           </ComboboxOptions>

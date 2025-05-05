@@ -8,7 +8,7 @@ type Data = {
   reservations?: Reservation[];
 };
 
-export default async function SaveReservation(
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>,
 ) {
@@ -16,7 +16,7 @@ export default async function SaveReservation(
     case "GET":
       return res.json({ reservations: await prisma.reservation.findMany() });
     case "POST":
-        const reservation: Reservation = await prisma.reservation.create({
+        const newReservation: Reservation = await prisma.reservation.create({
           data: {
             data: {
               fromCity: req.query.fromCity,
@@ -28,15 +28,15 @@ export default async function SaveReservation(
               toDatetime: req.query.toDatetime,
               price: req.query.price,
             },
-            status: String(Status.IN_PROCESSING),
+            status: Status.IN_PROCESSING,
           },
         });
 
-        return res.status(201).json({ message: "reservation created", reservation });
-    // case "DELETE":
-    //   const reservation: Reservation = await prisma.reservation.delete({
-    //     where: { id: req.body.id },
-    //   });
-    //   return res.status(200).json({ message: "Reservation deleted", reservation });
+        return res.status(201).json({ message: "reservation created", reservation: newReservation });
+    case "DELETE":
+      const reservation: Reservation = await prisma.reservation.delete({
+        where: { id: req.body.id },
+      });
+      return res.status(200).json({ message: "Reservation deleted", reservation });
   }
 }

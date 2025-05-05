@@ -3,21 +3,33 @@ import prisma from "@/utils/prisma";
 import { withAuth } from "@/utils/withAuth";
 import { withErrorHandler } from "@/utils/withErrorHandler";
 
+const DEFAULT_AVATAR = "";
+
+export const PROFILE_DEFAULT_SELECT = {
+  id: true,
+  email: true,
+  firstName: true,
+  lastName: true,
+  defaultCountry: true,
+  imageUrl: true,
+};
+
 const handler = withAuth(async (req, res) => {
   const session = (req as any).session;
 
   if (req.method === "GET") {
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        defaultCountry: true,
-      },
+      select: PROFILE_DEFAULT_SELECT,
     });
-    return res.status(200).json({ user });
+
+    if (user) {
+      user.imageUrl = user.imageUrl || DEFAULT_AVATAR;
+      console.log(user);
+      return res.status(200).json({ user });
+    } else {
+      return res.status(500).json({ error: "Internal server error" });
+    }
   } else if (req.method === "PATCH") {
     const validationResult = profileSchema.safeParse(req.body);
 
@@ -46,14 +58,10 @@ const handler = withAuth(async (req, res) => {
     const updatedUser = await prisma.user.update({
       where: { id: session.user.id },
       data: { firstName, lastName, email, defaultCountryId: defaultCountry.id },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        defaultCountry: true,
-      },
+      select: PROFILE_DEFAULT_SELECT,
     });
+
+    updatedUser.imageUrl = updatedUser.imageUrl || DEFAULT_AVATAR;
 
     return res.status(200).json({
       message: "Profile updated successfully",
