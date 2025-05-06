@@ -181,11 +181,6 @@ describe("Cities API", () => {
         name: "Springfield",
         countryId: "3b241101-e2bb-4255-8caf-4136a566f21c",
       };
-      const existingCityDifferentCountry = {
-        id: "1",
-        name: "Springfield",
-        countryId: "6b241101-e2bb-4255-8caf-4136a566f21c",
-      };
 
       (prisma.country.findUnique as jest.Mock).mockResolvedValue({ id: mockCity.countryId });
       (prisma.city.findFirst as jest.Mock).mockResolvedValueOnce(null);

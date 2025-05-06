@@ -66,7 +66,7 @@ export async function getServerSideProps(context: any) {
   };
 }
 
-export default function ResultsSearch({ isAuthenticated }) {
+export default function ResultsSearch({ isAuthenticated }: { isAuthenticated: boolean }) {
   const searchParams = useSearchParams();
 
   const [cityFrom, setCityFrom] = useState("");
@@ -262,13 +262,13 @@ export default function ResultsSearch({ isAuthenticated }) {
           allRoutes
             .flatMap(
               (route) =>
-                route.data?.flatMap((item) => item.airlines ?? []) ?? [],
+                route.data?.flatMap((item: any) => item.airlines ?? []) ?? [],
             )
             .filter(Boolean),
         ),
       );
 
-      const airlinesList = uniqueAirlines.map((airline, index) => ({
+      const airlinesList = uniqueAirlines.map((airline: string, index: number) => ({
         id: index + 1,
         name: airline,
         state: airline.toLowerCase().replace(/\s+/g, "-"),
@@ -576,7 +576,7 @@ export default function ResultsSearch({ isAuthenticated }) {
                   {oneWayData?.pages ? (
                     oneWayData.pages.map((page, i) => (
                       <React.Fragment key={`oneway-${i}`}>
-                        {page.data.map((route) => (
+                        {page.data.map((route: any) => (
                           <RouteCard
                             key={route.id}
                             routeThere={route}
