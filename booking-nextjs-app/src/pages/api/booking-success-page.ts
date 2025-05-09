@@ -14,29 +14,47 @@ export default async function handler(
 ) {
   switch (req.method) {
     case "GET":
-      return res.json({ reservations: await prisma.reservation.findMany() });
-    case "POST":
-        const newReservation: Reservation = await prisma.reservation.create({
-          data: {
-            data: {
-              fromCity: req.query.fromCity,
-              fromAirport: req.query.fromAirport,
-              toCity: req.query.toCity,
-              toAirport: req.query.toAirport,
-              company: req.query.company,
-              fromDatetime: req.query.fromDatetime,
-              toDatetime: req.query.toDatetime,
-              price: req.query.price,
-            },
-            status: Status.IN_PROCESSING,
+      return res.json({
+        reservations: await prisma.reservation.findMany({
+          orderBy: {
+            createdAt: "desc",
           },
-        });
-
-        return res.status(201).json({ message: "reservation created", reservation: newReservation });
-    case "DELETE":
-      const reservation: Reservation = await prisma.reservation.delete({
-        where: { id: req.body.id },
+        }),
       });
-      return res.status(200).json({ message: "Reservation deleted", reservation });
+    case "POST":
+      const newReservation: Reservation = await prisma.reservation.create({
+        data: {
+          data: {
+            fromCity: req.query.fromCity,
+            toCity: req.query.toCity,
+            company: req.query.company,
+            timeFrom: req.query.timeFrom,
+            dateFrom: req.query.dateFrom,
+            bookingDate: req.query.bookingDate,
+            price: req.query.price,
+          },
+          status: Status.IN_PROCESSING,
+        },
+      });
+
+      return res
+        .status(201)
+        .json({ message: "reservation created", reservation: newReservation });
+    case "DELETE":
+      const reservationToDelete: Reservation = await prisma.reservation.delete({
+        where: { id: JSON.parse(req.body).id },
+      });
+      return res
+        .status(200)
+        .json({ message: "Reservation deleted", reservation: reservationToDelete });
+    case "PATCH":
+      console.log(JSON.parse(req.body).data, typeof JSON.parse(req.body).data)
+      const reservationToUpdate: Reservation = await prisma.reservation.update({
+        where: { id: JSON.parse(req.body).id },
+        data: JSON.parse(req.body).data
+      });
+      return res
+        .status(200)
+        .json({ message: "Reservation updated", reservation: reservationToUpdate });
   }
 }

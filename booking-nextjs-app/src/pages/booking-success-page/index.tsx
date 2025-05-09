@@ -37,10 +37,9 @@ export default function BookingSuccessPage() {
       fromCity,
       toCity,
       company,
-      fromAirport: searchParams.get('fromAirport')!,
-      toAirport: searchParams.get('toAirport')!,
-      fromDatetime: searchParams.get('fromDatetime')!,
-      toDatetime: searchParams.get('toDatetime')!,
+      timeFrom,
+      dateFrom,
+      bookingDate: currentDateFormatted,
       price: searchParams.get('price')!
     })
 

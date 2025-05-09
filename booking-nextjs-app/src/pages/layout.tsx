@@ -32,8 +32,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Logo className="hidden md:inline" />
         <nav className="flex gap-2 justify-between md:justify-end w-full">
           <div className="flex flex-row-reverse justify-between w-[calc(50%+12px)] md:w-auto md:flex-row relative">
-            <div
-              className={`flex gap-1.5 md:px-5 md:py-2 items-center [&_path]:hover:stroke-blue-600 hover:text-blue-500 cursor-pointer}`}
+            <Link
+              href="/booking-airplane"
+              className={`flex gap-1.5 md:px-5 md:py-2 items-center md:[&_path]:hover:stroke-blue-600 hover:text-blue-500 cursor-pointer [&_path]:stroke-[${currentPage === "booking" ? "#FFF" : "#1F2937"}] md:[&_path]:stroke-[#1F2937] after:flex after:absolute after:size-7 after:rounded-full after:bg-blue-500 after:right-[1px] after:content-[""] after:z-[-1] md:after:hidden after:${currentPage === "booking" ? "flex" : "hidden"}`}
+              onClick={() => setCurrentPage("booking")}
             >
               <svg
                 width="24"
@@ -44,21 +46,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
               >
                 <path
                   d="M13.3321 4.71819L12.6235 2.47434C12.534 2.19107 12.2829 2 12 2C11.7171 2 11.466 2.19107 11.3765 2.47434L10.6679 4.71819C10.6088 4.9056 10.5673 5.09873 10.544 5.29476L10.1053 9L4.26559 13.1094C3.47492 13.6658 3 14.6025 3 15.6056V16L10.1053 14L10.5789 18L9.2079 18.7236C8.88695 18.893 8.68421 19.2393 8.68421 19.618V22L10.4585 21.0636C10.5387 21.0212 10.6216 20.985 10.7067 20.9551L11.4008 20.7108C11.7898 20.574 12.2102 20.574 12.5992 20.7108L13.2933 20.9551C13.3784 20.985 13.4613 21.0212 13.5415 21.0636L15.3158 22V19.618C15.3158 19.2393 15.1131 18.893 14.7921 18.7236L13.4211 18L13.8947 14L21 16V15.6056C21 14.6025 20.5251 13.6658 19.7344 13.1094L13.8947 9L13.456 5.29476C13.4327 5.09873 13.3912 4.9056 13.3321 4.71819Z"
-                  stroke={`${currentPage === "booking" ? "#FFF" : "#1F2937"}`}
                   strokeWidth="1.5"
                 />
               </svg>
-              <Link
-                href="/booking-airplane"
-                className="text-sm hidden md:inline"
-              >
-                Поиск авиабилетов
-              </Link>
-              {currentPage === "booking" && (
-                <div className="flex absolute size-7 rounded-full z-[3] bg-blue-500 right-0.5"></div>
-              )}
-            </div>
-            <div className="flex gap-2 md:px-5 md:py-2 items-center [&_path]:hover:stroke-blue-600 hover:text-blue-500 cursor-pointer">
+              <p className="text-sm hidden md:inline">Поиск авиабилетов</p>
+            </Link>
+            <Link
+              href="/all-bookings-page"
+              className={`flex relative gap-2 md:px-5 md:py-2 items-center [&_path]:hover:stroke-blue-600 hover:text-blue-500 cursor-pointer [&_path]:stroke-[${currentPage === "allBookings" ? "#FFF" : "#1F2937"}] md:[&_path]:stroke-[#1F2937] after:absolute after:size-7 after:rounded-full after:bg-blue-500 after:right-[1px] after:content-[""] after:z-[-1] md:after:hidden after:${currentPage === "allBookings" ? "flex" : "hidden"}`}
+              onClick={() => setCurrentPage("allBookings")}
+            >
               <svg
                 width="24"
                 height="24"
@@ -78,10 +75,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
                   fill="#1F2937"
                 />
               </svg>
-              <Link href="/booking-page" className="text-sm hidden md:inline">
-                Бронирования
-              </Link>
-            </div>
+              <p className="text-sm hidden md:inline">Бронирования</p>
+            </Link>
           </div>
 
           <Menu as="div" className="relative inline-block text-left">
