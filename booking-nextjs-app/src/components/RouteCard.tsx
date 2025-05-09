@@ -6,12 +6,12 @@ import { Separator } from "./separator";
 import { useCartStore } from "@/store/cartStore";
 import { useRouter } from "next/router";
 import { RouteDto } from "@/types/SearchResult";
-import { useSession } from "next-auth/react";
 
 interface RouteCardProps {
   routeThere: RouteDto;
   routeBack?: RouteDto;
   passengers: number;
+  isAuthenticated: boolean;
 }
 
 function getMonthName(monthIndex: any) {
@@ -35,12 +35,11 @@ function getMonthName(monthIndex: any) {
 export default function RouteCard(props: RouteCardProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const { routeThere, routeBack, passengers } = props;
+  const { routeThere, routeBack, passengers, isAuthenticated } = props;
   const { addToCart } = useCartStore();
-  const session = useSession();
 
   const handleButtonClick = async () => {
-    if (session.status !== "authenticated") {
+    if (!isAuthenticated) {
       toast.error("Необходимо авторизоваться для бронирования");
       router.push(`/auth/signin`);
       return;

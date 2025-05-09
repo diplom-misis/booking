@@ -16,6 +16,8 @@ import {
 } from "@/types/SearchResult";
 import Image from "next/image";
 import filter from "@/images/filter.svg";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../api/auth/[...nextauth]";
 
 const getPassengersLabel = (count: number) => {
   if (count === 1) {
@@ -54,7 +56,17 @@ const parseDateToISO = (dateStr: string): string | null => {
   return isoDate;
 };
 
-export default function ResultsSearch() {
+export async function getServerSideProps(context: any) {
+  const session = await getServerSession(context.req, context.res, authOptions);
+
+  return {
+    props: {
+      isAuthenticated: !!session,
+    },
+  };
+}
+
+export default function ResultsSearch({ isAuthenticated }: { isAuthenticated: boolean }) {
   const searchParams = useSearchParams();
 
   const [cityFrom, setCityFrom] = useState("");
@@ -250,13 +262,13 @@ export default function ResultsSearch() {
           allRoutes
             .flatMap(
               (route) =>
-                route.data?.flatMap((item) => item.airlines ?? []) ?? [],
+                route.data?.flatMap((item: any) => item.airlines ?? []) ?? [],
             )
             .filter(Boolean),
         ),
       );
 
-      const airlinesList = uniqueAirlines.map((airline, index) => ({
+      const airlinesList = uniqueAirlines.map((airline: string, index: number) => ({
         id: index + 1,
         name: airline,
         state: airline.toLowerCase().replace(/\s+/g, "-"),
@@ -548,6 +560,7 @@ export default function ResultsSearch() {
                         routeThere={routeThere}
                         routeBack={routeBack}
                         passengers={passengers}
+                        isAuthenticated={isAuthenticated}
                       />
                     ))
                   ) : (
@@ -563,11 +576,12 @@ export default function ResultsSearch() {
                   {oneWayData?.pages ? (
                     oneWayData.pages.map((page, i) => (
                       <React.Fragment key={`oneway-${i}`}>
-                        {page.data.map((route) => (
+                        {page.data.map((route: any) => (
                           <RouteCard
                             key={route.id}
                             routeThere={route}
                             passengers={passengers}
+                            isAuthenticated={isAuthenticated}
                           />
                         ))}
                       </React.Fragment>
