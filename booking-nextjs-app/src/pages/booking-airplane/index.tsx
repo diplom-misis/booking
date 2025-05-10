@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Layout } from "../layout";
+import Layout from "../layout";
 import { Field, Label, Button, Checkbox } from "@headlessui/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import CalendarInput from "@/components/CalendarInput";

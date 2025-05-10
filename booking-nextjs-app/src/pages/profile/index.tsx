@@ -1,5 +1,5 @@
 import PrimaryButton from "@/components/PrimaryButton";
-import { Layout } from "../layout";
+import Layout from "../layout";
 import defaultAvatar from "@/images/default-avatar.svg";
 import avatarUpload from "@/images/avatar-upload.svg";
 import Image from "next/image";

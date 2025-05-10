@@ -1,5 +1,5 @@
 import { Separator } from '@/components/separator';
-import { Layout } from '../layout';
+import Layout from '../layout';
 import { months } from '@/utils/constants';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
