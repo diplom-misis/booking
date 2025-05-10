@@ -157,7 +157,6 @@ export default async function handler(
       duplicatesIgnored: duplicateCount,
     });
   } catch (error) {
-    console.error("[FLIGHT_CREATE_ERROR]", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 }

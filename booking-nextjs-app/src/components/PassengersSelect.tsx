@@ -91,23 +91,52 @@ export default function PassengersSelect({
                 className="flex flex-row justify-between"
               >
                 <p className="text-sm">{item.name}</p>
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
                   <Button
                     onClick={() => handleDecrement(item.name)}
-                    className={`rounded-full w-5 h-5 ${value[item.name] <= (item.name === "Взрослые" ? 1 : 0) ? "bg-gray-200" : "bg-blue-500 hover:bg-blue-600"}`}
                     disabled={
                       value[item.name] <= (item.name === "Взрослые" ? 1 : 0)
                     }
+                    className="group"
                   >
-                    -
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      className={`w-7 h-7 transition-colors ${
+                        value[item.name] <= (item.name === "Взрослые" ? 1 : 0)
+                          ? "fill-gray-200"
+                          : "fill-blue-500 group-hover:fill-blue-600"
+                      }`}
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
                   </Button>
                   <span>{value[item.name] || 0}</span>
                   <Button
                     onClick={() => handleIncrement(item.name)}
-                    className={`rounded-full w-5 h-5 ${value[item.name] >= 9 ? "bg-gray-200" : "bg-blue-500 hover:bg-blue-600"}`}
                     disabled={value[item.name] >= 9}
+                    className="group"
                   >
-                    +
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      className={`w-7 h-7 transition-colors ${
+                        value[item.name] >= 9
+                          ? "fill-gray-200"
+                          : "fill-blue-500 group-hover:fill-blue-600"
+                      }`}
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
                   </Button>
                 </div>
               </MenuItem>

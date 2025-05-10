@@ -1,5 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
-import { Layout } from "./layout";
+import Layout from "./layout";
 import { Button } from "@headlessui/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -49,12 +49,18 @@ export default function Home() {
 
   return (
     <Layout>
-      <div className="flex flex-col md:gap-[92px] gap-6 lg:px-[110px]">
+      <div
+        id="home"
+        className="flex flex-col md:gap-[92px] gap-6 lg:px-[110px]"
+      >
         <div className="flex flex-col gap-4 items-center justify-center lg:justify-center">
           <div className="flex md:hidden items-start pt-10 self-start">
             <Logo />
           </div>
-          <div className="flex flex-col gap-2 w-full lg:w-[578px] text-left lg:text-center lg:pt-16">
+          <div
+            id="about"
+            className="flex flex-col gap-2 w-full lg:w-[578px] text-left lg:text-center lg:pt-16"
+          >
             <p className="text-3xl text-gray-800 font-bold font-roboto text-wrap">
               Yaplex Travel приглашает вас в мир волшебных путешествий!
             </p>
@@ -190,7 +196,7 @@ export default function Home() {
           </div>
         </div>
 
-        <footer className="flex flex-col gap-6 w-full">
+        <footer className="flex flex-col gap-6 w-full" id="contacts">
           <h2 className="text-2xl font-bold font-roboto">
             Контактная информация
           </h2>

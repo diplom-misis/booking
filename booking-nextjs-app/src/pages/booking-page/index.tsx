@@ -1,6 +1,6 @@
 import { Arrow } from '@/components/arrow';
 import { Separator } from '@/components/separator';
-import { Layout } from '../layout';
+import Layout from '../layout';
 import { months } from '@/utils/constants';
 import { SyntheticEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
