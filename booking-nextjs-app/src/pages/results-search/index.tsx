@@ -1,4 +1,4 @@
-import { Layout } from "../layout";
+import Layout from "../layout";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Filters from "@/components/filters";
 import { Arrow } from "@/components/arrow";
@@ -16,6 +16,8 @@ import {
 } from "@/types/SearchResult";
 import Image from "next/image";
 import filter from "@/images/filter.svg";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../api/auth/[...nextauth]";
 
 const getPassengersLabel = (count: number) => {
   if (count === 1) {
@@ -54,7 +56,21 @@ const parseDateToISO = (dateStr: string): string | null => {
   return isoDate;
 };
 
-export default function ResultsSearch() {
+export async function getServerSideProps(context: any) {
+  const session = await getServerSession(context.req, context.res, authOptions);
+
+  return {
+    props: {
+      isAuthenticated: !!session,
+    },
+  };
+}
+
+export default function ResultsSearch({
+  isAuthenticated,
+}: {
+  isAuthenticated: boolean;
+}) {
   const searchParams = useSearchParams();
 
   const [cityFrom, setCityFrom] = useState("");
@@ -250,17 +266,19 @@ export default function ResultsSearch() {
           allRoutes
             .flatMap(
               (route) =>
-                route.data?.flatMap((item) => item.airlines ?? []) ?? [],
+                route.data?.flatMap((item: any) => item.airlines ?? []) ?? [],
             )
             .filter(Boolean),
         ),
       );
 
-      const airlinesList = uniqueAirlines.map((airline, index) => ({
-        id: index + 1,
-        name: airline,
-        state: airline.toLowerCase().replace(/\s+/g, "-"),
-      }));
+      const airlinesList = uniqueAirlines.map(
+        (airline: string, index: number) => ({
+          id: index + 1,
+          name: airline,
+          state: airline.toLowerCase().replace(/\s+/g, "-"),
+        }),
+      );
 
       setAirlines(airlinesList);
 
@@ -397,47 +415,39 @@ export default function ResultsSearch() {
       <div className="flex flex-col justify-self-center gap-6">
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="hidden lg:flex flex-row gap-6">
-            <h1 className="text-3xl font-bold font-roboto">
+            <h1 className="text-3xl font-bold">
               Результаты поиска
             </h1>
             <div className="flex flex-row gap-6 pt-3 items-center">
               <div className="flex flex-row gap-2 items-center">
                 <div className="flex flex-row gap-1 items-center">
-                  <p className="text-sm text-gray-500 font-inter">{cityFrom}</p>
-                  <p className="text-base text-gray-400 font-inter">
-                    {airportFrom}
-                  </p>
+                  <p className="text-sm text-gray-500">{cityFrom}</p>
+                  <p className="text-base text-gray-400">{airportFrom}</p>
                 </div>
                 <Arrow className="rotate-180 w-5 h-2.5 [&>path]:stroke-gray-500" />
                 <div className="flex flex-row gap-1 items-center">
-                  <p className="text-sm text-gray-500 font-inter">{cityTo}</p>
-                  <p className="text-base text-gray-400 font-inter">
-                    {airportTo}
-                  </p>
+                  <p className="text-sm text-gray-500">{cityTo}</p>
+                  <p className="text-base text-gray-400">{airportTo}</p>
                 </div>
               </div>
               <div>
-                <p className="text-sm text-gray-500 font-inter">
+                <p className="text-sm text-gray-500">
                   {passengers} {getPassengersLabel(passengers)}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500 font-inter">
-                  {classTicket}
-                </p>
+                <p className="text-sm text-gray-500">{classTicket}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500 font-inter">{dateFrom}</p>
+                <p className="text-sm text-gray-500">{dateFrom}</p>
               </div>
               {dateTo ? (
                 <div>
-                  <p className="text-sm text-gray-500 font-inter">{dateTo}</p>
+                  <p className="text-sm text-gray-500 ">{dateTo}</p>
                 </div>
               ) : (
                 <div>
-                  <p className="text-sm text-gray-500 font-inter">
-                    В одну сторону
-                  </p>
+                  <p className="text-sm text-gray-500">В одну сторону</p>
                 </div>
               )}
             </div>
@@ -548,6 +558,7 @@ export default function ResultsSearch() {
                         routeThere={routeThere}
                         routeBack={routeBack}
                         passengers={passengers}
+                        isAuthenticated={isAuthenticated}
                       />
                     ))
                   ) : (
@@ -563,11 +574,12 @@ export default function ResultsSearch() {
                   {oneWayData?.pages ? (
                     oneWayData.pages.map((page, i) => (
                       <React.Fragment key={`oneway-${i}`}>
-                        {page.data.map((route) => (
+                        {page.data.map((route: any) => (
                           <RouteCard
                             key={route.id}
                             routeThere={route}
                             passengers={passengers}
+                            isAuthenticated={isAuthenticated}
                           />
                         ))}
                       </React.Fragment>

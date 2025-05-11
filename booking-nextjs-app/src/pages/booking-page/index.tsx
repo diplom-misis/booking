@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Arrow } from "@/components/arrow";
 import { Separator } from "@/components/separator";
 import { Layout } from "../layout";
@@ -5,6 +6,14 @@ import { months } from "@/utils/constants";
 import { SyntheticEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import PassengerInputs from "@/components/PassengerInputs";
+=======
+import { Arrow } from '@/components/arrow';
+import { Separator } from '@/components/separator';
+import Layout from '../layout';
+import { months } from '@/utils/constants';
+import { SyntheticEvent, useState } from 'react';
+import { useRouter } from 'next/navigation';
+>>>>>>> 824e7f3b15dca6c4b234a98ed701e4ceb93ae14b
 
 const data = {
   fromCity: "Лукоморье",

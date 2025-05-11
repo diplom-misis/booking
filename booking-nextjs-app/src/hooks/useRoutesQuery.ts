@@ -2,7 +2,7 @@
 // hooks/useRoutesQuery.ts
 import { useInfiniteQuery } from '@tanstack/react-query';
 
-const fetchRoutes = async ({ pageParam = 1, ...params }) => {
+export const fetchRoutes = async ({ pageParam = 1, ...params }) => {
   const query = new URLSearchParams();
   
   Object.entries(params).forEach(([key, value]) => {
