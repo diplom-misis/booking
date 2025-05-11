@@ -92,8 +92,8 @@ export default async function handler(
                   include: {
                     flight: {
                       include: {
-                        fromAirport: true,
-                        toAirport: true,
+                    fromAirport: { include: { city: true } },
+                    toAirport: { include: { city: true } },
                       },
                     },
                   },
@@ -125,8 +125,8 @@ export default async function handler(
           include: {
             flight: {
               include: {
-                fromAirport: true,
-                toAirport: true,
+                fromAirport: { include: { city: true } },
+                toAirport: { include: { city: true } },
               },
             },
           },
@@ -192,7 +192,7 @@ export default async function handler(
         const minutes = Math.floor((layoverMs % (1000 * 60 * 60)) / (1000 * 60));
         return {
           durationString: `${hours}ч. ${minutes}мин.`,
-          airport: flight.toAirport,
+          airport: flight.toAirport.city,
         };
       });
 
@@ -206,8 +206,8 @@ export default async function handler(
         airlines: Array.from(new Set(flights.map(f => f.company))),
         flights: flights.map((flight) => ({
           id: flight.id,
-          from: flight.fromAirport,
-          to: flight.toAirport,
+          from: flight.fromAirport.city,
+          to: flight.toAirport.city,
           departure: flight.fromDatetime,
           arrival: flight.toDatetime,
           company: flight.company,
