@@ -1,7 +1,8 @@
-import { Layout } from "../layout";
 import { Reservation } from "@prisma/client";
 import ReservationCard from "@/components/ReservationCard";
 import { useReservations } from "@/hooks/useReservations";
+import Layout from '../layout';
+import { withAuthPage } from '@/utils/withAuthPage';
 
 export default function handler() {
   const { data: reservations } = useReservations();
@@ -22,3 +23,5 @@ export default function handler() {
     </Layout>
   );
 }
+
+export const getServerSideProps = withAuthPage();

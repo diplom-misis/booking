@@ -3,6 +3,7 @@ import Layout from '../layout';
 import { months } from '@/utils/constants';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SyntheticEvent, useEffect, useState } from 'react';
+import { useCartStore } from '@/store/cartStore';
 
 export default function BookingSuccessPage() {
   const router = useRouter();
@@ -21,6 +22,10 @@ export default function BookingSuccessPage() {
   const currentYear = currentDate.getFullYear();
 
   const currentDateFormatted = `${currentDay} ${currentMonth} ${currentYear}`;
+
+  const carts = useCartStore().items
+
+  console.log(carts)
 
   useEffect(() => {
     setFromCity(searchParams.get('fromCity') || '');

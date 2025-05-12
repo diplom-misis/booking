@@ -1,34 +1,17 @@
-<<<<<<< HEAD
 import { Arrow } from "@/components/arrow";
 import { Separator } from "@/components/separator";
-import { Layout } from "../layout";
+import Layout from "../layout";
 import { months } from "@/utils/constants";
-import { SyntheticEvent, useState } from "react";
+import { SyntheticEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import PassengerInputs from "@/components/PassengerInputs";
-=======
-import { Arrow } from '@/components/arrow';
-import { Separator } from '@/components/separator';
-import Layout from '../layout';
-import { months } from '@/utils/constants';
-import { SyntheticEvent, useState } from 'react';
-import { useRouter } from 'next/navigation';
->>>>>>> 824e7f3b15dca6c4b234a98ed701e4ceb93ae14b
-
-const data = {
-  fromCity: "Лукоморье",
-  fromAirport: "LKMR",
-  toCity: "Тридевятье",
-  toAirport: "TN",
-  company: "Золотая стрела",
-  fromDatetime: new Date("2025-03-02T14:46:22.449Z"),
-  toDatetime: new Date("2025-03-02T15:46:22.449Z"),
-  passengerCount: 3,
-  price: 6000,
-};
+import { useCartStore } from '@/store/cartStore';
+import { useCities } from '@/hooks/useCities';
 
 export default function BookingPage() {
   const router = useRouter();
+
+  const cartData = useCartStore().getCart()
 
   // const [firstName, setFirstName] = useState<string>("");
   // const [lastName, setLastName] = useState<string>("");
@@ -37,7 +20,7 @@ export default function BookingPage() {
   // const [passportNumber, setPassportNumber] = useState<string>("");
 
   // const firstNameError = !/^[a-zа-я-]*$/i.test(firstName);
-  // const lastNameError = !/^[a-zа-я-]*$/i.test(lastName);
+  // const lastNameError = !/^[a-zа-я-]*$/i.test(lastName);xc
   // const passportSeriesError = !/^[0-9]*$/.test(passportSeries);
   // const passportNumberError = !/^[0-9]*$/.test(passportNumber);
 
@@ -55,16 +38,25 @@ export default function BookingPage() {
   //   );
 
   const {
-    fromCity,
+    fromCityId,
+    toCityId,
     fromAirport,
-    toCity,
     toAirport,
     company,
     fromDatetime,
     toDatetime,
-    passengerCount,
+    passengersCount,
     price,
-  } = data;
+    ticketClass
+  } = cartData;
+
+  const { data: cities } = useCities(fromCityId, toCityId)
+
+  useEffect(() => {
+    if (cities) {
+      console.log('Cities:', cities);
+    }
+  }, [cities]);
 
   const dayFrom = fromDatetime.getDate();
   const monthFrom = months[fromDatetime.getMonth() + 1];
@@ -86,11 +78,11 @@ export default function BookingPage() {
 
   let passengerEnding;
 
-  if (passengerCount == 1) {
+  if (passengersCount == 1) {
     passengerEnding = "пассажир";
-  } else if (2 <= passengerCount && passengerCount <= 4) {
+  } else if (2 <= passengersCount && passengersCount <= 4) {
     passengerEnding = "пассажира";
-  } else if (5 <= passengerCount && passengerCount <= 9) {
+  } else if (5 <= passengersCount && passengersCount <= 9) {
     passengerEnding = "пассажиров";
   }
 
@@ -107,8 +99,8 @@ export default function BookingPage() {
     });
 
     const query = new URLSearchParams({
-      fromCity,
-      toCity,
+      fromCity: cities?.fromCity,
+      toCity: cities?.toCity,
       company,
       dateFrom,
       timeFrom,
@@ -171,9 +163,9 @@ export default function BookingPage() {
               <div className="flex flex-col justify-between items-center md:flex-row gap-3">
                 <div className="flex flex-col gap-2 self-start">
                   <div className="flex gap-2 items-center text-sm md:text-base">
-                    <p>{`${fromCity} ${fromAirport}`}</p>
+                    <p>{`${cities?.fromCity} ${fromAirport}`}</p>
                     <Arrow className="rotate-180 w-5 h-2.5" />
-                    <p>{`${toCity} ${toAirport}`}</p>
+                    <p>{`${cities?.toCity} ${toAirport}`}</p>
                   </div>
                   <div className="flex gap-2 items-center text-sm md:text-base">
                     <p>{`${dateFrom} ${timeFrom}`}</p>
@@ -189,15 +181,15 @@ export default function BookingPage() {
               <div className="flex flex-col md:flex-row gap-1.5">
                 <div className="flex flex-row gap-1 md:w-[225px] md:flex-col justify-between">
                   <p className="text-gray-400 text-xs">Пассажиров</p>
-                  <p className="text-sm md:text-base">{`${passengerCount} ${passengerEnding}`}</p>
+                  <p className="text-sm md:text-base">{`${passengersCount} ${passengerEnding}`}</p>
                 </div>
                 <div className="flex flex-row gap-1 md:w-[225px] md:flex-col justify-between">
                   <p className="text-gray-400 text-xs">Класс</p>
-                  <p className="text-sm md:text-base">Эконом</p>
+                  <p className="text-sm md:text-base">{ ticketClass }</p>
                 </div>
                 <div className="flex flex-row gap-1 md:w-[180px] md:flex-col justify-between">
                   <p className="text-gray-400 text-xs">Цена</p>
-                  <p className="text-sm md:text-base">2 500 ₽</p>
+                  <p className="text-sm md:text-base">{ price } ₽</p>
                 </div>
               </div>
             </div>
@@ -209,7 +201,7 @@ export default function BookingPage() {
             >
               {(() => {
                 const passengers = [];
-                for (let count = 1; count <= passengerCount; count++) {
+                for (let count = 1; count <= passengersCount; count++) {
                   passengers.push(<PassengerInputs count={count} key={count} />);
                 }
                 return passengers;
@@ -219,7 +211,7 @@ export default function BookingPage() {
           <div className="flex flex-col gap-3 bg-white md:rounded-lg px-5 md:px-4 py-5 shadow-[0_4px_8px_rgba(0,0,0,0.15)] self-start w-screen md:w-auto ms-[-20px] md:ms-0">
             <div className="justify-between items-end hidden md:flex">
               <p className="text-gray-500 text-xs">Перелёт:</p>
-              <p className="text-sm">2 500 ₽</p>
+              <p className="text-sm">{ price } ₽</p>
             </div>
             <div className="flex justify-between items-end">
               <p className="text-gray-500 text-xs">Общая сумма:</p>

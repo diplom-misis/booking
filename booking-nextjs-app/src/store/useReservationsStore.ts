@@ -1,4 +1,3 @@
-import { fetchReservations } from "@/services/reservationsService";
 import { Reservation } from "@prisma/client";
 import { create } from "zustand";
 

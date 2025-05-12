@@ -21,6 +21,8 @@ model User {
   accounts         Account[]
   sessions         Session[]
   defaultCountry   Country?  @relation(fields: [defaultCountryId], references: [id])
+  reservations     Reservation[]
+  carts            Cart[]
 }
 
 model Account {
@@ -130,7 +132,9 @@ model FlightsRoutes {
 model Cart {
   id      String @id @default(uuid())
   routeId String
+  userId    String?
   route   Route  @relation(fields: [routeId], references: [id])
+  user      User?     @relation(fields: [userId], references: [id])
 }
 
 model Reservation {
@@ -139,6 +143,8 @@ model Reservation {
   status    Status   @default(IN_PROCESSING)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  userId    String?
+  user      User?     @relation(fields: [userId], references: [id])
 }
 
 enum Status {
