@@ -29,6 +29,12 @@ body {
   background-position: center;
 }
 
+@media (width <= 376px) {
+  body {
+    background-image: none;
+  }
+}
+
 h1 {
   font-size: 1.875rem;
   font-weight: 700;

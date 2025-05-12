@@ -28,6 +28,7 @@ export const authOptions: NextAuthOptions = {
         },
       },
       async authorize(credentials) {
+        console.log(credentials)
         const { email, password } = credentials || {};
 
         if (!email || !password) {

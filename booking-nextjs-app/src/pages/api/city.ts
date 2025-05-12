@@ -17,6 +17,7 @@ const CityCreateSchema = z.object({
 
 const CityQuerySchema = z.object({
   search: z.string().optional(),
+  id: z.string().uuid("Invalid ID").optional()
 });
 
 interface GetCitiesRequest extends NextApiRequest {
@@ -58,7 +59,18 @@ export default async function handler(
         });
       }
 
-      const { search } = validatedQuery.data;
+      const { id, search } = validatedQuery.data;
+
+      if (id) {
+        const city = await prisma.city.findUnique({ where: { id } });
+
+        if (!city) {
+          return res.status(404).json({ message: "City not found" });
+        }
+
+        return res.status(200).json({ message: 'City found', city });
+      }
+      
 
       const cities: City[] = await prisma.city.findMany({
         where: search

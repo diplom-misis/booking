@@ -2,7 +2,8 @@ import { Separator } from '@/components/separator';
 import Layout from '../layout';
 import { months } from '@/utils/constants';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { SyntheticEvent, useEffect, useState } from 'react';
+import { useCartStore } from '@/store/cartStore';
 
 export default function BookingSuccessPage() {
   const router = useRouter();
@@ -22,6 +23,10 @@ export default function BookingSuccessPage() {
 
   const currentDateFormatted = `${currentDay} ${currentMonth} ${currentYear}`;
 
+  const carts = useCartStore().items
+
+  console.log(carts)
+
   useEffect(() => {
     setFromCity(searchParams.get('fromCity') || '');
     setToCity(searchParams.get('toCity') || '');
@@ -30,9 +35,27 @@ export default function BookingSuccessPage() {
     setTimeFrom(searchParams.get('timeFrom') || '');
   }, [searchParams]);
 
+  const handleSubmit = async (e: SyntheticEvent) => {
+    e.preventDefault();
+
+    const query = new URLSearchParams({
+      fromCity,
+      toCity,
+      company,
+      timeFrom,
+      dateFrom,
+      bookingDate: currentDateFormatted,
+      price: searchParams.get('price')!
+    })
+
+    await fetch(`/api/booking-success-page?${query}`, {
+      method: 'POST'
+    })
+  }
+
   return (
     <Layout>
-      <div className='flex flex-col justify-self-center gap-6'>
+      <form className='flex flex-col justify-self-center gap-6' onSubmit={handleSubmit}>
         <h2 className='text-xl md:text-3xl font-bold text-gray-800'>
           Ваше бронирование подтверждено!
         </h2>
@@ -92,6 +115,7 @@ export default function BookingSuccessPage() {
           <button
             type='submit'
             className='bg-blue-500 text-gray-100 px-4 py-2 rounded-lg hover:bg-blue-600 active:bg-blue-700'
+            onSubmit={handleSubmit}
           >
             Оформить заказ
           </button>
@@ -102,7 +126,7 @@ export default function BookingSuccessPage() {
             Распечатать
           </button>
         </div>
-      </div>
+      </form>
     </Layout>
   );
 }

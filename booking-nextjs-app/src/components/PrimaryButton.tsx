@@ -2,7 +2,7 @@ import React from "react";
 import BaseButton from "./BaseButton";
 
 interface PrimaryButtonProps {
-  type?: "button" | "submit" | "reset";
+  type: "button" | "submit" | "reset" | undefined;
   onClick?: () => void;
   children: React.ReactNode;
   className?: string;
