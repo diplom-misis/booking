@@ -206,8 +206,8 @@ export default async function handler(
         airlines: Array.from(new Set(flights.map(f => f.company))),
         flights: flights.map((flight) => ({
           id: flight.id,
-          from: flight.fromAirport.city,
-          to: flight.toAirport.city,
+          from: flight.fromAirport,
+          to: flight.toAirport,
           departure: flight.fromDatetime,
           arrival: flight.toDatetime,
           company: flight.company,
