@@ -82,7 +82,7 @@ export default function ProfilePage({ session }: ProfilePageProps) {
   };
 
   const bookingHistoryButton = (
-    <PrimaryButton className="w-full md:w-[262px] h-[2.5rem]">
+    <PrimaryButton className="w-full md:w-[262px] h-[2.5rem]" type='button'>
       История бронирований
     </PrimaryButton>
   );

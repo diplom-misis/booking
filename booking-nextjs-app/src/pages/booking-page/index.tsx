@@ -5,13 +5,24 @@ import { months } from "@/utils/constants";
 import { SyntheticEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import PassengerInputs from "@/components/PassengerInputs";
-import { useCartStore } from '@/store/cartStore';
-import { useCities } from '@/hooks/useCities';
+import { useCartStore } from "@/store/cartStore";
+import { useCities } from "@/hooks/useCities";
 
 export default function BookingPage() {
   const router = useRouter();
 
-  const cartData = useCartStore().getCart()
+  const cartData = useCartStore().getCart();
+
+  if (!cartData) {
+    return (
+      <Layout>
+        <div className="text-center mt-10">
+          <p className="text-lg font-semibold">Корзина пуста</p>
+          <p className="text-gray-500">Пожалуйста, выберите рейс перед бронированием.</p>
+        </div>
+      </Layout>
+    );
+  }
 
   // const [firstName, setFirstName] = useState<string>("");
   // const [lastName, setLastName] = useState<string>("");
@@ -47,14 +58,14 @@ export default function BookingPage() {
     toDatetime,
     passengersCount,
     price,
-    ticketClass
+    ticketClass,
   } = cartData;
 
-  const { data: cities } = useCities(fromCityId, toCityId)
+  const { data: cities } = useCities(fromCityId, toCityId);
 
   useEffect(() => {
     if (cities) {
-      console.log('Cities:', cities);
+      console.log("Cities:", cities);
     }
   }, [cities]);
 
@@ -185,11 +196,11 @@ export default function BookingPage() {
                 </div>
                 <div className="flex flex-row gap-1 md:w-[225px] md:flex-col justify-between">
                   <p className="text-gray-400 text-xs">Класс</p>
-                  <p className="text-sm md:text-base">{ ticketClass }</p>
+                  <p className="text-sm md:text-base">{ticketClass}</p>
                 </div>
                 <div className="flex flex-row gap-1 md:w-[180px] md:flex-col justify-between">
                   <p className="text-gray-400 text-xs">Цена</p>
-                  <p className="text-sm md:text-base">{ price } ₽</p>
+                  <p className="text-sm md:text-base">{price} ₽</p>
                 </div>
               </div>
             </div>
@@ -202,7 +213,9 @@ export default function BookingPage() {
               {(() => {
                 const passengers = [];
                 for (let count = 1; count <= passengersCount; count++) {
-                  passengers.push(<PassengerInputs count={count} key={count} />);
+                  passengers.push(
+                    <PassengerInputs count={count} key={count} />,
+                  );
                 }
                 return passengers;
               })()}
@@ -211,7 +224,7 @@ export default function BookingPage() {
           <div className="flex flex-col gap-3 bg-white md:rounded-lg px-5 md:px-4 py-5 shadow-[0_4px_8px_rgba(0,0,0,0.15)] self-start w-screen md:w-auto ms-[-20px] md:ms-0">
             <div className="justify-between items-end hidden md:flex">
               <p className="text-gray-500 text-xs">Перелёт:</p>
-              <p className="text-sm">{ price } ₽</p>
+              <p className="text-sm">{price} ₽</p>
             </div>
             <div className="flex justify-between items-end">
               <p className="text-gray-500 text-xs">Общая сумма:</p>
