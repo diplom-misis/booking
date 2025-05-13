@@ -151,10 +151,10 @@ export default function RouteCard(props: RouteCardProps) {
 
             <div className="flex flex-row justify-between">
               <p className="text-sm font-inter">
-                {routeThere.flights[0].from.name}
+                {routeThere.flights[0].from.city.name}
               </p>
               <p className="text-sm font-inter">
-                {routeThere.flights[routeThere.flights.length - 1].to.name}
+                {routeThere.flights[routeThere.flights.length - 1].to.city.name}
               </p>
             </div>
             <div></div>
