@@ -1,8 +1,6 @@
-import prisma from "@/utils/prisma";
 import { create } from "zustand";
 import axios from "axios";
 import { RouteDto } from "@/types/SearchResult";
-import { fromJSON } from "postcss";
 
 interface CartItem {
   id: string;
@@ -65,6 +63,11 @@ export const useCartStore = create<CartState>((set, get) => ({
   getCart: () => {
     const data = get().items[0];
 
+    if (!data || !data.route || !data.route.flights || data.route.flights.length === 0) {
+      console.warn("Корзина пуста или данные маршрута отсутствуют");
+      return null;
+    }
+
     const fromCityId = data.route.flights[0].from.cityId
     const toCityId = data.route.flights[0].to.cityId
     const fromAirport = data.route.flights[0].from.code;
@@ -78,19 +81,6 @@ export const useCartStore = create<CartState>((set, get) => ({
       0,
     );
     const ticketClass = data.route.flights[0].ticketClass;
-
-    console.log({
-      fromCityId,
-      toCityId,
-      fromAirport,
-      toAirport,
-      company,
-      fromDatetime,
-      toDatetime,
-      passengersCount,
-      price,
-      ticketClass,
-    })
 
     return {
       fromCityId,

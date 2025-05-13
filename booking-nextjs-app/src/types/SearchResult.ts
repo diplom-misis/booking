@@ -22,6 +22,7 @@ interface Airport {
   cityId: string;
   code: string;
   name: string;
+  city: any
 }
 
 export interface Flight {
