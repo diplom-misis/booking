@@ -415,9 +415,7 @@ export default function ResultsSearch({
       <div className="flex flex-col justify-self-center gap-6">
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="hidden lg:flex flex-row gap-6">
-            <h1 className="text-3xl font-bold">
-              Результаты поиска
-            </h1>
+            <h1 className="text-3xl font-bold">Результаты поиска</h1>
             <div className="flex flex-row gap-6 pt-3 items-center">
               <div className="flex flex-row gap-2 items-center">
                 <div className="flex flex-row gap-1 items-center">
@@ -584,9 +582,13 @@ export default function ResultsSearch({
                         ))}
                       </React.Fragment>
                     ))
-                  ) : !isFetchingOneWay ? (
-                    <div className="text-center py-4">Маршруты не найдены</div>
-                  ) : null}
+                  ) : (
+                    <div className="text-center py-4">
+                      {isFetchingOneWay
+                        ? "Загрузка..."
+                        : "Маршруты не найдены"}
+                    </div>
+                  )}
                 </>
               )}
 
