@@ -82,7 +82,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="flex gap-5 overflow-x-auto">
+        <div className="flex gap-5 overflow-x-auto py-1">
           {[
             {
               title: "Путешествие в тридевятое царство",
@@ -122,11 +122,11 @@ export default function Home() {
           <h2 className="text-2xl text-gray-800 font-bold font-roboto">
             Популярные направления
           </h2>
-          <div className="flex gap-4 overflow-x-auto">
+          <div className="flex gap-4 overflow-x-auto py-4">
             {popularRoutes.map((route) => (
               <div
                 key={route.id}
-                className="flex-shrink-0 w-[224px] h-[184px] shadow-[0_8px_16px_rgba(0,0,0,0.2)] rounded-xl overflow-hidden"
+                className="flex-shrink-0 w-[224px] h-[184px] shad shadow-[0_8px_16px_rgba(0,0,0,0.2)] rounded-xl overflow-hidden"
               >
                 <div className="flex flex-col h-full">
                   <div className="h-12 bg-red-500 px-6 py-3 flex flex-row gap-2 items-center">

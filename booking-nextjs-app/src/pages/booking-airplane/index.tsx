@@ -324,6 +324,7 @@ export default function BookingAirplane() {
                   fromAirport={formValues.fromAirport?.code}
                   toAirport={formValues.toAirport?.code}
                   error={!!errors.departureDate}
+                  title={"Дата отправления"}
                 />
                 {errors.departureDate && (
                   <p className="text-red-500 text-xs">
@@ -347,6 +348,7 @@ export default function BookingAirplane() {
                   fromAirport={formValues.toAirport?.code}
                   toAirport={formValues.fromAirport?.code}
                   error={!!errors.returnDate}
+                  title={"Обратно"}
                 />
                 {errors.returnDate && (
                   <p className="text-red-500 text-xs break-words whitespace-normal">
