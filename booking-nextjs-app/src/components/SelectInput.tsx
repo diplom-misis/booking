@@ -83,9 +83,6 @@ export default function SelectInput(props: SelectInputProps) {
                 }
                 return item?.name || "";
               }}
-              style={{
-                backgroundColor: disabled ? "#F9FAFB" : "",
-              }}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 const inputValue = event.target.value;
                 setQuery(inputValue);

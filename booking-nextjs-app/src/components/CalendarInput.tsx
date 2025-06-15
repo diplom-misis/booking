@@ -1,4 +1,4 @@
-import { Popover } from "@headlessui/react";
+import { Field, Label, Popover } from "@headlessui/react";
 import { DayButtonProps, DayPicker } from "react-day-picker";
 import { DateTime } from "luxon";
 import { CalendarIcon } from "@heroicons/react/24/outline";
@@ -21,6 +21,7 @@ interface CalendarInputProps {
   fromAirport?: string | null;
   toAirport?: string | null;
   error?: boolean;
+  title: string;
 }
 
 function DayPrice(props: DayButtonProps) {
@@ -68,6 +69,7 @@ export default function CalendarInput(props: CalendarInputProps) {
     fromAirport,
     toAirport,
     error,
+    title,
   } = props;
 
   const [wasOpened, setWasOpened] = useState(false);
@@ -118,70 +120,74 @@ export default function CalendarInput(props: CalendarInputProps) {
   }, [visibleMonth, wasOpened, fromAirport, toAirport, refetch]);
 
   return (
-    <PricesContext.Provider value={{ prices }}>
-      <Popover className="relative">
-        {({ open }) => {
-          useEffect(() => {
-            if (open && !wasOpened) {
-              setWasOpened(true);
-              setVisibleMonth(new Date(new Date().getFullYear(), 3));
-            }
-          }, [open]);
+    <Field className="flex flex-col gap-1">
+      <Label className="text-gray-400 text-xs font-inter">{title}</Label>
+      <PricesContext.Provider value={{ prices }}>
+        <Popover className="relative">
+          {({ open }) => {
+            useEffect(() => {
+              if (open && !wasOpened) {
+                setWasOpened(true);
+                setVisibleMonth(new Date(new Date().getFullYear(), 3));
+              }
+            }, [open]);
 
-          return (
-            <>
-              <Popover.Button
-                disabled={disabled}
-                className={cn(
-                  `border ${
-                    error
-                      ? "border-red-500"
-                      : open
-                        ? "border-blue-500"
-                        : "border-gray-300"
-                  } p-2 rounded-[4px] flex items-center justify-between bg-white`,
-                  className,
-                )}
-                style={{
-                  backgroundColor: disabled ? "#F9FAFB" : "",
-                }}
-              >
-                <span
-                  className={`${!value ? "text-gray-300" : "text-gray-800"} font-inter`}
+            return (
+              <>
+                <Popover.Button
+                  disabled={disabled}
+                  className={cn(
+                    `border ${
+                      error
+                        ? "border-red-500"
+                        : open
+                          ? "border-blue-500"
+                          : "border-gray-300"
+                    } px-[14px] py-2 rounded-[4px] flex items-center justify-between bg-white`,
+                    className,
+                  )}
+                  style={{
+                    backgroundColor: disabled ? "#F9FAFB" : "",
+                  }}
                 >
-                  {value
-                    ? DateTime.fromJSDate(value).toFormat("d MMMM yyyy", {
-                        locale: "ru",
-                      })
-                    : placeholder}
-                </span>
-                {!hideCalendarIcon && (
-                  <CalendarIcon className="w-5 h-5 text-gray-500" />
-                )}
-              </Popover.Button>
+                  <span
+                    className={`${!value ? "text-gray-300" : "text-gray-800"} font-inter`}
+                  >
+                    {value
+                      ? DateTime.fromJSDate(value).toFormat("d MMMM yyyy", {
+                          locale: "ru",
+                        })
+                      : placeholder}
+                  </span>
+                  {!hideCalendarIcon && (
+                    <CalendarIcon className="w-5 h-5 text-gray-500" />
+                  )}
+                </Popover.Button>
 
-              <Popover.Panel className="absolute z-10 mt-2 bg-white p-4 shadow-lg rounded-lg">
-                <DayPicker
-                  locale={ru}
-                  mode="single"
-                  selected={value || undefined}
-                  onSelect={handleDateChange}
-                  onMonthChange={handleMonthChange}
-                  fromMonth={new Date()}
-                  month={visibleMonth}
-                  classNames={{
-                    nav_button: "text-gray-800",
-                  }}
-                  components={{
-                    DayButton: DayPrice,
-                  }}
-                  required={required}
-                />
-              </Popover.Panel>
-            </>
-          );
-        }}
-      </Popover>
-    </PricesContext.Provider>
+                <Popover.Panel className="absolute z-10 mt-2 bg-white p-4 shadow-lg rounded-lg">
+                  <DayPicker
+                    locale={ru}
+                    mode="single"
+                    selected={value || undefined}
+                    onSelect={handleDateChange}
+                    onMonthChange={handleMonthChange}
+                    fromMonth={new Date()}
+                    month={visibleMonth}
+                    className="text-sm [&_.rdp-day]:w-8 [&_.rdp-day]:h-8 [&_.rdp]:text-[12px] [&_.rdp-caption_label]:text-sm"
+                    classNames={{
+                      nav_button: "text-gray-800",
+                    }}
+                    components={{
+                      DayButton: DayPrice,
+                    }}
+                    required={required}
+                  />
+                </Popover.Panel>
+              </>
+            );
+          }}
+        </Popover>
+      </PricesContext.Provider>
+    </Field>
   );
 }
