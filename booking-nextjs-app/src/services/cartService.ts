@@ -2,8 +2,8 @@ import { Cart } from '@prisma/client';
 
 export const fetchCart = async () => {
   try {
-    const cart: Cart = await fetch(`/api/booking-page`).then((res) => res.json());
-    return cart;
+    const carts: Cart[] = await fetch(`/api/cart`).then((res) => res.json());
+    return carts;
   } catch (e) {
     console.log('error -', e)
   }

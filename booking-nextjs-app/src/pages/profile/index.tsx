@@ -19,6 +19,7 @@ import { useCountries } from "@/hooks/useCountries";
 import SelectInput from "@/components/SelectInput";
 import { queryClient } from "@/utils/queryClient";
 import LightButton from "@/components/LightButton";
+import Link from 'next/link';
 
 interface ProfilePageProps {
   session: Session;
@@ -81,9 +82,11 @@ export default function ProfilePage({ session }: ProfilePageProps) {
     }
   };
 
-  const bookingHistoryButton = (
+  const bookingHistoryButton = ( 
     <PrimaryButton className="w-full md:w-[262px] h-[2.5rem]" type='button'>
-      История бронирований
+      <Link href='/all-bookings-page'>
+        История бронирований
+      </Link>
     </PrimaryButton>
   );
 

@@ -25,7 +25,6 @@ const handler = withAuth(async (req, res) => {
 
     if (user) {
       user.imageUrl = user.imageUrl || DEFAULT_AVATAR;
-      console.log(user);
       return res.status(200).json({ user });
     } else {
       return res.status(500).json({ error: "Internal server error" });
