@@ -13,6 +13,8 @@ const get = withAuth(async (req, res) => {
       where: { userId },
     });
 
+    console.log(carts)
+
     return res.status(200).json({ carts });
   } catch (e) {
     console.log(`error - ${e}`);

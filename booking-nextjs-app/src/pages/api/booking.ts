@@ -1,6 +1,6 @@
 import prisma from "@/utils/prisma";
 import { withAuth } from "@/utils/withAuth";
-import { withErrorHandler } from '@/utils/withErrorHandler';
+import { withErrorHandler } from "@/utils/withErrorHandler";
 import { Reservation, Status } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -30,6 +30,7 @@ const handler = withAuth(
         const newReservation: Reservation = await prisma.reservation.create({
           data: {
             data: {
+              id: req.query.id,
               fromCity: req.query.fromCity,
               toCity: req.query.toCity,
               company: req.query.company,
@@ -37,8 +38,8 @@ const handler = withAuth(
               dateFrom: req.query.dateFrom,
               bookingDate: req.query.bookingDate,
               price: req.query.price,
-              userId
             },
+            userId,
             status: Status.IN_PROCESSING,
           },
         });
@@ -57,10 +58,6 @@ const handler = withAuth(
           reservation: reservationToDelete,
         });
       case "PATCH":
-        console.log(
-          JSON.parse(req.body).data,
-          typeof JSON.parse(req.body).data,
-        );
         const reservationToUpdate: Reservation =
           await prisma.reservation.update({
             where: { id: JSON.parse(req.body).id },

@@ -16,6 +16,8 @@ export default function PassengerInputs({ count }: PassengerInputsData) {
   const passportSeriesError = !/^[0-9]*$/.test(passportSeries);
   const passportNumberError = !/^[0-9]*$/.test(passportNumber);
 
+  const isValid = !firstNameError && !lastNameError && !passportSeriesError && !passportNumberError;
+
   return (
     <div>
       <div className="flex flex-col gap-3">
@@ -27,8 +29,12 @@ export default function PassengerInputs({ count }: PassengerInputsData) {
               type="text"
               className="border border-gray-300 rounded-sm px-3.5 py-2 w-full md:w-[202px] hover:border-gray-400 focus:outline-none focus:border-blue-500 h-10 invalid:border-red-500 placeholder:text-sm md:placeholder:text-base"
               placeholder="Ярополк"
+              required
               value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
+              onChange={(e) => {
+                setFirstName(e.target.value)
+              }
+            }
               pattern="[A-za-zА-яа-я\-]*$"
             />
             {firstNameError && (
@@ -43,6 +49,7 @@ export default function PassengerInputs({ count }: PassengerInputsData) {
               type="text"
               className="border border-gray-300 rounded-sm px-3.5 py-2 w-full md:w-[202px] hover:border-gray-400 focus:outline-none focus:border-blue-500 h-10 invalid:border-red-500 placeholder:text-sm md:placeholder:text-base"
               placeholder="Иванов"
+              required
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               pattern="[A-za-zА-яа-я\-]*$"
@@ -59,6 +66,7 @@ export default function PassengerInputs({ count }: PassengerInputsData) {
               type="date"
               className="border border-gray-300 rounded-sm px-3.5 py-2 w-full md:w-[202px] hover:border-gray-400 focus:outline-none focus:border-blue-500 h-10 invalid:border-red-500 placeholder:text-sm md:placeholder:text-base"
               placeholder="04.06.1993"
+              required
               value={birthday}
               onChange={(e) => setBirthday(e.target.value)}
               onFocus={(e) => (e.target.type = "date")}
@@ -75,6 +83,7 @@ export default function PassengerInputs({ count }: PassengerInputsData) {
                   type="text"
                   className="border border-gray-300 rounded-sm px-[14px] py-2 w-full md:w-24 hover:border-gray-400 focus:outline-none focus:border-blue-500 h-10 invalid:border-red-500 placeholder:text-sm md:placeholder:text-base"
                   placeholder="7341"
+                  required
                   value={passportSeries}
                   onChange={(e) => setPassportSeries(e.target.value)}
                   maxLength={4}
@@ -91,6 +100,7 @@ export default function PassengerInputs({ count }: PassengerInputsData) {
                   type="text"
                   className="border border-gray-300 rounded-sm px-[14px] py-2 w-full md:w-24 hover:border-gray-400 focus:outline-none focus:border-blue-500 h-10 invalid:border-red-500 placeholder:text-sm md:placeholder:text-base"
                   placeholder="71 34 30"
+                  required
                   value={passportNumber}
                   onChange={(e) => setPassportNumber(e.target.value)}
                   maxLength={6}

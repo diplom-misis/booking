@@ -38,6 +38,20 @@ export default function RouteCard(props: RouteCardProps) {
   const { routeThere, routeBack, passengers, isAuthenticated } = props;
   const { addToCart } = useCartStore();
 
+  const routeId = routeThere.id;
+  const fromCityId = routeThere.flights[0].from.cityId;
+  const toCityId = routeThere.flights[0].to.cityId;
+  const fromAirport = routeThere.flights[0].from.code;
+  const toAirport = routeThere.flights[0].to.code;
+  const company = routeThere.airlines[0];
+  const fromDatetime = new Date(routeThere.flights[0].departure);
+  const toDatetime = new Date(routeThere.flights[0].arrival);
+  const passengersCount = passengers;
+  const price = passengers * routeThere.flights[0].price;
+  const ticketClass = routeThere.flights[0].ticketClass;
+
+  const query = `routeId=${routeId}&fromCityId=${fromCityId}&toCityId=${toCityId}&fromAirport=${fromAirport}&toAirport=${toAirport}&company=${company}&fromDatetime=${fromDatetime}&toDatetime=${toDatetime}&passengersCount=${passengersCount}&price=${price}&ticketClass=${ticketClass}`;
+
   const handleButtonClick = async () => {
     if (!isAuthenticated) {
       toast.error("Необходимо авторизоваться для бронирования");
@@ -45,12 +59,14 @@ export default function RouteCard(props: RouteCardProps) {
       return;
     }
 
+    console.log(routeThere);
+
     setIsLoading(true);
     try {
       await addToCart(routeThere, passengers);
       if (routeBack) await addToCart(routeBack, passengers);
       toast.success("Маршрут добавлен в бронирование");
-      router.push(`/booking-page`);
+      router.push(`/booking-page?${query}`);
     } catch (error) {
       console.log(error);
     } finally {

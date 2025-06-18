@@ -11,14 +11,18 @@ interface CartItem {
 
 interface CartState {
   items: CartItem[];
+  currentReservationId: string | null;
   addToCart: (route: RouteDto, passengers: number) => Promise<void>;
   removeFromCart: (routeId: string) => Promise<void>;
   isInCart: (routeId: string) => boolean;
   getCart: () => any;
+  setCurrentReservationId: (currentReservationId: string) => any;
+  getCurrentReservationId: () => string | null;
 }
 
 export const useCartStore = create<CartState>((set, get) => ({
   items: [],
+  currentReservationId: null,
   addToCart: async (route, passengers) => {
     try {
       const { data } = await axios.post("/api/cart", {
@@ -83,6 +87,7 @@ export const useCartStore = create<CartState>((set, get) => ({
     const ticketClass = data.route.flights[0].ticketClass;
 
     return {
+      id: data.id,
       fromCityId,
       toCityId,
       fromAirport,
@@ -95,4 +100,10 @@ export const useCartStore = create<CartState>((set, get) => ({
       ticketClass,
     };
   },
+
+  setCurrentReservationId: (currentReservationId: string) => set({ currentReservationId }),
+
+  getCurrentReservationId: () => {
+    return get().currentReservationId
+  }
 }));
