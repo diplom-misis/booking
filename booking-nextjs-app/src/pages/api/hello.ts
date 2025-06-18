@@ -38,6 +38,7 @@ export default async function handler(
         totalPrice: 200.5,
       },
       status: Status.IN_PROCESSING,
+      userId: "1"
     },
   });
 
