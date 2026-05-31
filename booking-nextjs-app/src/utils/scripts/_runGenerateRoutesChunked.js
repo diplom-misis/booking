@@ -1,5 +1,5 @@
 const CRON_SECRET = "some-secret";
-const CHUNK_STRIDE_DAYS = 6;       // сдвиг между началами чанков (как в оригинале)
+const CHUNK_STRIDE_DAYS = 1;      // сдвиг между началами чанков
 const TOTAL_MONTHS_AHEAD = 12;     // на сколько месяцев вперёд генерировать
 const START_FROM_CHUNK = 0;         // с какого чанка начать (для возобновления после ошибки)
 const MAX_RETRIES_PER_CHUNK = 2;   // повторов при таймауте/ошибке

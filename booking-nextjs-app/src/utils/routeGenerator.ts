@@ -17,21 +17,24 @@ interface FlightNode {
 }
 
 /*
-  Генерирует маршруты на неделю вперёд, начиная с указанной или текущей даты.
-  
+  Генерирует маршруты на 2 дня вперёд, начиная с указанной или текущей даты.
+
   Если нужно покрыть больший период, запускайте функцию несколько раз,
-  сдвигая каждый следующий fromDt на 6 дней вперёд от предыдущего запуска.
-  Так маршруты будут формироваться быстрее, и ни один из них не потеряется.
+  сдвигая каждый следующий fromDt на 1 день вперёд от предыдущего запуска.
+  1 день перекрытия гарантирует, что маршруты с пересадкой на стыке окон
+  (MAX_WAIT_HOURS = 24) не теряются.
 */
+const WINDOW_DAYS = 2;
+
 export async function generateRoutes(fromDateTime: DateTime | null = null) {
   const fromDt = fromDateTime || DateTime.utc();
-  const oneWeekAhead = fromDt.plus({ weeks: 1 });
+  const windowEnd = fromDt.plus({ days: WINDOW_DAYS });
 
   const flights = await prisma.flight.findMany({
     where: {
       fromDatetime: {
         gte: fromDt.toJSDate(),
-        lt: oneWeekAhead.toJSDate(),
+        lt: windowEnd.toJSDate(),
       },
     },
   });

@@ -35,7 +35,7 @@ export default async function handler(
       return res.status(200).json({
         message: "Chunk processed",
         start: startDate.toISO(),
-        end: startDate.plus({ days: 7 }).toISO(),
+        end: startDate.plus({ days: 2 }).toISO(),
         durationSec,
       });
     } catch (err) {
@@ -58,11 +58,11 @@ export default async function handler(
 
     while (currentDate < endDate) {
       const periodStart = currentDate.toISO();
-      const periodEnd = currentDate.plus({ days: 6 }).toISO();
+      const periodEnd = currentDate.plus({ days: 1 }).toISO();
       console.log(`[ROUTE_GENERATION] Период: ${periodStart} - ${periodEnd}`);
 
       await generateRoutes(currentDate);
-      currentDate = currentDate.plus({ days: 6 });
+      currentDate = currentDate.plus({ days: 1 });
     }
 
     const duration = (Date.now() - startTime) / 1000;
