@@ -64,7 +64,7 @@ export async function generateRoutes(fromDateTime: DateTime | null = null) {
     );
   }
 
-  const batchSize = 10000;
+  const batchSize = 2000;
   for (let i = 0; i < allRoutes.length; i += batchSize) {
     console.log(`Начинаем обработку с ${i} по ${i + batchSize}`);
     await saveRoutes(allRoutes.slice(i, i + batchSize), flights);
@@ -129,7 +129,7 @@ async function saveRoutes(routes: string[][], flights: Flight[]) {
     });
 
     console.log("Закончили создание FlightsRoutes.");
-  });
+  }, { timeout: 30_000, maxWait: 10_000 });
 }
 
 async function dfs(

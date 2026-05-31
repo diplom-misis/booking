@@ -118,7 +118,7 @@ model Route {
 }
 
 model FlightsRoutes {
-  id         String   @id @default(uuid())
+  id         String   @default(uuid())
   sequenceId Int
   flightId   String
   flightDate DateTime
@@ -126,7 +126,8 @@ model FlightsRoutes {
   flight     Flight   @relation("flightToRoutes", fields: [flightId, flightDate], references: [id, fromDatetime])
   route      Route    @relation(fields: [routeId], references: [id])
 
-  @@unique([sequenceId, routeId])
+  @@id([id, flightDate])
+  @@unique([sequenceId, routeId, flightDate])
 }
 
 model Cart {
