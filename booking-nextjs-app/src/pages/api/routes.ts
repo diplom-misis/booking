@@ -37,11 +37,6 @@ const querySchema = z
     },
   );
 
-// Маршрут с MAX_TRANSFERS=3 и MAX_WAIT_HOURS=24 укладывается в ~3 суток;
-// берём 4 для запаса и используем как ограничение по flightDate в FlightsRoutes,
-// чтобы при загрузке include сработал partition pruning по этой таблице.
-const MAX_ROUTE_SPAN_DAYS = 4;
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
@@ -107,23 +102,10 @@ export default async function handler(
       return res.status(200).json({ data: [], hasMore: false, total: 0 });
     }
 
-    const flightDateBounds = parsedQuery.departureDate
-      ? {
-          gte: parsedQuery.departureDate,
-          lt: new Date(
-            parsedQuery.departureDate.getTime() +
-              MAX_ROUTE_SPAN_DAYS * 24 * 60 * 60 * 1000,
-          ),
-        }
-      : undefined;
-
     const routes = await prisma.route.findMany({
       where: { id: { in: candidateRouteIds } },
       include: {
         flightRoutes: {
-          ...(flightDateBounds && {
-            where: { flightDate: flightDateBounds },
-          }),
           orderBy: { sequenceId: "asc" },
           include: {
             flight: {
