@@ -102,10 +102,20 @@ export default async function handler(
       return res.status(200).json({ data: [], hasMore: false, total: 0 });
     }
 
+    // Окно flightDate для partition pruning. WINDOW_DAYS=2 в routeGenerator
+    // + 1 день буфера, чтобы покрыть все сегменты длинных маршрутов.
+    const flightDateWindow = parsedQuery.departureDate
+      ? {
+          gte: parsedQuery.departureDate,
+          lt: new Date(parsedQuery.departureDate.getTime() + 3 * 24 * 60 * 60 * 1000),
+        }
+      : undefined;
+
     const routes = await prisma.route.findMany({
       where: { id: { in: candidateRouteIds } },
       include: {
         flightRoutes: {
+          ...(flightDateWindow && { where: { flightDate: flightDateWindow } }),
           orderBy: { sequenceId: "asc" },
           include: {
             flight: {

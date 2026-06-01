@@ -82,6 +82,10 @@ model Flight {
   @@id([id, fromDatetime])
   @@unique([id, fromDatetime], name: "Flight_pkey")
   @@index([fromDatetime])
+  @@index([fromAirportId, fromDatetime])
+  @@index([ticketClass])
+  @@index([company])
+  @@index([price])
   @@map("Flight")
 }
 
@@ -128,6 +132,8 @@ model FlightsRoutes {
 
   @@id([id, flightDate])
   @@unique([sequenceId, routeId, flightDate])
+  @@index([flightId, flightDate])
+  @@index([routeId])
 }
 
 model Cart {
