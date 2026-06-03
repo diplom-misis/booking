@@ -51,25 +51,25 @@ export default async function handler(
         : undefined,
     });
 
-    const whereClause = {
+    const startingFlightFilter = {
+      fromAirport: { code: parsedQuery.fromAirport },
       ...(parsedQuery.ticketClass && {
         ticketClass: parsedQuery.ticketClass,
       }),
       ...(parsedQuery.airline && {
         company: { in: parsedQuery.airline as string[] },
       }),
-      ...(parsedQuery.minPrice || parsedQuery.maxPrice
-        ? {
-            price: {
-              ...(parsedQuery.minPrice !== undefined && {
-                gte: parsedQuery.minPrice,
-              }),
-              ...(parsedQuery.maxPrice !== undefined && {
-                lte: parsedQuery.maxPrice,
-              }),
-            },
-          }
-        : {}),
+      ...((parsedQuery.minPrice !== undefined ||
+        parsedQuery.maxPrice !== undefined) && {
+        price: {
+          ...(parsedQuery.minPrice !== undefined && {
+            gte: parsedQuery.minPrice,
+          }),
+          ...(parsedQuery.maxPrice !== undefined && {
+            lte: parsedQuery.maxPrice,
+          }),
+        },
+      }),
       ...(parsedQuery.departureDate && {
         fromDatetime: {
           gte: parsedQuery.departureDate,
@@ -80,47 +80,42 @@ export default async function handler(
       }),
     };
 
-    const flights = await prisma.flight.findMany({
-      where: whereClause,
-      include: {
+    const startingFlights = await prisma.flight.findMany({
+      where: startingFlightFilter,
+      select: {
         flightRoutes: {
-          include: {
-            route: {
-              include: {
-                flightRoutes: {
-                  orderBy: { sequenceId: "asc" },
-                  include: {
-                    flight: {
-                      include: {
-                    fromAirport: { include: { city: true } },
-                    toAirport: { include: { city: true } },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
+          where: { sequenceId: 0 },
+          select: { routeId: true },
         },
-        fromAirport: true,
-        toAirport: true,
       },
     });
 
+    const candidateRouteIds = Array.from(
+      new Set(
+        startingFlights.flatMap((f) =>
+          f.flightRoutes.map((fr) => fr.routeId),
+        ),
+      ),
+    );
+
+    if (candidateRouteIds.length === 0) {
+      return res.status(200).json({ data: [], hasMore: false, total: 0 });
+    }
+
+    // Окно flightDate для partition pruning. WINDOW_DAYS=2 в routeGenerator
+    // + 1 день буфера, чтобы покрыть все сегменты длинных маршрутов.
+    const flightDateWindow = parsedQuery.departureDate
+      ? {
+          gte: parsedQuery.departureDate,
+          lt: new Date(parsedQuery.departureDate.getTime() + 3 * 24 * 60 * 60 * 1000),
+        }
+      : undefined;
+
     const routes = await prisma.route.findMany({
-      where: {
-        id: {
-          in: [
-            ...new Set(
-              flights.flatMap((f) =>
-                f.flightRoutes.map((fr) => fr.route.id),
-              ),
-            ),
-          ],
-        },
-      },
+      where: { id: { in: candidateRouteIds } },
       include: {
         flightRoutes: {
+          ...(flightDateWindow && { where: { flightDate: flightDateWindow } }),
           orderBy: { sequenceId: "asc" },
           include: {
             flight: {
@@ -136,10 +131,14 @@ export default async function handler(
 
     const validRoutes = routes.filter((route) => {
       const flights = route.flightRoutes.map((fr) => fr.flight);
+      if (flights.length === 0) return false;
 
       if (flights[0].fromAirport.code !== parsedQuery.fromAirport) return false;
-      if (flights[flights.length - 1].toAirport.code !== parsedQuery.toAirport)
+      if (
+        flights[flights.length - 1].toAirport.code !== parsedQuery.toAirport
+      ) {
         return false;
+      }
 
       for (let i = 0; i < flights.length - 1; i++) {
         if (flights[i].toAirport.code !== flights[i + 1].fromAirport.code) {
@@ -148,8 +147,8 @@ export default async function handler(
       }
 
       if (parsedQuery.airline && parsedQuery.airline.length > 0) {
-        const hasMatchingAirline = flights.some(flight => 
-          parsedQuery.airline?.includes(flight.company)
+        const hasMatchingAirline = flights.some((flight) =>
+          parsedQuery.airline?.includes(flight.company),
         );
         if (!hasMatchingAirline) return false;
       }
@@ -159,16 +158,22 @@ export default async function handler(
 
     const filteredRoutes = parsedQuery.allowedStops.length
       ? validRoutes.filter((route) =>
-          parsedQuery.allowedStops.includes(route.flightRoutes.length - 1)
+          parsedQuery.allowedStops.includes(route.flightRoutes.length - 1),
         )
       : validRoutes;
 
     const sortedRoutes = [...filteredRoutes].sort((a, b) => {
-      const priceA = a.flightRoutes.reduce((sum, fr) => sum + fr.flight.price, 0);
-      const priceB = b.flightRoutes.reduce((sum, fr) => sum + fr.flight.price, 0);
-      
-      return parsedQuery.sortByPrice === 'desc' 
-        ? priceB - priceA 
+      const priceA = a.flightRoutes.reduce(
+        (sum, fr) => sum + fr.flight.price,
+        0,
+      );
+      const priceB = b.flightRoutes.reduce(
+        (sum, fr) => sum + fr.flight.price,
+        0,
+      );
+
+      return parsedQuery.sortByPrice === "desc"
+        ? priceB - priceA
         : priceA - priceB;
     });
 
@@ -178,16 +183,21 @@ export default async function handler(
 
     const result = paginatedRoutes.map((route) => {
       const flights = route.flightRoutes.map((fr) => fr.flight);
-      const totalPrice = flights.reduce((sum, flight) => sum + flight.price, 0) * parsedQuery.passengers;
+      const totalPrice =
+        flights.reduce((sum, flight) => sum + flight.price, 0) *
+        parsedQuery.passengers;
 
       const firstDeparture = flights[0].fromDatetime;
       const lastArrival = flights[flights.length - 1].toDatetime;
       const totalDurationMs = lastArrival.getTime() - firstDeparture.getTime();
       const totalHours = Math.floor(totalDurationMs / (1000 * 60 * 60));
-      const totalMinutes = Math.floor((totalDurationMs % (1000 * 60 * 60)) / (1000 * 60));
+      const totalMinutes = Math.floor(
+        (totalDurationMs % (1000 * 60 * 60)) / (1000 * 60),
+      );
 
       const layovers = flights.slice(0, -1).map((flight, i) => {
-        const layoverMs = flights[i+1].fromDatetime.getTime() - flight.toDatetime.getTime();
+        const layoverMs =
+          flights[i + 1].fromDatetime.getTime() - flight.toDatetime.getTime();
         const hours = Math.floor(layoverMs / (1000 * 60 * 60));
         const minutes = Math.floor((layoverMs % (1000 * 60 * 60)) / (1000 * 60));
         return {
@@ -203,7 +213,7 @@ export default async function handler(
         durationString: `${totalHours}ч. ${totalMinutes}мин.`,
         stops: route.flightRoutes.length - 1,
         layovers,
-        airlines: Array.from(new Set(flights.map(f => f.company))),
+        airlines: Array.from(new Set(flights.map((f) => f.company))),
         flights: flights.map((flight) => ({
           id: flight.id,
           from: flight.fromAirport,

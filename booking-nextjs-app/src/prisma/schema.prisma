@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -82,6 +83,10 @@ model Flight {
   @@id([id, fromDatetime])
   @@unique([id, fromDatetime], name: "Flight_pkey")
   @@index([fromDatetime])
+  @@index([fromAirportId, fromDatetime])
+  @@index([ticketClass])
+  @@index([company])
+  @@index([price])
   @@map("Flight")
 }
 
@@ -118,7 +123,7 @@ model Route {
 }
 
 model FlightsRoutes {
-  id         String   @id @default(uuid())
+  id         String   @default(uuid())
   sequenceId Int
   flightId   String
   flightDate DateTime
@@ -126,7 +131,10 @@ model FlightsRoutes {
   flight     Flight   @relation("flightToRoutes", fields: [flightId, flightDate], references: [id, fromDatetime])
   route      Route    @relation(fields: [routeId], references: [id])
 
-  @@unique([sequenceId, routeId])
+  @@id([id, flightDate])
+  @@unique([sequenceId, routeId, flightDate])
+  @@index([flightId, flightDate])
+  @@index([routeId])
 }
 
 model Cart {
