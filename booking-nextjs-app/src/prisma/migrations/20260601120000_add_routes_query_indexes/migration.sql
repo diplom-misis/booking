@@ -1,11 +1,4 @@
--- Индексы под OLTP-запрос /api/routes (см. 2.3.2 диплома).
---
--- Замечание о CONCURRENTLY: в PostgreSQL 14 CREATE INDEX CONCURRENTLY
--- на партиционированной таблице не поддерживается. Production-путь —
--- создать локальный индекс на каждой партиции CONCURRENTLY и затем
--- ATTACH к родителю. В условиях dev-стенда без конкурентной нагрузки
--- применяется прямой CREATE INDEX: каждая партиция блокируется
--- последовательно на несколько секунд.
+-- Индексы под OLTP-запрос /api/routes.
 
 CREATE INDEX IF NOT EXISTS "Flight_fromAirportId_fromDatetime_idx"
   ON "Flight" ("fromAirportId", "fromDatetime");
